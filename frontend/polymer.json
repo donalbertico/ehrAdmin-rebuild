@@ -1,9 +1,10 @@
 {
   "entrypoint": "index.html",
-  "shell": "src/ehr-app.html",
+  "shell": "src/admin-app.html",
   "fragments": [
-    "src/fragments/homepage-view.html",
-    "src/my-view404.html"
+    "src/fragments/account-view.html",
+    "src/fragments/main-view.html",
+    "src/fragments/p404-view.html"
   ],
   "sources": [
     "src/**/*",
