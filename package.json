@@ -24,7 +24,8 @@
     "sails": "^1.0.0-36",
     "sails-hook-fixtures": "^1.0.0-beta",
     "sails-hook-orm": "^2.0.0-16",
-    "sails-mongo": "^1.0.0-9"
+    "sails-mongo": "^1.0.0-9",
+    "webcomponentsjs": "^1.0.2"
   },
   "devDependencies": {},
   "scripts": {
