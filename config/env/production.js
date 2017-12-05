@@ -45,11 +45,11 @@ module.exports = {
     *    (See https://sailsjs.com/config/datastores for help.)                 *
     *                                                                          *
     ***************************************************************************/
-    appDatabase: {
+    mongodbServer: {
       adapter: require('sails-mongo'),
       url: process.env.APP_DATABASE
     },
-    adminDatabase:{
+    mongoAdmin:{
       adapter: require('sails-mongo'),
       url: process.env.ADMIN_DATABASE
     }
@@ -161,7 +161,7 @@ module.exports = {
     ***************************************************************************/
     adapter: 'connect-redis',
     url: process.env.REDISTOGO_URL,
-    secret: process.env.SESSION_SECRET
+    secret: process.env.SESSION_SECRET,
     //--------------------------------------------------------------------------
     // /\   OR, to avoid checking it in to version control, you might opt to
     // ||   set sensitive credentials like this using an environment variable.
@@ -199,7 +199,7 @@ module.exports = {
     cookie: {
       // secure: true,
       maxAge: 24 * 60 * 60 * 1000,  // 24 hours
-    },
+    }
 
   },
 
