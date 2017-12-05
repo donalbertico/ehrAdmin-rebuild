@@ -25,5 +25,14 @@ module.exports.custom = {
       name : 'local',
       protocol: 'local'
     }
-  }
+  },
+  qb_config : {
+    consumerKey:process.env.QB_CONSUMER_KEY,
+    consumerSecret::process.env.QB_CONSUMER_SECRET,
+    token::process.env.QB_TOKEN,
+    secret::process.env.QB_SECRET,
+    realmId::process.env.QB_REALMID,
+    qbTest:true
+  },
+  mP : process.env.MP
 };
