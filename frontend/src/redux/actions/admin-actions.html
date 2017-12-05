@@ -1,0 +1,39 @@
+<script>
+  AdminMixin = (superclass) => {
+    return class extends superclass{
+      cosntructor(){
+        super();
+      }
+      static get actions(){
+        return {
+          promoteToPlus : (id,code,callback) => {
+            return (dispatch) =>{
+              dispatch({type :'LOG_IN'});
+              let request = new Request('/admin/promote-plus',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({
+                  username:username,
+                  password:password,
+                  _csrf:sh.get('X-CSRF-Token')
+                }),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                dispatch({type:'LOG_IN',status:'success'});
+                callback(null);
+              })
+              .catch((e)=>{
+                console.log(e);
+                dispatch({type:'LOG_IN',status:'error',error:e});
+                callback(e.message);
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+</script>

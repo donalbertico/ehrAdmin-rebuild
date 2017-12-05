@@ -1,0 +1,70 @@
+<script>
+  AuthMixin = (superclass) => {
+    return class extends superclass {
+      constructor(){
+        super();
+      }
+      static get actions(){
+        return {
+          logIn : (username,password,callback) =>{
+            return (dispatch) =>{
+              dispatch({type :'LOG_IN'});
+              let request = new Request('/login',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({
+                  username:username,
+                  password:password,
+                  _csrf:sh.get('X-CSRF-Token')
+                }),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                dispatch({type:'LOG_IN',status:'success'});
+                callback(null);
+              })
+              .catch((e)=>{
+                console.log(e);
+                dispatch({type:'LOG_IN',status:'error',error:e});
+                callback(e.message);
+              });
+            }
+          },
+          loadInfo:(callback)=>{
+            return (dispatch)=>{
+              dispatch({type:'LOAD_INFO'});
+              let url = '/user/info';
+              let request = new Request(url,{
+                method:'GET',
+                headers: sh,
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_INFO',status:'success',info:json});
+                  callback(null,json);
+                });
+              })
+              .catch((e)=>{
+                dispatch({type:'LOAD_INFO',status:'error',error:e});
+                callback(e);
+              });
+            };
+          },
+          loadRegisterInfo:(info)=>{
+            return {type:'LOAD_REGISTER_INFO',info:info};
+          },
+          changeRegisterUserType:(type)=>{
+            return {type:'CHANGE_REGISTER_TYPE',type:type};
+          }
+        }
+      }
+
+
+    }
+  };
+</script>

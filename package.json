@@ -1,0 +1,50 @@
+{
+  "name": "ehr-2-0",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Web app for administrators at EHR",
+  "keywords": [],
+  "dependencies": {
+    "async": "2.0.1",
+    "bcrypt": "^1.0.2",
+    "bcryptjs": "^2.4.3",
+    "bower": "^1.8.0",
+    "connect-redis": "^3.3.0",
+    "date-utils": "^1.2.21",
+    "fb": "^2.0.0",
+    "google-auth-library": "^0.10.0",
+    "lodash": "3.10.1",
+    "mongo": "^0.1.0",
+    "node-quickbooks": "^2.0.20",
+    "passport": "^0.3.2",
+    "passport-custom": "^1.0.5",
+    "passport-local": "^1.0.0",
+    "polymer-cli": "^1.2.0",
+    "polymer-redux": "^1.0.1",
+    "sails": "^1.0.0-36",
+    "sails-hook-fixtures": "^1.0.0-beta",
+    "sails-hook-orm": "^2.0.0-16",
+    "sails-mongo": "^1.0.0-9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "postinstall": "bash ./post-install.sh",
+    "start": "NODE_ENV=production node app.js",
+    "test": "NODE_ENV=test sh test.sh",
+    "debug": "node debug app.js"
+  },
+  "main": "app.js",
+  "engines": {
+    "node": "6.4.0",
+    "npm": "3.10.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/donalbertico/ehr-2-0.git"
+  },
+  "authors": [
+    "skullerj",
+    "donalbertico"
+  ],
+  "license": "Private(Look under LICENCE file)"
+}

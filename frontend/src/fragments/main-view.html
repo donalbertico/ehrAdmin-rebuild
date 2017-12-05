@@ -1,0 +1,72 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../elements/login-form.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../redux/global-store.html">
+<link rel="import" href="../redux/actions/auth-actions.html">
+<dom-module id="main-view">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+      .main{
+        height: 90vh;
+        @apply --layout-vertical;
+        @apply --layout-center-center;
+      }
+    </style>
+    <app-header-layout>
+      <app-header slot="header">
+        <app-toolbar class="horizontal">
+          <div main-title class="horizontal">
+            <span class="logo">Administrador EHR</span>
+          </div>
+          <div class="flex"></div>
+          <a href="/account" hidden="[[!user.authenticated]]">
+            <paper-button raised class="accent"> Consola</paper-button>
+          </a>
+          <a href="/logout" hidden="[[!user.authenticated]]" rel="external">
+            <paper-button class="accent"> Salir</paper-button>
+          </a>
+        </app-toolbar>
+      </app-header>
+      <div class="main">
+        <login-form></login-form>
+      </div>
+    </app-header-layout>
+  </template>
+
+  <script>
+
+    class MainView extends AuthMixin(GlobalStoreMixin(Polymer.Element)) {
+      static get is() { return 'main-view'; }
+
+      static get properties(){
+        return {
+          user:{
+            type:Object,
+            statePath:'user'
+          }
+        }
+      }
+      connectedCallback(){
+        super.connectedCallback();
+      }
+
+    }
+    window.customElements.define(MainView.is, MainView);
+  </script>
+</dom-module>

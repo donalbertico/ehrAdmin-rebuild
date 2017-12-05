@@ -1,0 +1,40 @@
+<script>
+  const GlobalState= {
+    user: {
+      authenticated: false,
+      loading: false,
+      lastError: false,
+      info: {
+        email:null
+      }
+    },
+    search:{
+      stats:{
+        users:0,
+        subsUsers:0,
+        payments:0,
+        completePayments:0,
+        totalCollected:0,
+        totalEarnings:0
+      },
+      users:{
+        entities:[],
+        selectedUser:{
+          id:null,
+          email:null,
+          firstName:null,
+          lastName:null,
+          subscribedUntil:null,
+          maxReco:null,
+          balance:0,
+          recomended:[],
+          recomender:{
+            firstName:null,
+            lastName:null,
+            email:null
+          }
+        }
+      }
+    }
+  }
+</script>

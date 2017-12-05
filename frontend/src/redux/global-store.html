@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
+<link rel="import" href="global-state.html">
+<link rel="import" href="reducers/user-reducer.html">
+<link rel="import" href="reducers/search-reducer.html">
+
+<script type="text/javascript">
+  function handleReqError(response) {
+    console.log(response);
+    if (response.ok) {
+      return Promise.resolve(response);
+    }
+    return response.json().then(json => {
+      const error = new Error(json.error || response.statusText)
+      return Promise.reject(Object.assign(error, { response }))
+    })
+  };
+  function showMessage(message,duration){
+     window.dispatchEvent(new CustomEvent('show-message',{'detail':{message : message, duration: duration}}),{bubbles:false});
+  }
+  function requestCRSF(){
+    let request = new Request('/csrfToken',{
+      method:'GET',
+      headers: new Headers({'Content-Type':'application/json'})
+    });
+    window.fetch(request)
+    .then(handleReqError)
+    .then((response)=>{
+      response.json().then((json)=>{
+        console.log(json._csrf);
+        window.sh = new Headers({
+          'X-CSRF-Token': json['_csrf'],
+          'Content-Type': 'application/json'
+
+        });
+      });
+    })
+    .catch((e)=>{
+      showMessage('Hubo un error cargando la página. Por favor recárgala',10000);
+    });
+  }
+
+  function redirect(location){
+    window.history.pushState({}, null, location);
+    window.dispatchEvent(new CustomEvent('location-changed'));
+  }
+  function checkLogIn(){
+    var found = false,name='authenticated',value='1';
+    document.cookie.split(";").forEach(function(e) {
+        var cookie = e.split("=");
+        if(name == cookie[0].trim() && (!value || value == cookie[1].trim())) {
+            found = true;
+        }
+    });
+    return found;
+  }
+  requestCRSF();
+  const globalReducer = (state=GlobalState,action)=>{
+    return{
+      user:user(state.user,action),
+      search:search(state.search,action)
+    };
+  };
+  const globalStore = Redux.createStore(globalReducer,Redux.applyMiddleware(ReduxThunk.default));
+  const GlobalStoreMixin = PolymerRedux(globalStore);
+</script>

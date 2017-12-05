@@ -1,0 +1,41 @@
+<script>
+  const {user:userInit} = GlobalState;
+
+  const user = (state=userInit,action)=>{
+    switch(action.type){
+      case 'LOG_IN':
+        switch (action.status) {
+          case 'success':
+            return Object.assign({},state,{loading:false,authenticated:true});
+            break;
+          case 'error':
+            return Object.assign({},state,{loading:false,lastError:action.error});
+            break;
+          default:
+            return Object.assign({},state,{loading:true})
+            break;
+        }
+        break;
+      case 'LOAD_INFO':
+        switch (action.status) {
+          case 'success':
+            return Object.assign({},state,{loading:false,info:action.info,authenticated:true});
+            break;
+          case 'error':
+            return Object.assign({},state,{loading:false,lastError:action.error});
+            break;
+          default:
+            return Object.assign({},state,{loading:true})
+            break;
+        }
+        break;
+      default:
+      return state;
+    }
+  }
+
+
+
+
+
+</script>

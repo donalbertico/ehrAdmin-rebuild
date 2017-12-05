@@ -1,0 +1,86 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../redux/global-store.html">
+<link rel="import" href="../redux/actions/auth-actions.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="login-form">
+  <template>
+    <style include="shared-styles">
+      :host{
+        display: block;
+      }
+      paper-card{
+        background-color: #fff;
+      }
+      div.overlay{
+        background-color: rgba(0,0,0,0.25);
+        height: 90%;
+        width: 100%;
+        position: absolute;
+        z-index: 100;
+      }
+      paper-card{
+        min-width:300px;
+        --paper-card-background-color:#fff;
+        --paper-card-header-color:#fff;
+        --paper-card-header: {
+          background-color:var(--accent-color);
+        }
+      }
+    </style>
+    <paper-card heading="Ingresar">
+      <div class="overlay vertical center" hidden$="[[!loading]]">
+        <paper-spinner active></paper-spinner>
+      </div>
+      <div class="card-content">
+        <iron-form id="loginForm">
+          <form>
+            <paper-input name="username" label="Nombre de usuario" type="text" required ></paper-input>
+            <paper-input name="password" label="Contraseña" type="password" required  error-message="Ingresa tu contraseña"></paper-input>
+          </form>
+        </iron-form>
+      </div>
+      <div class="card-actions vertical">
+        <paper-button on-click="login" class="accent self-end">Ingresar</paper-button>
+      </div>
+    </paper-card>
+  </template>
+  <script>
+    class LoginForm extends GlobalStoreMixin(AuthMixin(Polymer.Element)){
+      static get is() {return 'login-form';}
+      static get properties() {
+        return {
+          loading:{
+            type:Boolean,
+            statePath:'user.loading'
+          }
+        };
+      }
+
+      login(){
+        var form = this.$.loginForm;
+        if(form.validate()){
+          var data = form.serializeForm();
+          this.dispatch('logIn',data.username,data.password,(err)=>{
+            if(err){
+              console.log(err);
+              switch (err) {
+                case 'username_or_password_invalid':
+                  showMessage('Usuario');
+                  break;
+              }
+              return;
+            }
+            this.dispatchEvent(new CustomEvent('login',{bubbles:false,composed:false}));
+            redirect('/account');
+          });
+        }
+      }
+    }
+    customElements.define(LoginForm.is, LoginForm);
+  </script>
+</dom-module>

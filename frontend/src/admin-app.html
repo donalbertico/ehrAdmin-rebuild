@@ -1,0 +1,180 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<link rel="import" href="my-icons.html">
+
+<link rel="lazy-import" href="main-view.html">
+<link rel="lazy-import" href="404-view.html">
+
+<!-- Import web animations API for the whole app -->
+<script src="../bower_components/web-animations-js/web-animations-next-lite.min.js"></script>
+<!-- Polyfills -->
+<script src="../bower_components/promise-polyfill/Promise.min.js"></script>
+<script src="../bower_components/fetch/fetch.js"></script>
+
+<!-- Redux -->
+<script src="../bower_components/redux.min/index.js"></script>
+<script src="../bower_components/redux-thunk.min/index.js"></script>
+
+<link rel="import" href="redux/global-store.html">
+<link rel="import" href="redux/actions/auth-actions.html">
+<dom-module id="admin-app">
+  <template>
+    <style>
+
+    :host {
+      --dark-primary-color:         #34515e;
+      --primary-color:              #607d8b;
+      --light-primary-color:        #cfd8dc;
+      --dark-secondary-color:       #0064b7;
+      --secondary-color:            #0091ea;
+      --light-secondary-color:      #64c1ff;
+      --primary-background-color:   #F5F5F5;
+
+      --white-primary-text-color:   rgba(255,255,255,0.8);
+      --primary-text-color:         rgba(0,0,0,0.86);
+      --dark-primary-text-color:    rgba(255,255,255,0.73);
+      --light-primary-text-color:   rgba(0,0,0,0.66);
+      --secondary-text-color:       rgba(255,255,255,0.91);
+      --light-secondary-text-color: rgba(0,0,0,0.66);
+      --dark-secondary-text-color:  rgba(255,255,255,0.91);
+      --error-color:                #e53935;
+      --success-color:              #008e76;
+
+      /*set accent color */
+      --accent-color:               var(--secondary-color);
+
+      /*default inputs*/
+      --paper-input-container-color:       var(--light-primary-text-color);
+      --paper-input-container-focus-color: var(--primary-text-color);
+      --paper-input-container-input-color: var(--primary-text-color);
+
+      /*paper-toggle-button*/
+      --paper-toggle-button-checked-bar-color: var(--secondary-color);
+      --paper-toggle-button-checked-button-color: var(--secondary-color);
+    }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+
+    <app-route
+        route="{{route}}"
+        pattern="[[rootPattern]]:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+    <iron-pages
+        selected="[[page]]"
+        attr-for-selected="name"
+        fallback-selection="p404"
+        role="main">
+      <main-view name="main" sub-page="[[subPage]]" on-subpage-not-found="_showPage404"></main-view>
+      <account-view name="account" route="[[subroute]]"></account-view>
+      <p404-view name="p404"></p404-view>
+    </iron-pages>
+    <paper-toast id="toast"></paper-toast>
+
+  </template>
+
+  <script>
+    class AdminApp extends GlobalStoreMixin(Polymer.Element) {
+
+      static get is() { return 'admin-app'; }
+
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_pageChanged',
+          },
+          user:{
+            type:Object,
+            statePath:(state)=>{
+              return state.user;
+            },
+            value:()=>{
+              return {}
+            }
+          },
+          rootPattern: String,
+          routeData: Object,
+          subroute: String,
+          subPage:String,
+        };
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)',
+        ];
+      }
+
+      constructor() {
+        super();
+
+        // Get root pattern for app-route, for more info about `rootPath` see:
+        // https://www.polymer-project.org/2.0/docs/upgrade#urls-in-templates
+        this.rootPattern = (new URL(this.rootPath)).pathname;
+        window.addEventListener('show-message',(e)=>{
+          var toast = this.$.toast;
+          toast.text = e.detail.message;
+          toast.duration = 4000||e.detail.duration;
+          toast.show();
+        });
+      }
+      _routePageChanged(page) {
+        // Polymer 2.0 will call with `undefined` on initialization.
+        // Ignore until we are properly called with a string.
+        if (page === undefined) {
+          return;
+        }
+        var newPage = page || 'main';
+        if(!this.user.authenticated&&checkLogIn()){
+          this.dispatch({type:'LOG_IN',status:'success'});
+        }else{
+          if(newPage!=='main'&&!this.user.authenticated){
+            newPage='main';
+          }
+        }
+        this.page = newPage;
+      }
+
+      _pageChanged(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('fragments/'+ page + '-view.html');
+        Polymer.importHref(
+            resolvedPageUrl,
+            null,
+            this._showPage404.bind(this),
+            true);
+
+      }
+      _showPage404() {
+        this.page = 'p404';
+      }
+    }
+
+    window.customElements.define(AdminApp.is, AdminApp);
+  </script>
+</dom-module>

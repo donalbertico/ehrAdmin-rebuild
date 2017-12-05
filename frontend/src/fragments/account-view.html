@@ -1,0 +1,300 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../redux/global-store.html">
+<link rel="import" href="../redux/actions/search-actions.html">
+
+<dom-module id="account-view">
+  <template>
+    <style include="shared-styles app-grid-style">
+      :host {
+        display: block;
+        --app-grid-columns: 4;
+        --app-grid-gutter: 12px;
+        --app-grid-expandible-item-columns: 2;
+        --app-grid-item-height: 50%;
+      }
+      div.card{
+        @apply --shadow-elevation-2dp;
+        padding: 8px;
+        background-color: #fff;
+      }
+      .relative{
+        position: relative;
+      }
+      div.overlay{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        background-color: rgba(0,0,0,0.3);
+      }
+      div.results{
+        max-height: 600px;
+        overflow: auto;
+        margin-top: 12px;
+      }
+      div.results-top{
+        padding: 8px;
+        @apply --layout-horizontal;
+      }
+      div.result{
+        padding: 8px;
+        @apply --layout-horizontal;
+        height: 32px;raised
+        border-bottom: 1px solid rgba(0,0,0,0.3);
+      }
+      div.result:nth-last-child(2){
+        border-bottom: 0px;
+      }
+      span.link{
+        color: var(--accent-color);
+        cursor: pointer;
+      }
+    </style>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+    <app-drawer-layout>
+      <app-drawer slot="drawer">
+        <app-toolbar>Menu</app-toolbar>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="start" href="/account/start">Inicio</a>
+          <a name="users" href="/account/users">Usuarios</a>
+        </iron-selector>
+      </app-drawer>
+      <div>
+        <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="start" role="main">
+          <section name="start" class="vertical p2">
+            <div class="horizontal m1-b">
+              Administrador
+            </div>
+          </section>
+          <section name="users" class="p2 vertical">
+            <span class="font-display1 self-start m1-b">Usuarios</span>
+            <div class="horizontal">
+              <div class="vertical flex">
+                <span class="font-headline s m1-b">Filtros</span>
+                <div class="card horizontal">
+                  <paper-input class="m1-r" label="Email" value="{{query.email}}"></paper-input>
+                  <paper-input class="m1-r" label="Nombre" value="{{query.firstName}}"></paper-input>
+                  <paper-input class="m1-r" label="Apellido" value="{{query.lastName}}"></paper-input>
+                  <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
+                </div>
+                <div class="card results">
+                  <div class="results-top">
+                    <div class="flex-2">
+                      <b class="font-subhead">Nombre</b>
+                    </div>
+                    <div class="flex-2">
+                      <b class="font-subhead">Email</b>
+                    </div>
+                  </div>
+                  <template is="dom-repeat" items="[[results]]">
+                    <div class="result">
+                      <div class="flex-3">
+                        [[item.firstName]] [[item.lastName]]
+                      </div>
+                      <span class="flex-3 link" on-tap="getUser">
+                        [[item.email]]
+                      </span>
+                      <span class="flex-3 horizontal self-end">
+                        <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
+                      </span>
+                    </div>
+                  </template>
+                  <div class="p1"></div>
+                </div>
+              </div>
+              <div class="flex p2-l vertical relative">
+                <div class="overlay vertical center" hidden="[[!loading]]">
+                  <paper-spinner active></paper-spinner>
+                </div>
+                <span class="font-display1 self-end">[[su.firstName]] [[su.lastName]]</span>
+                <div class="vertical center flex" hidden="[[su.id]]">
+                  <span class="font-headline">
+                    Selecciona un usuario para ver su información
+                  </span>
+                </div>
+                <div class="vertical" hidden="[[!su.id]]">
+                  <paper-card heading="Información" >
+                    <div class="card-content">
+                      <span class="font-title">[[su.email]]</span>
+                      <div class="horizontal self-end">
+                        <div class="flex vertical">
+                          <div class="flex"></div>
+                          <span class="accent" hidden="[[!su.isSubs]]">Suscrito hasta el: [[su.subscribedUntil]]</span>
+                          <span class="error" hidden="[[su.isSubs]]">Sin suscripción</span>
+                        </div>
+                        <div class="vertical">
+                          <span class="font-caption">Saldo</span>
+                          <span class="font-title">[[su.balance]] BTC</span>
+                        </div>
+                      </div>
+                    </div>
+                  </paper-card>
+                  <paper-card heading="Recomendados" class="m2-t">
+                    <div class="card-content vertical">
+                      <template is="dom-repeat" items="[[su.recommended]]">
+                        <div class="horizontal">
+                          <span class="flex">[[item.firstName]] [[item.lastName]]</span>
+                          <span class="flex link" on-tap="getUser">[[item.email]]</span>
+                        </div>
+                      </template>
+                    </div>
+                    <div class="card-content vertical">
+                      <span class="font-title">Máximo de recomendados</span>
+                      <div class="horizontal">
+                        <paper-slider min="3" max="24" value="[[su.maxReco]]" snaps step="3" pin editable class="flex" id="maxRecoSelector"></paper-slider>
+                      </div>
+                    </div>
+                    <div class="card-actions vertical">
+                      <paper-button class="accent self-end" on-tap="updateUserMr">Actualizar</paper-button>
+                    </div>
+                  </paper-card>
+                </div>
+              </div>
+            </div>
+          </section>
+        </iron-pages>
+      </div>
+      <paper-dialog id="benefitsDialog" class="vertical">
+        <span class="font-display1">Beneficios</span>
+        <span>Selecciona el beneficio</span>
+        <paper-radio-group id="group" selected="{{benefit}}">
+          <paper-radio-button name="PL001">1 dia</paper-radio-button>
+          <paper-radio-button name="PL002">1 semana</paper-radio-button>
+          <paper-radio-button name="PL003">1 mes</paper-radio-button>
+          <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
+          <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
+          <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
+          <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
+        </paper-radio-group>
+        <div class="horizontl self-end">
+          <paper-button on-tap="benefy">Beneficiar</paper-button>
+        </div>
+      </paper-dialog>
+    </app-drawer-layout>
+  </template>
+  <script>
+    class AccountView extends SearchMixin(GlobalStoreMixin(Polymer.Element)) {
+      static get is() {return 'account-view';}
+      static get properties(){
+        return {
+          su:{
+            type:Object,
+            statePath:(state)=>{
+              var user = Object.assign({},state.search.users.selectedUser);
+              user.isSubs = user.subscribedUntil==null ? false :  Date.compare(new Date(this.subscribedUntil), Date.today()) >= 0;
+              user.subscribedUntil= (new Date(user.subscribedUntil)).toFormat('DD-MM-YYYY');
+              return user;
+            }
+          },
+          results:{
+            type:Array,
+            statePath:'search.users.entities'
+          },
+          query:{
+            type:Object,
+            value:()=>{
+              return {
+                email:null,
+                firstName:null,
+                lastName:null
+              }
+            }
+          },
+          stats:{
+            type:Object,
+            statePath:'search.stats'
+          },
+          loading:{
+            type:Boolean,
+            value:false
+          },
+          route:String,
+          page:String,
+          beneficiary: String,
+          benefit : {
+            type : String,
+            value : 'PL001'
+          }
+        }
+      }
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)',
+        ];
+      }
+      searchStats(){
+        this.dispatch('getStats',(e)=>{
+          if(e)return showMessage('No pudimos obtener las estadísticas');
+        })
+      }
+      searchUsers(){
+        var query={};
+        Object.keys(this.query).forEach((key)=>{
+          if(this.query[key]){
+            query[key]=this.query[key];
+          }
+        });
+        this.dispatch('searchUsers',query,(e)=>{
+          console.log(e);
+          if(e)return showMessage('Error en la búsqueda');
+        });
+      }
+      getUser(e){
+        var id = e.model.__data.item.id;
+        this.selectUser(id);
+      }
+      selectUser(id){
+        this.loading=true;
+        this.dispatch('selectUser',id,(e)=>{
+          this.loading=false;
+          if(e)return showMessage('Error obteniendo la información del usuario');
+        });
+      }
+      updateUserMr(){
+        var newMr = parseInt(this.$.maxRecoSelector.value);
+        this.dispatch('updateUserMr',this.su.id,newMr,(e)=>{
+          if(e)return showMessage('Error actualizando el MR');
+          return showMessage('Usuario actualizado.');
+        });
+      }
+      _routePageChanged(page){
+        if(page===undefined){
+          return;
+        }
+        if(page===''){
+          this.page='start';
+        }else{
+          this.page=page;
+        }
+      }
+      setBenefeciary(e){
+        this.set('beneficiary',e.target.id);
+        this.$.benefitsDialog.open();
+      }
+      benefy(e){
+        console.log(this.benefit);
+        this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
+          showMessage('Beneficio agregado');
+          this.$.benefitsDialog.close();
+        });
+      }
+    }
+    window.customElements.define(AccountView.is, AccountView);
+  </script>
+</dom-module>

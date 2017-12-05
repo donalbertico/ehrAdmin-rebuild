@@ -1,0 +1,136 @@
+<script>
+  SearchMixin = (superclass) => {
+    return class extends superclass {
+      constructor(){
+        super();
+      }
+      static get actions(){
+        return {
+          getStats:(callback)=>{
+            return (dispatch)=>{
+              let url = '/admin/get-statistics';
+              let request = new Request(url,{
+                method:'POST',
+                headers: sh,
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_STATS',stats:json});
+                  callback(null,json);
+                });
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            };
+          },
+          searchUsers:(query,callback)=>{
+            console.log(query);
+            return (dispatch)=>{
+              let url = '/admin/search-users';
+              let request = new Request(url,{
+                method:'POST',
+                headers: sh,
+                credentials: 'include',
+                body:JSON.stringify({
+                  firstName:query.firstName,
+                  lastName:query.lastName,
+                  email:query.email
+                })
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_USERS',users:json});
+                  callback(null,json);
+                });
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            };
+          },
+          selectUser:(id,callback)=>{
+            return (dispatch)=>{
+              let url = '/admin/get-single-user';
+              let request = new Request(url,{
+                method:'POST',
+                headers: sh,
+                credentials: 'include',
+                body:JSON.stringify({
+                  id:id
+                })
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'SELECT_USER',selectedUser:json});
+                  callback(null,json);
+                });
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            };
+          },
+          updateUserMr:(id,newMr,callback)=>{
+            return (dispatch)=>{
+              let url = '/admin/update-user-mr';
+              let request = new Request(url,{
+                method:'POST',
+                headers: sh,
+                credentials: 'include',
+                body:JSON.stringify({
+                  id:id,
+                  newMr:newMr
+                })
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                dispatch({type:'UPDATE_USER',updates:{maxReco:newMr}});
+                callback(null);
+              })
+              .catch((e)=>{
+                console.log(e);
+                callback(e.message);
+              });
+            };
+          },
+          promoteToPlus : (id,code,callback) => {
+            return (dispatch) =>{
+              dispatch({type :'LOG_IN'});
+              let request = new Request('/admin/promote-plus',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({
+                  user:id,
+                  code:code
+                }),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                dispatch({type:'LOG_IN',status:'success'});
+                callback(null);
+              })
+              .catch((e)=>{
+                console.log(e);
+                dispatch({type:'LOG_IN',status:'error',error:e});
+                callback(e.message);
+              });
+            }
+          }
+        }
+      }
+
+
+    }
+  };
+</script>

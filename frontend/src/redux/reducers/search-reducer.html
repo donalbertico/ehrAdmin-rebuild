@@ -1,0 +1,37 @@
+<script>
+const statsSearch = (state,action)=>{
+  switch (action.type) {
+    case 'LOAD_STATS':
+      return Object.assign({},state.stats,action.stats);
+      break;
+    default:
+      return state;
+  }
+}
+const userSearch = (state,action)=>{
+  switch (action.type) {
+    case 'LOAD_USERS':
+      return Object.assign({},state,{entities:action.users});
+      break;
+    case 'UPDATE_USER':
+      var newSelectedUser=Object.assign({},state.selectedUser,action.updates);
+      return Object.assign({},state,{selectedUser:newSelectedUser});
+      break;
+    case 'SELECT_USER':
+      return Object.assign({},state,{selectedUser:Object.assign({},action.selectedUser)});
+      break;
+    default:
+      return state;
+  }
+}
+
+
+const search=(state,action)=>{
+  return {
+    stats:statsSearch(state.stats,action),
+    users:userSearch(state.users,action)
+  }
+}
+
+
+</script>

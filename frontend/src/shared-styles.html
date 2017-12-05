@@ -1,0 +1,414 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+
+<!-- shared styles for all views -->
+<dom-module id="shared-styles">
+  <template>
+    <style>
+      body{
+        color: rgba(0,0,0,0.87);
+      }
+      .s-text{
+        color: rgba(0,0,0,0.54);
+      }
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+      .drawer-list {
+        margin: 0 20px;
+      }
+      [hidden]{
+        display: none !important;
+      }
+      .drawer-list a {
+        display: block;
+        text-decoration: none;
+        color: var(--primary-color);
+        line-height: 40px;
+      }
+      .drawer-list a.iron-selected {
+        color: var(--dark-primary-color);
+        font-weight: bold;
+      }
+      /*Backgrounds and color combinations*/
+      .primary{
+        background-color: var(--primary-color);
+        color: var(--primary-text-color);
+      }
+      .white-primary{
+        background-color: var(--primary-color);
+        color: var(--white-primary-text-color);
+      }
+      .dark-primary{
+        background-color: var(--dark-primary-color);
+        color: var(--dark-primary-text-color);
+      }
+      .dark-primary * {
+        color: var(--dark-primary-text-color) !important;
+      }
+      .light-primary{
+        background-color: var(--light-primary-color);
+        color: var(--light-primary-text-color);
+      }
+      .secondary, .accent{
+        background-color: var(--secondary-color);
+        color: var(--secondary-text-color);
+      }
+      .secondary * , .accent *{
+        color: var(--secondary-text-color) !important;
+      }
+      .dark-secondary, .dark-accent{
+        background-color: var(--dark-secondary-color);
+        color: var(--dark-secondary-text-color);
+      }
+      .dark-secondary * {
+        color: var(--dark-secondary-text-color) !important;
+      }
+      .light-secondary, .light-accent{
+        background-color: var(--light-secondary-color);
+        color: var(--light-secondary-text-color);
+      }
+      .input-light{
+        --paper-input-container-color:       var(--dark-primary-text-color);
+        --paper-input-container-focus-color: var(--white-primary-text-color);
+        --paper-input-container-input-color: var(--white-primary-text-color);
+      }
+      app-header {
+        background-color: var(--primary-color);
+        color: var(--white-primary-text-color);
+      }
+      paper-button.primary{
+        color: var(--primary-color);
+        background-color: inherit;
+      }
+      paper-button[raised].primary{
+        color: var(--primary-text-color);
+        background-color: var(--primary-color);
+      }
+      paper-button.accent{
+        color: var(--accent-color);
+        background-color: inherit;
+      }
+      paper-button[raised].accent{
+        color: var(--secondary-text-color);
+        background-color: var(--secondary-color);
+      }
+      app-toolbar paper-button{
+        font-size: 14px;
+      }
+      a paper-button {
+        color: #fff;
+      }
+      a, a:active, a:visited, a:focus { color: var(--accent-color); text-decoration: none; }
+      a:hover { color: var(--accent-color); text-decoration: none; }
+      .vertical{
+        @apply(--layout-vertical);
+      }
+      .horizontal{
+        @apply(--layout-horizontal);
+      }
+      .center{
+        @apply(--layout-center-center);
+      }
+      .justified{
+        @apply --layout-around-justified;
+      }
+      .wrap{
+        @apply --layout-wrap;
+      }
+      .wrap-reverse{
+        @apply --layout-wrap-reverse;
+      }
+      .flex{
+        @apply(--layout-flex);
+      }
+      .flex-2{
+        @apply(--layout-flex-2);
+      }
+      .flex-3{
+        @apply(--layout-flex-3);
+      }
+      .flex-4{
+        @apply(--layout-flex-4);
+      }
+      .self-start{
+        @apply(--layout-self-start);
+      }
+      .self-end{
+        @apply(--layout-self-end);
+      }
+      .self-center{
+        @apply(--layout-self-center);
+      }
+      .font-caption{
+        @apply(--paper-font-caption);
+        color: rgba(0,0,0,0.54);
+      }
+      .font-title{
+        @apply(--paper-font-title);
+      }
+      .font-headline{
+        @apply(--paper-font-headline);
+      }
+      .font-subhead{
+        @apply(--paper-font-subhead);
+      }
+      .font-display1{
+        @apply(--paper-font-display1);
+        color: rgba(0,0,0,0.54);
+      }
+      .font-display2{
+        @apply(--paper-font-display2);
+        color: rgba(0,0,0,0.54);
+      }
+      .font-display3{
+        @apply(--paper-font-display3);
+        color: rgba(0,0,0,0.54);
+      }
+      .font-display4{
+        @apply(--paper-font-display4);
+        color: rgba(0,0,0,0.54);
+      }
+      .text-p{
+        color:var(--primary-color);
+      }
+      .text-lp{
+        color:var(--light-primary-color);
+      }
+      .text-dp{
+        color:var(--dark-primary-color);
+      }
+      .text-s,.text-accent{
+        color:var(--secondary-color);
+      }
+      .text-ls{
+        color:var(--light-secondary-color);
+      }
+      .text-ds{
+        color:var(--dark-secondary-color);
+      }
+      .text-e{
+        color:var(--error-color);
+      }
+      .m1{
+        margin: 0.5rem;
+      }
+      .m1-x{
+        margin: 0 0.5rem;
+      }
+      .m1-y{
+        margin: 0.5rem 0;
+      }
+      .m2{
+        margin: 1rem;
+      }
+      .m2-x{
+        margin: 0 1rem;
+      }
+      .m2-y{
+        margin: 1rem 0;
+      }
+      .m3{
+        margin: 1.5rem;
+      }
+      .m3-x{
+        margin: 0 1.5rem;
+      }
+      .m3-y{
+        margin: 1.5rem 0;
+      }
+      .p1{
+        padding: 0.5rem;
+      }
+      .p1-x{
+        padding: 0 0.5rem;
+      }
+      .p1-y{
+        padding: 0.5rem 0;
+      }
+      .p2{
+        padding: 1rem;
+      }
+      .p2-x{
+        padding: 0 1rem;
+      }
+      .p2-y{
+        padding: 1rem 0;
+      }
+      .p3{
+        padding: 1.5rem;
+      }
+      .p3-x{
+        padding: 0 1.5rem;
+      }
+      .p3-y{
+        padding: 1.5rem 0;
+      }
+      .p1-t{
+        padding-top: 0.5rem;
+      }
+      .p2-t{
+        padding-top: 1rem;
+      }
+      .p3-t{
+        padding-top: 1.5rem;
+      }
+      .p1-b{
+        padding-bottom: 0.5rem;
+      }
+      .p2-b{
+        padding-bottom: 1rem;
+      }
+      .p3-b{
+        padding-bottom: 1.5rem;
+      }
+      .p1-l{
+        padding-left: 0.5rem;
+      }
+      .p2-l{
+        padding-left: 1rem;
+      }
+      .p3-l{
+        padding-left: 1.5rem;
+      }
+      .p1-r{
+        padding-right: 0.5rem;
+      }
+      .p2-r{
+        padding-right: 1rem;
+      }
+      .p3-r{
+        padding-right: 1.5rem;
+      }
+      .m1-t{
+        margin-top: 0.5rem;
+      }
+      .m2-t{
+        margin-top: 1rem;
+      }
+      .m3-t{
+        margin-top: 1.5rem;
+      }
+      .m1-b{
+        margin-bottom: 0.5rem;
+      }
+      .m2-b{
+        margin-bottom: 1rem;
+      }
+      .m3-b{
+        margin-bottom: 1.5rem;
+      }
+      .m1-l{
+        margin-left: 0.5rem;
+      }
+      .m2-l{
+        margin-left: 1rem;
+      }
+      .m3-l{
+        margin-left: 1.5rem;
+      }
+      .m1-r{
+        margin-right: 0.5rem;
+      }
+      .m2-r{
+        margin-right: 1rem;
+      }
+      .m3-r{
+        margin-right: 1.5rem;
+      }
+      .h-100{
+        height: 100%;
+      }
+      .w-100{
+        width: 100%;
+      }
+      /*htv(horizontal-to-vertical) class makes the element change from a vertical layout to an horizontal one on small screens */
+      .htv{
+        @apply(--layout-horizontal);
+      }
+      .vth{
+        @apply(--layout-vertical);
+      }
+
+      @media screen and (max-width:760px){
+        .htv{
+          @apply(--layout-vertical);
+        }
+        .vth{
+          @apply(--layout-horizontal);
+        }
+        /*fos(flex-on-small) class apply flex behavior on small screens*/
+        .fos{
+          @apply(--layout-flex);
+        }
+        .rms{
+          margin-right: 8px;
+        }
+        .lms{
+          margin-left: 8px;
+        }
+      }
+      @media screen and (min-width:761px){
+        /*fob(flex-on-big) class apply flex behavior on big screens*/
+        .fob{
+          @apply(--layout-flex);
+        }
+        /*This clases allow to apply standar margin on big screens*/
+        .rmb{
+          margin-right: 8px;
+        }
+        .lmb{
+          margin-left: 8px;
+        }
+
+      }
+      paper-card{
+        background-color: #fff;
+      }
+
+      @media(min-width:761px){
+        app-drawer-layout [drawer-toggle]{
+          display: none;
+        }
+        .hide-big{
+          display: none !important;
+        }
+      }
+      @media(max-width:760px){
+        span.logo, .publish, .register{
+          display: none;
+        }
+        .hide-small{
+          display: none !important;
+        }
+      }
+      iron-image.icon{
+        height: 50px;
+        width: 50px;
+        @apply --layout-self-center;
+      }
+      span.logo{
+        margin-left: 8px;
+        font-family: 'Lato',sans-serif;
+        color: white;
+        font-weight: 400;
+        @apply --layout-self-center;
+      }
+      @media screen and (max-width:1100px){
+        span.logo{
+          display: none !important;
+        }
+      }
+    </style>
+  </template>
+</dom-module>
