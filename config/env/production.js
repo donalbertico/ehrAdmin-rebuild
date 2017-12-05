@@ -80,7 +80,7 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     migrate: 'safe',
-    datastore : 'appDatabase'
+    datastore : 'mongodbServer'
 
   },
 
