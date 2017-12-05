@@ -19,7 +19,7 @@
     "passport": "^0.3.2",
     "passport-custom": "^1.0.5",
     "passport-local": "^1.0.0",
-    "polymer-cli": "^1.2.0",
+    "polymer-cli": "^1.5.7",
     "polymer-redux": "^1.0.1",
     "sails": "^1.0.0-36",
     "sails-hook-fixtures": "^1.0.0-beta",
