@@ -357,7 +357,7 @@ module.exports = {
 
   },
   paths: {
-    'public':'frontend/src'
+    'public':'frontend'
   }
 
 
