@@ -7,19 +7,22 @@
     "src/fragments/p404-view.html"
   ],
   "sources": [
-    "src/**/*",
+    "src/componnents/*",
+    "src/elements/*",
+    "src/locales/*",
+    "src/redux/**/*",
     "images/**/*",
-    "bower.json"
+    "src/shared-styles.html"
   ],
   "extraDependencies": [
     "manifest.json",
-    "bower_components/webcomponentsjs/*.js"
+    "bower_components/webcomponentsjs/*.js",
+    "bower_components/promise-polyfill/promise.min.js",
+    "bower_components/fetch/fetch.js",
+    "bower_components/redux.min/index.js",
+    "bower_components/redux-thunk.min/index.js"
   ],
-  "lint": {
-    "rules": ["polymer-2"]
-  },
   "builds": [
-    { "preset": "es5-bundled" },
-    { "preset": "es6-unbundled" }
+    { "preset": "es5-bundled" }
   ]
 }
