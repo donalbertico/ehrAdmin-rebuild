@@ -357,7 +357,7 @@ module.exports = {
 
   },
   paths: {
-    'public':'frontend'
+    'public':'frontend/build/es5-bundled'
   }
 
 
