@@ -5,6 +5,14 @@ const statsSearch = (state,action)=>{
       return Object.assign({},state.stats,action.stats);
       break;
     default:
+  }
+}
+const paymentsSearch = (state,action)=>{
+  switch (action.type) {
+    case 'LOAD_PAYMENTS':
+      console.log('pege',action.payments);
+      return action.payments
+      break;
       return state;
   }
 }
@@ -29,7 +37,8 @@ const userSearch = (state,action)=>{
 const search=(state,action)=>{
   return {
     stats:statsSearch(state.stats,action),
-    users:userSearch(state.users,action)
+    users:userSearch(state.users,action),
+    payments:paymentsSearch(state.payments,action)
   }
 }
 

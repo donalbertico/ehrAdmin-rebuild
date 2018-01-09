@@ -8,7 +8,9 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
 
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../redux/global-store.html">
@@ -61,6 +63,9 @@
         color: var(--accent-color);
         cursor: pointer;
       }
+      div.benefits{
+        width: 25rem;
+      }
     </style>
     <app-route
         route="{{route}}"
@@ -73,6 +78,7 @@
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="start" href="/account/start">Inicio</a>
           <a name="users" href="/account/users">Usuarios</a>
+          <a name="users" href="/account/payments">Pagos por Verificar</a>
         </iron-selector>
       </app-drawer>
       <div>
@@ -95,11 +101,14 @@
                 </div>
                 <div class="card results">
                   <div class="results-top">
-                    <div class="flex-2">
+                    <div class="flex-3">
                       <b class="font-subhead">Nombre</b>
                     </div>
-                    <div class="flex-2">
+                    <div class="flex-3">
                       <b class="font-subhead">Email</b>
+                    </div>
+                    <div class="flex-3">
+                      <b class="font-subhead">Acción</b>
                     </div>
                   </div>
                   <template is="dom-repeat" items="[[results]]">
@@ -168,20 +177,47 @@
               </div>
             </div>
           </section>
+          <section name="payments">
+            <span class="font-headline s m1-b">Pagos</span>
+            <prism-table>
+                <prism-thead>
+                    <prism-tr>
+                        <prism-th>Fecha</prism-th>
+                        <prism-th>Numero</prism-th>
+                        <prism-th>Usuario</prism-th>
+                        <prism-th>Acción</prism-th>
+                    </prism-tr>
+                </prism-thead>
+                <prism-tbody>
+                  <template is="dom-repeat" items="[[payments]]" index-as="index">
+                    <prism-tr>
+                        <prism-td title="Fecha">[[item.createdAt]]</prism-td>
+                        <prism-td title="Numero">[[item.transferNumber]]</prism-td>
+                        <prism-td title="Usuario">[[item.payer.email]]</prism-td>
+                        <prism-td title="Accion">
+                          <paper-button id="[[item.payer.id]]" raised class="primary" on-click="setBenefeciary">Aprobar</paper-button>
+                        </prism-td>
+                    </prism-tr>
+                  </template>
+                </prism-tbody>
+            </prism-table>
+          </section>
         </iron-pages>
       </div>
       <paper-dialog id="benefitsDialog" class="vertical">
         <span class="font-display1">Beneficios</span>
         <span>Selecciona el beneficio</span>
-        <paper-radio-group id="group" selected="{{benefit}}">
-          <paper-radio-button name="PL001">1 dia</paper-radio-button>
-          <paper-radio-button name="PL002">1 semana</paper-radio-button>
-          <paper-radio-button name="PL003">1 mes</paper-radio-button>
-          <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
-          <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
-          <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
-          <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
-        </paper-radio-group>
+        <div class="benefits">
+          <paper-radio-group id="group" selected="{{benefit}}">
+            <paper-radio-button name="PL001">1 dia</paper-radio-button>
+            <paper-radio-button name="PL002">1 semana</paper-radio-button>
+            <paper-radio-button name="PL003">1 mes</paper-radio-button>
+            <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
+            <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
+            <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
+            <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
+          </paper-radio-group>
+        </div>
         <div class="horizontl self-end">
           <paper-button on-tap="benefy">Beneficiar</paper-button>
         </div>
@@ -189,10 +225,14 @@
     </app-drawer-layout>
   </template>
   <script>
-    class AccountView extends SearchMixin(GlobalStoreMixin(Polymer.Element)) {
+    class AccountView extends SearchMixin(GlobalStoreMixin(Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior],Polymer.Element))) {
       static get is() {return 'account-view';}
       static get properties(){
         return {
+          language:{
+            type:String,
+            value:'es'
+          },
           su:{
             type:Object,
             statePath:(state)=>{
@@ -204,7 +244,9 @@
           },
           results:{
             type:Array,
-            statePath:'search.users.entities'
+            statePath:(state)=>{
+              console.log(state.search);
+            }
           },
           query:{
             type:Object,
@@ -216,6 +258,10 @@
               }
             }
           },
+          payments:{
+            type:Array,
+            statePath : 'search.payments'
+          },
           stats:{
             type:Object,
             statePath:'search.stats'
@@ -223,6 +269,18 @@
           loading:{
             type:Boolean,
             value:false
+          },
+          resources:{
+            value:function(){
+              return{
+                'en':{
+                  'date' : '{value,date,medium}'
+                },
+                'es':{
+                  'date' : '{value,date,medium}'
+                }
+              }
+            }
           },
           route:String,
           page:String,
@@ -251,7 +309,6 @@
           }
         });
         this.dispatch('searchUsers',query,(e)=>{
-          console.log(e);
           if(e)return showMessage('Error en la búsqueda');
         });
       }
@@ -281,6 +338,10 @@
           this.page='start';
         }else{
           this.page=page;
+          if(page == 'payments'){
+            console.log('a cargar');
+            this.dispatch('loadPayments');
+          }
         }
       }
       setBenefeciary(e){
@@ -288,10 +349,10 @@
         this.$.benefitsDialog.open();
       }
       benefy(e){
-        console.log(this.benefit);
         this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
           showMessage('Beneficio agregado');
           this.$.benefitsDialog.close();
+          this.dispatch('loadPayments');
         });
       }
     }

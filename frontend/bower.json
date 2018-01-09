@@ -40,7 +40,8 @@
     "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
     "paper-dialog": "^2.0.0",
     "paper-slider": "PolymerElements/paper-slider#^2.0.4",
-    "paper-styles": "^2.0.0"
+    "paper-styles": "^2.0.0",
+    "prism-table": "Prhythm/prism-table#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"

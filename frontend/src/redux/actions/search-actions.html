@@ -126,6 +126,26 @@
                 callback(e.message);
               });
             }
+          },
+          loadPayments : (callback) => {
+            return (dispatch) =>{
+              dispatch({type :'LOAD_PAYMENTS'});
+              let request = new Request('/payments/get',{
+                method:'GET',
+                headers: sh,
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_PAYMENTS',status:'success',payments:json});
+                });
+              })
+              .catch((e)=>{
+                dispatch({type:'LOAD_PAYMENTS',status:'error',error:e});
+              });
+            }
           }
         }
       }
