@@ -19,11 +19,17 @@ module.exports = {
   },
 
   fn: function (inputs, exits,env) {
-    User.applyBenefits(inputs.user,[{code:inputs.code}],(err)=>{
-      if (err) {
-        return exits.error(err);
-      }
-      exits.success();
+    var payment = {
+      payer : inputs.user,
+      method : 'Deposito Bancario',
+      details : [{code:inputs.code,}]
+    }
+    console.log(payment,'EL PAGO');
+    Payments.create(payment).meta({fetch:true}).exec((err,created)=>{
+      if(err) return exits.error(err);
+        Payments.verify(created.id,(response)=>{
+          return exits.success();
+        });
     });
   }
 };

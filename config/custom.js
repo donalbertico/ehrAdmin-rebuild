@@ -34,5 +34,17 @@ module.exports.custom = {
     realmId:process.env.QB_REALMID,
     qbTest:true
   },
-  mP : process.env.MP
+  mP : process.env.MP,
+  bill:{
+    ruc: '1792569036001',
+    razonSocial:'CONFORTDIL CIA.LTDA.',
+    nombreComercial:'Ecuador House Rentals',
+    ambiente: process.env.BILL_ENVIRONMENT||'1',
+    dirMatriz:'Av. de los Shyris N35-34 y Avenida Portugal, Edificio Albartos Piso 4 oficina 402',
+    dirEstablecimiento:'AV. DE LOS SHYRIS Y PORTUGAL',
+    establecimiento: '001',
+    recepUrl:process.env.BILL_RECEPTURL,
+    autoUrl:process.env.BILL_AUTOURLS
+  },
+  sriPassword : process.env.SRI_PASSWORD
 };

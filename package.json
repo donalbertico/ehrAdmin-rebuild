@@ -6,9 +6,11 @@
   "keywords": [],
   "dependencies": {
     "async": "2.0.1",
+    "aws-sdk": "^2.178.0",
     "bcrypt": "^1.0.2",
     "bcryptjs": "^2.4.3",
     "bower": "^1.8.0",
+    "checkdigit": "^1.1.1",
     "connect-redis": "^3.3.0",
     "date-utils": "^1.2.21",
     "fb": "^2.0.0",
@@ -21,11 +23,15 @@
     "passport-local": "^1.0.0",
     "polymer-cli": "^1.5.7",
     "polymer-redux": "^1.0.1",
+    "randomstring": "^1.1.5",
     "sails": "^1.0.0-36",
     "sails-hook-fixtures": "^1.0.0-beta",
     "sails-hook-orm": "^2.0.0-16",
     "sails-mongo": "^1.0.0-9",
-    "webcomponentsjs": "^1.0.2"
+    "soap": "^0.23.0",
+    "ursa": "^0.9.4",
+    "webcomponentsjs": "^1.0.2",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {},
   "scripts": {

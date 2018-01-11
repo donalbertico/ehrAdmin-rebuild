@@ -1,0 +1,23 @@
+<body>
+  <tr>
+    <td bgcolor="#ffffff" style="padding: 40px 40px 20px; text-align: center;">
+      <h1 style="margin: 0; font-family: sans-serif; font-size: 24px; line-height: 27px; color: #333333; font-weight: normal;">Pago exitoso!</h1>
+    </td>
+  </tr>
+  <!-- 1 Column Text + Button : BEGIN -->
+  <tr>
+  	<td bgcolor="#ffffff" style="padding: 0 40px 40px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; text-align: left;">
+      <p>Estimado(a) <%=recipientName%>,</p>
+      <%if(type==='plan'){%>
+        <p style="margin:0;">Hemos recibido tu pago exitosamente por lo que ahora cuentas con los beneficios de un Cliente Plus.</p>
+        <p style="margin:0;">Puedes ir a <a href="https://www.ecuadorhouserentals.com/account" rel="external" target="_blank" style="color:#0091ea;">Tu cuenta</a> para obtener tus facturas y certificados de descuento.</p>
+        <%}else{%>
+        <p style="margin:0;">Hemos recibido tu pago de manera exitosa.</p>
+        <p style="margin:0;">Los tokens han sido acreditados a tu cuenta y podrás verlos en <a href="https://www.ecuadorhouserentals.com/account" rel="external" target="_blank" style="color:#0091ea;">la página principal de tu cuenta</a> o en la sección <a href="https://www.ecuadorhouserentals.com/account#!/props" rel="external" target="_blank" style="color:#0091ea;">Mis propiedades</a>.</p>
+        <p>Desde allí podras seleccionar uno de tus anuncios publicados para renovarlo automáticamente.</p>
+        <p style="margin:0;">Si necesitas tus facturas las puedes encontrar  <a href="https://www.ecuadorhouserentals.com/account#!/plans" rel="external" target="_blank" style="color:#0091ea;">en este enlace.</a> </p>
+      <%}%>
+  	</td>
+  </tr>
+  <!-- 1 Column Text + Button : END -->
+</body>

@@ -5,6 +5,9 @@
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
 require('date-utils');
+var random = require('randomstring');
+var billInfo=sails.config.custom.bill;
+var checkDigit = require('checkdigit');
 
 /**
 *Returns the corresponding digit 11 of a n input (mod 11)
@@ -42,6 +45,7 @@ module.exports = {
     taxTotal:{type :'number'}
   },
 	toSRIFormat: (bill)=>{
+    console.log('LA FACTURA',bill);
 		var detalles=[],taxes={},subTotal=0,discSubTotal=0,taxTotal=0;
        bill.details.forEach((item,index)=>{
          var det = {
@@ -102,7 +106,7 @@ module.exports = {
  					dirMatriz:billInfo.dirMatriz
  				},
  				infoFactura:{
- 					fechaEmision:(new Date(bill.createdAt)).toFormat('DD/MM/YYYY'),
+ 					fechaEmision:(new Date()).toFormat('DD/MM/YYYY'),
  					obligadoContabilidad:"SI",
  					tipoIdentificacionComprador:bill.idType,
  					razonSocialComprador:bill.name,

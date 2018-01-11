@@ -11,7 +11,6 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
-
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/search-actions.html">
@@ -99,81 +98,27 @@
                   <paper-input class="m1-r" label="Apellido" value="{{query.lastName}}"></paper-input>
                   <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
                 </div>
-                <div class="card results">
-                  <div class="results-top">
-                    <div class="flex-3">
-                      <b class="font-subhead">Nombre</b>
-                    </div>
-                    <div class="flex-3">
-                      <b class="font-subhead">Email</b>
-                    </div>
-                    <div class="flex-3">
-                      <b class="font-subhead">Acción</b>
-                    </div>
-                  </div>
-                  <template is="dom-repeat" items="[[results]]">
-                    <div class="result">
-                      <div class="flex-3">
-                        [[item.firstName]] [[item.lastName]]
-                      </div>
-                      <span class="flex-3 link" on-tap="getUser">
-                        [[item.email]]
-                      </span>
-                      <span class="flex-3 horizontal self-end">
-                        <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
-                      </span>
-                    </div>
-                  </template>
-                  <div class="p1"></div>
-                </div>
-              </div>
-              <div class="flex p2-l vertical relative">
-                <div class="overlay vertical center" hidden="[[!loading]]">
-                  <paper-spinner active></paper-spinner>
-                </div>
-                <span class="font-display1 self-end">[[su.firstName]] [[su.lastName]]</span>
-                <div class="vertical center flex" hidden="[[su.id]]">
-                  <span class="font-headline">
-                    Selecciona un usuario para ver su información
-                  </span>
-                </div>
-                <div class="vertical" hidden="[[!su.id]]">
-                  <paper-card heading="Información" >
-                    <div class="card-content">
-                      <span class="font-title">[[su.email]]</span>
-                      <div class="horizontal self-end">
-                        <div class="flex vertical">
-                          <div class="flex"></div>
-                          <span class="accent" hidden="[[!su.isSubs]]">Suscrito hasta el: [[su.subscribedUntil]]</span>
-                          <span class="error" hidden="[[su.isSubs]]">Sin suscripción</span>
-                        </div>
-                        <div class="vertical">
-                          <span class="font-caption">Saldo</span>
-                          <span class="font-title">[[su.balance]] BTC</span>
-                        </div>
-                      </div>
-                    </div>
-                  </paper-card>
-                  <paper-card heading="Recomendados" class="m2-t">
-                    <div class="card-content vertical">
-                      <template is="dom-repeat" items="[[su.recommended]]">
-                        <div class="horizontal">
-                          <span class="flex">[[item.firstName]] [[item.lastName]]</span>
-                          <span class="flex link" on-tap="getUser">[[item.email]]</span>
-                        </div>
+                <prism-table>
+                    <prism-thead>
+                        <prism-tr>
+                            <prism-th>Nombre</prism-th>
+                            <prism-th>Email</prism-th>
+                            <prism-th>Acción</prism-th>
+                        </prism-tr>
+                    </prism-thead>
+                    <prism-tbody>
+                      <template is="dom-repeat" items="[[users]]" index-as="index">
+                        <prism-tr>
+                            <!-- <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td> -->
+                            <prism-td title="Nombre">[[item.firstName]] [[item.lastName]]</prism-td>
+                            <prism-td title="Email">[[item.email]]</prism-td>
+                            <prism-td title="Accion">
+                              <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
+                            </prism-td>
+                        </prism-tr>
                       </template>
-                    </div>
-                    <div class="card-content vertical">
-                      <span class="font-title">Máximo de recomendados</span>
-                      <div class="horizontal">
-                        <paper-slider min="3" max="24" value="[[su.maxReco]]" snaps step="3" pin editable class="flex" id="maxRecoSelector"></paper-slider>
-                      </div>
-                    </div>
-                    <div class="card-actions vertical">
-                      <paper-button class="accent self-end" on-tap="updateUserMr">Actualizar</paper-button>
-                    </div>
-                  </paper-card>
-                </div>
+                    </prism-tbody>
+                </prism-table>
               </div>
             </div>
           </section>
@@ -191,11 +136,12 @@
                 <prism-tbody>
                   <template is="dom-repeat" items="[[payments]]" index-as="index">
                     <prism-tr>
+                        <!-- <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td> -->
                         <prism-td title="Fecha">[[item.createdAt]]</prism-td>
                         <prism-td title="Numero">[[item.transferNumber]]</prism-td>
                         <prism-td title="Usuario">[[item.payer.email]]</prism-td>
                         <prism-td title="Accion">
-                          <paper-button id="[[item.payer.id]]" raised class="primary" on-click="setBenefeciary">Aprobar</paper-button>
+                          <paper-button id="[[item.id]]" raised class="primary" on-click="setPayment">Aprobar</paper-button>
                         </prism-td>
                     </prism-tr>
                   </template>
@@ -222,6 +168,28 @@
           <paper-button on-tap="benefy">Beneficiar</paper-button>
         </div>
       </paper-dialog>
+      <paper-dialog id="benefitsPDialog" class="vertical">
+        <span class="font-display1">Beneficios</span>
+        <span>Selecciona el beneficio</span>
+        <div class="benefits">
+          <paper-radio-group id="benf" selected="{{benefit}}">
+            <paper-radio-button name="PL001">1 dia</paper-radio-button>
+            <paper-radio-button name="PL002">1 semana</paper-radio-button>
+            <paper-radio-button name="PL003">1 mes</paper-radio-button>
+            <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
+            <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
+            <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
+            <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
+          </paper-radio-group>
+        </div>
+        <div class="horizontl self-end">
+          <paper-button on-tap="verify">Verificar</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="wait" modal>
+        <span>Espere...</span>
+
+      </paper-dialog>
     </app-drawer-layout>
   </template>
   <script>
@@ -233,20 +201,9 @@
             type:String,
             value:'es'
           },
-          su:{
-            type:Object,
-            statePath:(state)=>{
-              var user = Object.assign({},state.search.users.selectedUser);
-              user.isSubs = user.subscribedUntil==null ? false :  Date.compare(new Date(this.subscribedUntil), Date.today()) >= 0;
-              user.subscribedUntil= (new Date(user.subscribedUntil)).toFormat('DD-MM-YYYY');
-              return user;
-            }
-          },
-          results:{
+          users:{
             type:Array,
-            statePath:(state)=>{
-              console.log(state.search);
-            }
+            statePath:'search.users.entities'
           },
           query:{
             type:Object,
@@ -285,6 +242,7 @@
           route:String,
           page:String,
           beneficiary: String,
+          payment:String,
           benefit : {
             type : String,
             value : 'PL001'
@@ -348,11 +306,26 @@
         this.set('beneficiary',e.target.id);
         this.$.benefitsDialog.open();
       }
+      setPayment(e){
+        this.set('payment',e.target.id);
+        console.log('a verificar');
+        this.$.benefitsPDialog.open();
+      }
       benefy(e){
         this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
           showMessage('Beneficio agregado');
           this.$.benefitsDialog.close();
           this.dispatch('loadPayments');
+        });
+      }
+      verify(e){
+        console.log('A VERIFICAR',this.benefit);
+        this.$.benefitsPDialog.close();
+        this.$.wait.open();
+        this.dispatch('verifyPayment',this.payment,this.benefit,(err)=>{
+          showMessage('Beneficio agregado');
+          this.dispatch('loadPayments');
+          this.$.wait.close();
         });
       }
     }
