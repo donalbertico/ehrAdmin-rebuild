@@ -46,5 +46,10 @@ module.exports.custom = {
     recepUrl:process.env.BILL_RECEPTURL,
     autoUrl:process.env.BILL_AUTOURLS
   },
+  aws : {
+    bucket : process.env.AWS_BUCKET,
+    key : process.env.AWS_KEY,
+    secret : process.env.AWS_SECRET
+  },
   sriPassword : process.env.SRI_PASSWORD
 };
