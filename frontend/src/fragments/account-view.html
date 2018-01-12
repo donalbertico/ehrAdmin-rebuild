@@ -136,7 +136,7 @@
                 <prism-tbody>
                   <template is="dom-repeat" items="[[payments]]" index-as="index">
                     <prism-tr>
-                        <!-- <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td> -->
+                        <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
                         <prism-td title="Fecha">[[item.createdAt]]</prism-td>
                         <prism-td title="Numero">[[item.transferNumber]]</prism-td>
                         <prism-td title="Usuario">[[item.payer.email]]</prism-td>

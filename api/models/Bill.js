@@ -146,7 +146,6 @@ module.exports = {
       if(factura['factura'].infoAdicional.campoAdicional.length<1){
         delete factura['factura'].infoAdicional;
       }
-      console.log('AQI VIENDO VIENDO',factura['factura'].detalles.detalle[0].impuestos);
       return factura;
 	},
 	beforeCreate : (newRecord,next)=>{
