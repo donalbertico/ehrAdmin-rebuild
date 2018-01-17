@@ -273,7 +273,6 @@ module.exports = {
         }
         type = benefits.type;
       });
-      console.log(userBenefits);
       User.update(found.id,userBenefits,(err)=>{
         if(err) return cb(err);
         return cb(null,type);

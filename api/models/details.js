@@ -23,10 +23,8 @@ var customer = {}
     methods = {}
     accounts = {}
     taxes = {};
-    console.log('los items');
 qb.findItems([{field:'type',value:'Service'}], (err, response)=>{
   if(err) throw err;
-  console.log('encontrando!');
   response.QueryResponse.Item.forEach((product)=>{
     if(!product.Sku) return;
     var unitPrice = parseInt(product.UnitPrice / (1 - (iva.rate/100)));
@@ -45,7 +43,6 @@ qb.findItems([{field:'type',value:'Service'}], (err, response)=>{
     };
     detailDic[product.Sku].taxes = [tax];
   });
-  console.log(detailDic);
 });
 
 module.exports = {

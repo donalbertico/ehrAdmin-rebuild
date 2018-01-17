@@ -45,7 +45,6 @@ module.exports = {
     taxTotal:{type :'number'}
   },
 	toSRIFormat: (bill)=>{
-    console.log('LA FACTURA',bill);
 		var detalles=[],taxes={},subTotal=0,discSubTotal=0,taxTotal=0;
        bill.details.forEach((item,index)=>{
          var det = {

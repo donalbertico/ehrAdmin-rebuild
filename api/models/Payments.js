@@ -81,23 +81,22 @@ module.exports = {
             if(err) return cb(err);
             Payments.update(payment.id,{verifiedAt: new Date ,verified:true,bill:newBill.id,amount:bill.total,type:benefType},(err)=>{
               if(err) return cb(err);
-              // sails.hooks.mail.send(
-              //                       'paymentAproved',
-              //                       {
-              //                         recipientName: payment.payer.firstName,
-              //                         type: benefType
-              //                       },
-              //                       {
-              //                         to: payment.payer.email,
-              //                         subject: 'Pago recivido'
-              //                       },
-              //                        function(err) {
-              //
-              //                         if(err) return cb(err);
-              //                         return cb();
-              //                        }
-              //                      );
-              return cb();
+              sails.hooks.mail.send(
+                                    'paymentAproved',
+                                    {
+                                      recipientName: payment.payer.firstName,
+                                      type: benefType
+                                    },
+                                    {
+                                      to: payment.payer.email,
+                                      subject: 'Pago recivido'
+                                    },
+                                     function(err) {
+
+                                      if(err) return cb(err);
+                                      return cb();
+                                     }
+                                   );
             });
           });
         });

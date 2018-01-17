@@ -28,7 +28,6 @@ module.exports = {
 
 
   fn: function (inputs, exits,env) {
-    console.log('A');
     var prod = detailDic.detailFromCode(inputs.code);
     Payments.update({id : inputs.payment},{details : [prod]}).exec((err,found)=>{
       if(err) return exits.error(err);
