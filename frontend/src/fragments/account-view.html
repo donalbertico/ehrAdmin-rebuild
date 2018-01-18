@@ -312,10 +312,12 @@
         this.$.benefitsPDialog.open();
       }
       benefy(e){
+        this.$.wait.open();
+        this.$.benefitsDialog.close();
         this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
           showMessage('Beneficio agregado');
           this.$.benefitsDialog.close();
-          this.dispatch('loadPayments');
+          this.$.wait.close();          
         });
       }
       verify(e){

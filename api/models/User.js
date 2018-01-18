@@ -267,9 +267,9 @@ module.exports = {
           newDate.add(benefits.add);
           userBenefits = {plusUntil : newDate};
         }else{
-          var tokens = userBenefits.renovateTokens|| found.renovateTokens || 0;
+          var tokens = userBenefits.promoteTokens|| found.promoteTokens || 0;
           tokens += benefits.add.tokens;
-          userBenefits = {renovateTokens : tokens};
+          userBenefits = {promoteTokens : tokens};
         }
         type = benefits.type;
       });

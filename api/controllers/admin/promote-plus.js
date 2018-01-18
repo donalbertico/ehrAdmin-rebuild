@@ -24,7 +24,6 @@ module.exports = {
       method : 'Deposito Bancario',
       details : [{code:inputs.code,}]
     }
-    console.log(payment,'EL PAGO');
     Payments.create(payment).meta({fetch:true}).exec((err,created)=>{
       if(err) return exits.error(err);
         Payments.verify(created.id,(response)=>{
