@@ -51,5 +51,11 @@ module.exports.custom = {
     key : process.env.AWS_KEY,
     secret : process.env.AWS_SECRET
   },
+  mailgun:{
+    api_key:process.env.MAILGUN_APIKEY,
+    domain:process.env.MAILGUN_DOMAIN,
+    test:process.env.MAILGUN_TEST? true : false,
+    avoidSend:process.env.MAILGUN_AVOIDSEND?true:false
+  },
   sriPassword : process.env.SRI_PASSWORD
 };
