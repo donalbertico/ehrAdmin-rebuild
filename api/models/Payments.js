@@ -89,7 +89,7 @@ module.exports = {
                                     },
                                     {
                                       to: payment.payer.email,
-                                      subject: 'Pago recivido'
+                                      subject: 'Pago recibido'
                                     },
                                      function(err) {
 
