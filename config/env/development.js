@@ -4,5 +4,6 @@ module.exports={
   },
   paths:{
     'public':'frontend'
-  }
+  },
+  port:4420
 };

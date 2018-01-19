@@ -18,7 +18,6 @@ module.exports = {
   },
 
   fn: function (inputs, exits,env) {
-    console.log('beneficiendo o lo q sea');
     var  details = [{code:inputs.code}];
     User.findOne(inputs.user,(err,found)=>{
       if(err)exits.error(err);

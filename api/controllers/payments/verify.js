@@ -29,6 +29,7 @@ module.exports = {
 
   fn: function (inputs, exits,env) {
     var prod = detailDic.detailFromCode(inputs.code);
+    console.log('verificando');
     Payments.update({id : inputs.payment},{details : [prod]}).exec((err,found)=>{
       if(err) return exits.error(err);
       Payments.verify(inputs.payment,(err)=>{

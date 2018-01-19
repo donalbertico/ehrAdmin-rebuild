@@ -26,7 +26,8 @@ module.exports = {
     }
     Payments.create(payment).meta({fetch:true}).exec((err,created)=>{
       if(err) return exits.error(err);
-        Payments.verify(created.id,(response)=>{
+        Payments.verify(created.id,(err,response)=>{
+          if(err) return exits.error(err);
           return exits.success();
         });
     });

@@ -243,7 +243,6 @@ module.exports = {
                               },
                                function(err) {
                                 if(err) {
-                                  console.log(err);
                                   return next();
                                 };
                                 return next();

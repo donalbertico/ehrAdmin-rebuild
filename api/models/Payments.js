@@ -79,7 +79,7 @@ module.exports = {
           };
           Bill.create(bill).meta({fetch:true}).exec((err,newBill)=>{
             if(err) return cb(err);
-            Payments.update(payment.id,{verifiedAt: new Date ,verified:true,bill:newBill.id,amount:bill.total,type:benefType},(err)=>{
+            Payments.update(payment.id,{verifiedAt: new Date().getTime() ,verified:true,bill:newBill.id,amount:bill.total,type:benefType},(err)=>{
               if(err) return cb(err);
               sails.hooks.mail.send(
                                     'paymentAproved',

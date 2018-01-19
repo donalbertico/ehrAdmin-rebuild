@@ -138,7 +138,6 @@
                   <template is="dom-repeat" items="[[payments]]" index-as="index">
                     <prism-tr>
                         <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
-                        <prism-td title="Fecha">[[item.createdAt]]</prism-td>
                         <prism-td title="Numero">[[item.transferNumber]]</prism-td>
                         <prism-td title="Usuario">[[item.payer.email]]</prism-td>
                         <prism-td title="Accion">
@@ -156,13 +155,13 @@
         <span>Selecciona el beneficio</span>
         <div class="benefits">
           <paper-radio-group id="group" selected="{{benefit}}">
-            <paper-radio-button name="PL001">1 dia</paper-radio-button>
-            <paper-radio-button name="PL002">1 semana</paper-radio-button>
-            <paper-radio-button name="PL003">1 mes</paper-radio-button>
-            <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
-            <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
-            <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
-            <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
+            <paper-radio-button name="PL001">1 dia,$3</paper-radio-button>
+            <paper-radio-button name="PL002">1 semana,$5</paper-radio-button>
+            <paper-radio-button name="PL003">1 mes,$10</paper-radio-button>
+            <paper-radio-button name="TO001">1 propiedad,$3</paper-radio-button>
+            <paper-radio-button name="TO002">10 propeidades,$20</paper-radio-button>
+            <paper-radio-button name="TO003">25 propiedades,$37.50</paper-radio-button>
+            <paper-radio-button name="TO004">50 propiedades$50</paper-radio-button>
           </paper-radio-group>
         </div>
         <div class="horizontl self-end">
@@ -174,13 +173,13 @@
         <span>Selecciona el beneficio</span>
         <div class="benefits">
           <paper-radio-group id="benf" selected="{{benefit}}">
-            <paper-radio-button name="PL001">1 dia</paper-radio-button>
-            <paper-radio-button name="PL002">1 semana</paper-radio-button>
-            <paper-radio-button name="PL003">1 mes</paper-radio-button>
-            <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
-            <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
-            <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
-            <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
+            <paper-radio-button name="PL001">1 dia,$3</paper-radio-button>
+            <paper-radio-button name="PL002">1 semana,$5</paper-radio-button>
+            <paper-radio-button name="PL003">1 mes,$10</paper-radio-button>
+            <paper-radio-button name="TO001">1 propiedad,$3</paper-radio-button>
+            <paper-radio-button name="TO002">10 propeidades,$20</paper-radio-button>
+            <paper-radio-button name="TO003">25 propiedades,$37.50</paper-radio-button>
+            <paper-radio-button name="TO004">50 propiedades$50</paper-radio-button>
           </paper-radio-group>
         </div>
         <div class="horizontl self-end">
@@ -192,13 +191,13 @@
         <span>Selecciona el beneficio</span>
         <div class="benefits">
           <paper-radio-group id="benf" selected="{{benefit}}">
-            <paper-radio-button name="PL001">1 dia</paper-radio-button>
-            <paper-radio-button name="PL002">1 semana</paper-radio-button>
-            <paper-radio-button name="PL003">1 mes</paper-radio-button>
-            <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
-            <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
-            <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
-            <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
+            <paper-radio-button name="PL001">1 dia,$3</paper-radio-button>
+            <paper-radio-button name="PL002">1 semana,$5</paper-radio-button>
+            <paper-radio-button name="PL003">1 mes,$10</paper-radio-button>
+            <paper-radio-button name="TO001">1 propiedad,$3</paper-radio-button>
+            <paper-radio-button name="TO002">10 propeidades,$20</paper-radio-button>
+            <paper-radio-button name="TO003">25 propiedades,$37.50</paper-radio-button>
+            <paper-radio-button name="TO004">50 propiedades$50</paper-radio-button>
           </paper-radio-group>
         </div>
         <div class="horizontl self-end">
@@ -331,12 +330,12 @@
       }
       setPayment(e){
         this.set('payment',e.target.id);
-        console.log('a verificar');
         this.$.benefitsPDialog.open();
       }
       benefy(e){
         this.$.wait.open();
         this.$.benefitsDialog.close();
+        console.log('a beneficiar');
         this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
           showMessage('Beneficio agregado');
           this.$.benefitsDialog.close();
