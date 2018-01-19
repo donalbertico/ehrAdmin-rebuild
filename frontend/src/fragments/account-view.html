@@ -109,11 +109,12 @@
                     <prism-tbody>
                       <template is="dom-repeat" items="[[users]]" index-as="index">
                         <prism-tr>
-                            <!-- <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td> -->
+                            <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
                             <prism-td title="Nombre">[[item.firstName]] [[item.lastName]]</prism-td>
                             <prism-td title="Email">[[item.email]]</prism-td>
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
                             </prism-td>
                         </prism-tr>
                       </template>
@@ -184,6 +185,24 @@
         </div>
         <div class="horizontl self-end">
           <paper-button on-tap="verify">Verificar</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="luckyDialog" class="vertical">
+        <span class="font-display1">Beneficios</span>
+        <span>Selecciona el beneficio</span>
+        <div class="benefits">
+          <paper-radio-group id="benf" selected="{{benefit}}">
+            <paper-radio-button name="PL001">1 dia</paper-radio-button>
+            <paper-radio-button name="PL002">1 semana</paper-radio-button>
+            <paper-radio-button name="PL003">1 mes</paper-radio-button>
+            <paper-radio-button name="TO001">1 propiedad</paper-radio-button>
+            <paper-radio-button name="TO002">10 propeidades</paper-radio-button>
+            <paper-radio-button name="TO003">25 propiedades</paper-radio-button>
+            <paper-radio-button name="TO004">50 propiedades</paper-radio-button>
+          </paper-radio-group>
+        </div>
+        <div class="horizontl self-end">
+          <paper-button on-tap="donate">Donar</paper-button>
         </div>
       </paper-dialog>
       <paper-dialog id="wait" modal>
@@ -306,6 +325,10 @@
         this.set('beneficiary',e.target.id);
         this.$.benefitsDialog.open();
       }
+      setLucky(e){
+        this.set('beneficiary',e.target.id);
+        this.$.luckyDialog.open();
+      }
       setPayment(e){
         this.set('payment',e.target.id);
         console.log('a verificar');
@@ -317,16 +340,24 @@
         this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
           showMessage('Beneficio agregado');
           this.$.benefitsDialog.close();
-          this.$.wait.close();          
+          this.$.wait.close();
         });
       }
       verify(e){
-        console.log('A VERIFICAR',this.benefit);
         this.$.benefitsPDialog.close();
         this.$.wait.open();
         this.dispatch('verifyPayment',this.payment,this.benefit,(err)=>{
           showMessage('Beneficio agregado');
           this.dispatch('loadPayments');
+          this.$.wait.close();
+        });
+      }
+      donate(e){
+        console.log('A donar',this.benefit);
+        this.$.luckyDialog.close();
+        this.$.wait.open();
+        this.dispatch('donateBenefit',this.beneficiary,this.benefit,(err)=>{
+          showMessage('Beneficio donado');
           this.$.wait.close();
         });
       }

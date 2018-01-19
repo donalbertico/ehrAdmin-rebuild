@@ -170,7 +170,30 @@
                 dispatch({type:'LOAD_PAYMENTS',status:'error',error:e});
               });
             }
-          }
+          },
+          donateBenefit : (id,code,callback) => {
+            console.log('a verificar');
+            return (dispatch) =>{
+              let request = new Request('/admin/give-benefits',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({
+                  user:id,
+                  code:code
+                }),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback(null);
+              })
+              .catch((e)=>{
+                console.log(e);
+                callback(e.message);
+              });
+            }
+          },
         }
       }
 

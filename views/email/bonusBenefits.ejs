@@ -1,0 +1,22 @@
+<body>
+  <tr>
+    <td bgcolor="#ffffff" style="padding: 40px 40px 20px; text-align: center;">
+      <h1 style="margin: 0; font-family: sans-serif; font-size: 24px; line-height: 27px; color: #333333; font-weight: normal;">Felicitaciones!</h1>
+    </td>
+  </tr>
+  <!-- 1 Column Text + Button : BEGIN -->
+  <tr>
+  	<td bgcolor="#ffffff" style="padding: 0 40px 40px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; text-align: left;">
+      <p>Estimado(a) <%=recipientName%>,</p>
+      <p style="margin:0;">Ecuador House Rentals premia tu fidelidad y te regala</p>
+      <%if(type==='plan'){%>
+        <p style="margin:0;">Un dia como Cliente Plus</p>
+        <p style="margin:0;">Puedes ir a <a href="https://www.ecuadorhouserentals.com/account" rel="external" target="_blank" style="color:#0091ea;">Tu cuenta</a> para ver tus ventajas.</p>
+        <%}else{%>
+          <p style="margin:0;">Un token para Renvoar una Propiedad</p>
+          <p style="margin:0;">Puedes ir a <a href="https://www.ecuadorhouserentals.com/properties" rel="external" target="_blank" style="color:#0091ea;">Tu cuenta</a> para ver tus ventajas.</p>
+      <%}%>
+  	</td>
+  </tr>
+  <!-- 1 Column Text + Button : END -->
+</body>
