@@ -411,8 +411,10 @@
           this.$.wait.close();
         });
       }
+      loadPayments(){
+        this.dispatch('loadPayments');
+      }
       donate(e){
-        console.log('A donar',this.benefit);
         this.$.luckyDialog.close();
         this.$.wait.open();
         this.dispatch('donateBenefit',this.beneficiary,this.benefit,(err)=>{
