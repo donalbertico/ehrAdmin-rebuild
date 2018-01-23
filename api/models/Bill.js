@@ -181,6 +181,8 @@ module.exports = {
       newRecord.taxTotal = Number(taxTotal);
 			newRecord.numericCode = random.generate({length:8,charset:'numeric'});
 			newRecord.accessKey = Date.today().toFormat('DDMMYYYY')+'01'+billInfo.ruc+billInfo.ambiente+billInfo.establecimiento+pad(newRecord.emisionPoint,3)+pad(newRecord.secuence,9)+newRecord.numericCode+'1';
+      console.log(checkDigit.mod11.create(newRecord.accessKey));
+      console.log(checkDigit.mod11.apply(newRecord.accessKey));
 			newRecord.accessKey = checkDigit.mod11.apply(newRecord.accessKey);
 			return next();
 		});
