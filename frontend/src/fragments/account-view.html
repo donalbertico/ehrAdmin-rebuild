@@ -71,6 +71,7 @@
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
+    <app-route route="{{route}}" pattern="/account/payments" on-active-changed="loadPayments" data="{{data}}" tail="{{tail}}"></app-route>
     <app-drawer-layout>
       <app-drawer slot="drawer">
         <app-toolbar>Menu</app-toolbar>
@@ -147,6 +148,66 @@
                 </prism-tbody>
             </prism-table>
           </section>
+          <section>
+            <span  class="font-headline s m1-b">Propiedades</span>
+            <paper-card>
+              <div class="card-content vertical">
+                <div class="">
+                  Total :
+                </div>
+                <div class="">
+                  <span>
+                    Pendientes :
+                  </span>
+                  <span>
+                    No publicadas :
+                  </span>
+                  <span>
+                    Publicadas
+                  </span>
+                </div>
+              </div>
+            </paper-card>
+          </section>
+          <div class="horizontal">
+            <div class="vertical flex">
+              <span class="font-headline s m1-b">Filtros</span>
+              <div class="card horizontal">
+                <paper-input class="m1-r" label="Id" value="{{propsQuery.email}}"></paper-input>
+                <paper-dropdown-menu label="Your favourite pastry">
+                  <paper-listbox slot="dropdown-content">
+                    <paper-item>Croissant</paper-item>
+                    <paper-item>Donut</paper-item>
+                    <paper-item>Financier</paper-item>
+                    <paper-item>Madeleine</paper-item>
+                  </paper-listbox>
+                </paper-dropdown-menu>
+                <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
+              </div>
+              <prism-table>
+                  <prism-thead>
+                      <prism-tr>
+                          <prism-th>Nombre</prism-th>
+                          <prism-th>Email</prism-th>
+                          <prism-th>Acción</prism-th>
+                      </prism-tr>
+                  </prism-thead>
+                  <prism-tbody>
+                    <template is="dom-repeat" items="[[users]]" index-as="index">
+                      <prism-tr>
+                          <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                          <prism-td title="Nombre">[[item.firstName]] [[item.lastName]]</prism-td>
+                          <prism-td title="Email">[[item.email]]</prism-td>
+                          <prism-td title="Accion">
+                            <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
+                            <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
+                          </prism-td>
+                      </prism-tr>
+                    </template>
+                  </prism-tbody>
+              </prism-table>
+            </div>
+          </div>
         </iron-pages>
       </div>
       <paper-dialog id="benefitsDialog" class="vertical">
