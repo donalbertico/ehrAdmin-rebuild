@@ -208,7 +208,7 @@
                             <prism-th>Id</prism-th>
                             <prism-th>Fecha</prism-th>
                             <prism-th>Titulo</prism-th>
-                            <prism-th>Email</prism-th>
+                            <prism-th>Estado</prism-th>
                             <prism-th>Acción</prism-th>
                         </prism-tr>
                     </prism-thead>
@@ -216,7 +216,7 @@
                       <template is="dom-repeat" items="[[props]]" index-as="index">
                         <prism-tr>
                             <prism-td title="Id">[[item.id]]</prism-td>
-                            <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                            <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
                             <prism-td title="Nombre">[[item.title]]</prism-td>
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
                             <prism-td title="Accion">
@@ -349,11 +349,11 @@
               return{
                 'en':{
                   'date' : '{value,date,medium}',
-                  'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada}}'
+                  'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada} e {expirada}}'
                 },
                 'es':{
                   'date' : '{value,date,medium}',
-                  'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada}}'
+                  'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada} e {expirada}}'
                 }
               }
             }
