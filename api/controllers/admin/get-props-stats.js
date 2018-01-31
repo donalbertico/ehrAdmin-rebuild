@@ -1,10 +1,10 @@
 module.exports = {
 
 
-  friendlyName: 'Get statistics',
+  friendlyName: 'Get statistics from props',
 
 
-  description: 'Get statistics for the whole page',
+  description: 'Get statistics from props',
 
 
   inputs: {
@@ -26,35 +26,32 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    var user = User.getDatastore().manager.collection('user');
-    var payment = User.getDatastore().manager.collection('payment');
+    var prop = User.getDatastore().manager.collection('property');
     var result={};
-    user.count({},(err,totalUsers)=>{
+    prop.count({},(err,total)=>{
       if(err){
         console.error(err);
         return exits.error({message:'server_error'});
       }
-      result.users=totalUsers;
-      user.count({subscribedUntil:{'$gt':new Date()}},(err,subsUsers)=>{
+      result.total=total;
+      prop.count({state:'v'},(err,published)=>{
         if(err){
           console.error(err);
           return exits.error({message:'server_error'});
         }
-        result.subsUsers=subsUsers;
-        payment.count({},(err,totalPays)=>{
+        result.published=published;
+        prop.count({state:'n'},(err,noPublish)=>{
           if(err){
             console.error(err);
             return exits.error({message:'server_error'});
           }
-          result.payments=totalPays;
-          payment.count({'txStatus':'completed'},(err,completedPays)=>{
+          result.noPublish=noPublish;
+          prop.count({state:'p'},(err,pendent)=>{
             if(err){
               console.error(err);
               return exits.error({message:'server_error'});
             }
-            result.completePayments=completedPays;
-            result.totalCollected=(completedPays*0.01);
-            result.totalEarnings=(completedPays*0.0032);
+            result.pendent=pendent;
             return exits.success(result);
           });
         });

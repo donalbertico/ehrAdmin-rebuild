@@ -12,7 +12,6 @@
  */
 const mp = sails.config.custom.mP;
 module.exports = function create(req, res) {
-
   if(req.body.mp!==mp){
     return res.ok('Not today!');
   }
@@ -20,7 +19,9 @@ module.exports = function create(req, res) {
     username:req.body.username,
     password:req.body.password
   };
-
+  if(!newAdmin.username || !newAdmin.password){
+    return res.ok('Not today!');
+  }
   Admin.create(newAdmin,(err)=>{
     console.log(err);
     if(err){

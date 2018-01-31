@@ -8,7 +8,11 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
 <link rel="import" href="../shared-styles.html">
@@ -65,6 +69,9 @@
       div.benefits{
         width: 25rem;
       }
+      span.stat{
+        width: 10rem;
+      }
     </style>
     <app-route
         route="{{route}}"
@@ -72,6 +79,7 @@
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
     <app-route route="{{route}}" pattern="/account/payments" on-active-changed="loadPayments" data="{{data}}" tail="{{tail}}"></app-route>
+    <app-route route="{{route}}" pattern="/account/props" on-active-changed="loadPropsStats" data="{{data}}" tail="{{tail}}"></app-route>
     <app-drawer-layout>
       <app-drawer slot="drawer">
         <app-toolbar>Menu</app-toolbar>
@@ -79,6 +87,7 @@
           <a name="start" href="/account/start">Inicio</a>
           <a name="users" href="/account/users">Usuarios</a>
           <a name="users" href="/account/payments">Pagos por Verificar</a>
+          <a name="users" href="/account/props">Propiedades</a>
         </iron-selector>
       </app-drawer>
       <div>
@@ -94,9 +103,9 @@
               <div class="vertical flex">
                 <span class="font-headline s m1-b">Filtros</span>
                 <div class="card horizontal">
-                  <paper-input class="m1-r" label="Email" value="{{query.email}}"></paper-input>
-                  <paper-input class="m1-r" label="Nombre" value="{{query.firstName}}"></paper-input>
-                  <paper-input class="m1-r" label="Apellido" value="{{query.lastName}}"></paper-input>
+                  <paper-input class="m1-r" label="Email" value="{{userQuery.email}}"></paper-input>
+                  <paper-input class="m1-r" label="Nombre" value="{{userQuery.firstName}}"></paper-input>
+                  <paper-input class="m1-r" label="Apellido" value="{{userQuery.lastName}}"></paper-input>
                   <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
                 </div>
                 <prism-table>
@@ -148,66 +157,78 @@
                 </prism-tbody>
             </prism-table>
           </section>
-          <section>
-            <span  class="font-headline s m1-b">Propiedades</span>
-            <paper-card>
-              <div class="card-content vertical">
-                <div class="">
-                  Total :
+          <section name="props">
+            <div class="vertical">
+              <span  class="font-headline s m1-b">Propiedades</span>
+              <paper-card>
+                <div class="card-content vertical">
+                  <div class="">
+                    Total : [[propStats.total]]
+                  </div>
+                  <div class="">
+                    <span class="stat">
+                      Pendientes : [[propStats.pendent]]
+                    </span>
+                    <span class="stat">
+                      No publicadas : [[propStats.noPublish]]
+                    </span>
+                    <span class="stat">
+                      Publicadas : [[propStats.published]]
+                    </span>
+                  </div>
                 </div>
-                <div class="">
-                  <span>
-                    Pendientes :
-                  </span>
-                  <span>
-                    No publicadas :
-                  </span>
-                  <span>
-                    Publicadas
-                  </span>
-                </div>
-              </div>
-            </paper-card>
-          </section>
-          <div class="horizontal">
-            <div class="vertical flex">
-              <span class="font-headline s m1-b">Filtros</span>
-              <div class="card horizontal">
-                <paper-input class="m1-r" label="Id" value="{{propsQuery.email}}"></paper-input>
-                <paper-dropdown-menu label="Your favourite pastry">
-                  <paper-listbox slot="dropdown-content">
-                    <paper-item>Croissant</paper-item>
-                    <paper-item>Donut</paper-item>
-                    <paper-item>Financier</paper-item>
-                    <paper-item>Madeleine</paper-item>
-                  </paper-listbox>
-                </paper-dropdown-menu>
-                <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
-              </div>
-              <prism-table>
-                  <prism-thead>
-                      <prism-tr>
-                          <prism-th>Nombre</prism-th>
-                          <prism-th>Email</prism-th>
-                          <prism-th>Acción</prism-th>
-                      </prism-tr>
-                  </prism-thead>
-                  <prism-tbody>
-                    <template is="dom-repeat" items="[[users]]" index-as="index">
-                      <prism-tr>
-                          <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
-                          <prism-td title="Nombre">[[item.firstName]] [[item.lastName]]</prism-td>
-                          <prism-td title="Email">[[item.email]]</prism-td>
-                          <prism-td title="Accion">
-                            <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
-                            <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
-                          </prism-td>
-                      </prism-tr>
-                    </template>
-                  </prism-tbody>
-              </prism-table>
+              </paper-card>
             </div>
-          </div>
+            <div class="horizontal">
+              <div class="vertical flex">
+                <span class="font-headline s m1-b">Filtros</span>
+                <div class="card vertical">
+                  <div class="horizontal">
+                    <paper-input class="m1-r" label="Id" value="{{propsQuery.id}}"></paper-input>
+                    <paper-input class="m1-r" label="title" value="{{propsQuery.title}}"></paper-input>
+                    <paper-dropdown-menu id="propState" label="Estado">
+                      <paper-listbox slot="dropdown-content" attr-for-selected="state" selected="{{propsQuery.state}}">
+                        <paper-item state="a">Todo</paper-item>
+                        <paper-item state="v">Publicada</paper-item>
+                        <paper-item state="n">No publicada</paper-item>
+                        <paper-item state="p">Pendiente</paper-item>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
+                  </div>
+                  <div class="horizontal">
+                    <vaadin-date-picker id="propFrom" value="{{propsQuery.from}}" label="Desde"></vaadin-date-picker>
+                    <vaadin-date-picker id="propTo" value="{{propsQuery.to}}" label="Hasta"></vaadin-date-picker>
+                    <paper-button raised class="accent self-center" on-tap="searchProps">Buscar</paper-button>
+                  </div>
+                </div>
+                <span>[[props.length]] Resultados</span>
+                <prism-table>
+                    <prism-thead>
+                        <prism-tr>
+                            <prism-th>Id</prism-th>
+                            <prism-th>Fecha</prism-th>
+                            <prism-th>Titulo</prism-th>
+                            <prism-th>Email</prism-th>
+                            <prism-th>Acción</prism-th>
+                        </prism-tr>
+                    </prism-thead>
+                    <prism-tbody>
+                      <template is="dom-repeat" items="[[props]]" index-as="index">
+                        <prism-tr>
+                            <prism-td title="Id">[[item.id]]</prism-td>
+                            <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                            <prism-td title="Nombre">[[item.title]]</prism-td>
+                            <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
+                            <prism-td title="Accion">
+                              <paper-button id="[[item.id]]" raised on-tap="unPublish">Dejar de publicar</paper-button>
+                            </prism-td>
+                        </prism-tr>
+                      </template>
+                    </prism-tbody>
+                </prism-table>
+              </div>
+            </div>
+          </section>
         </iron-pages>
       </div>
       <paper-dialog id="benefitsDialog" class="vertical">
@@ -283,7 +304,11 @@
             type:Array,
             statePath:'search.users.entities'
           },
-          query:{
+          props:{
+            type:Array,
+            statePath: 'search.props.entities'
+          },
+          userQuery:{
             type:Object,
             value:()=>{
               return {
@@ -292,6 +317,20 @@
                 lastName:null
               }
             }
+          },
+          propsQuery:{
+            type:Object,
+            value:()=>{
+              return {
+                id:null,
+                state:'a',
+                title:null
+              }
+            }
+          },
+          propStats:{
+            type: Object,
+            statePath:'search.props.stats'
           },
           payments:{
             type:Array,
@@ -309,10 +348,12 @@
             value:function(){
               return{
                 'en':{
-                  'date' : '{value,date,medium}'
+                  'date' : '{value,date,medium}',
+                  'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada}}'
                 },
                 'es':{
-                  'date' : '{value,date,medium}'
+                  'date' : '{value,date,medium}',
+                  'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada}}'
                 }
               }
             }
@@ -338,13 +379,28 @@
         })
       }
       searchUsers(){
-        var query={};
-        Object.keys(this.query).forEach((key)=>{
-          if(this.query[key]){
-            query[key]=this.query[key];
+        var userQuery={};
+        Object.keys(this.userQuery).forEach((key)=>{
+          if(this.userQuery[key]){
+            userQuery[key]=this.userQuery[key];
           }
         });
-        this.dispatch('searchUsers',query,(e)=>{
+        this.dispatch('searchUsers',userQuery,(e)=>{
+          if(e)return showMessage('Error en la búsqueda');
+        });
+      }
+      searchProps(){
+        var propsQuery= {};
+        Object.keys(this.propsQuery).forEach((key)=>{
+          if(this.propsQuery[key]){
+            propsQuery[key]=this.propsQuery[key];
+          }
+        });
+        if(propsQuery.from && propsQuery.to){
+          propsQuery.from = new Date(propsQuery.from).getTime();
+          propsQuery.to = new Date(propsQuery.to).getTime();
+        }
+        this.dispatch('searchProps',propsQuery,(e)=>{
           if(e)return showMessage('Error en la búsqueda');
         });
       }
@@ -375,7 +431,6 @@
         }else{
           this.page=page;
           if(page == 'payments'){
-            console.log('a cargar');
             this.dispatch('loadPayments');
           }
         }
@@ -395,7 +450,6 @@
       benefy(e){
         this.$.wait.open();
         this.$.benefitsDialog.close();
-        console.log('a beneficiar');
         this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
           showMessage('Beneficio agregado');
           this.$.benefitsDialog.close();
@@ -413,6 +467,18 @@
       }
       loadPayments(){
         this.dispatch('loadPayments');
+      }
+      loadPropsStats(){
+        this.dispatch('loadPropsStats',(json)=>{
+        });
+      }
+      unPublish(e){
+        this.dispatch('unPublishProp',e.target.id,(err)=>{
+          if (err) return showMessage(err);
+          this.searchProps();
+          this.loadPropsStats();
+          showMessage('Propiedad despublicada');
+        });
       }
       donate(e){
         this.$.luckyDialog.close();

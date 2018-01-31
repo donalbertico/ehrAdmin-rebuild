@@ -20,7 +20,7 @@
     "paper-button": "PolymerElements/paper-button",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "paper-input": "PolymerElements/paper-input#^2.0.5",
-    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.0.1",
+    "paper-dropdown-menu": "^2.0.2",
     "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
     "paper-item": "PolymerElements/paper-item#^2.0.0",
     "paper-menu-button": "PolymerElements/paper-menu-button#^2.0.0",
@@ -41,7 +41,8 @@
     "paper-dialog": "^2.0.0",
     "paper-slider": "PolymerElements/paper-slider#^2.0.4",
     "paper-styles": "^2.0.0",
-    "prism-table": "Prhythm/prism-table#^2.0.0"
+    "prism-table": "Prhythm/prism-table#^2.0.0",
+    "vaadin-date-picker": "^2.0.7"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"

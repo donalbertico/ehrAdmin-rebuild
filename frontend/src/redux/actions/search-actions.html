@@ -28,7 +28,6 @@
             };
           },
           searchUsers:(query,callback)=>{
-            console.log(query);
             return (dispatch)=>{
               let url = '/admin/search-users';
               let request = new Request(url,{
@@ -54,22 +53,41 @@
               });
             };
           },
-          selectUser:(id,callback)=>{
+          searchProps:(query,callback)=>{
             return (dispatch)=>{
-              let url = '/admin/get-single-user';
+              let url = '/admin/search-props';
               let request = new Request(url,{
                 method:'POST',
                 headers: sh,
                 credentials: 'include',
-                body:JSON.stringify({
-                  id:id
-                })
+                body:JSON.stringify(query)
               });
               window.fetch(request)
               .then(handleReqError)
               .then((response)=>{
                 response.json().then((json)=>{
-                  dispatch({type:'SELECT_USER',selectedUser:json});
+                  dispatch({type:'LOAD_PROPS',props:json});
+                  callback(null,json);
+                });
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            };
+          },
+          loadPropsStats:(callback)=>{
+            return (dispatch)=>{
+              let url = '/admin/get-props-stats';
+              let request = new Request(url,{
+                method:'GET',
+                headers: sh,
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_STATS',stats:json});
                   callback(null,json);
                 });
               })
@@ -121,14 +139,12 @@
                 callback(null);
               })
               .catch((e)=>{
-                console.log(e);
                 dispatch({type:'LOG_IN',status:'error',error:e});
                 callback(e.message);
               });
             }
           },
           verifyPayment : (id,code,callback) => {
-            console.log('a verificar');
             return (dispatch) =>{
               dispatch({type :'LOG_IN'});
               let request = new Request('/payments/verify',{
@@ -172,7 +188,6 @@
             }
           },
           donateBenefit : (id,code,callback) => {
-            console.log('a verificar');
             return (dispatch) =>{
               let request = new Request('/admin/give-benefits',{
                 method:'POST',
@@ -194,6 +209,28 @@
               });
             }
           },
+          unPublishProp : (id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/property/un-publish',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({
+                  id:id
+                }),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                console.log(response);
+                callback(null);
+              })
+              .catch((e)=>{
+                console.log(e);
+                callback(e.message);
+              });
+            }
+          }
         }
       }
 
