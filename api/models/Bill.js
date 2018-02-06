@@ -7,8 +7,26 @@
 require('date-utils');
 var random = require('randomstring');
 var billInfo=sails.config.custom.bill;
-var checkDigit = require('checkdigit');
 
+
+function apply11(input) {
+  return input + create11(input);
+}
+
+function create11(input) {
+  var sum = 0;
+  input.split('').reverse().forEach(function (value, index) {
+    sum += parseInt(value, 10) * (index % 6 + 2);
+  });
+  var sumMod11 = sum % 11;
+  if (sumMod11 === 0) {
+    return '0';
+  } else if (sumMod11 === 1) {
+    return '1';
+  } else {
+    return (11 - sumMod11) + '';
+  }
+}
 /**
 *Returns the corresponding digit 11 of a n input (mod 11)
 *
@@ -181,9 +199,9 @@ module.exports = {
       newRecord.taxTotal = Number(taxTotal);
 			newRecord.numericCode = random.generate({length:8,charset:'numeric'});
 			newRecord.accessKey = Date.today().toFormat('DDMMYYYY')+'01'+billInfo.ruc+billInfo.ambiente+billInfo.establecimiento+pad(newRecord.emisionPoint,3)+pad(newRecord.secuence,9)+newRecord.numericCode+'1';
-      console.log(checkDigit.mod11.create(newRecord.accessKey));
-      console.log(checkDigit.mod11.apply(newRecord.accessKey));
-			newRecord.accessKey = checkDigit.mod11.apply(newRecord.accessKey);
+      console.log(create11(newRecord.accessKey));
+      console.log(apply11(newRecord.accessKey));
+			newRecord.accessKey = apply11(newRecord.accessKey);
 			return next();
 		});
 	},
