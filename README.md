@@ -1,6 +1,6 @@
 # Dinabun Admin App
 
-App for admins at Dinabun
+App for admins at ECHR
 
 ### Creators
 
