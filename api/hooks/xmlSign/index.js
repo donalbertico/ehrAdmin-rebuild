@@ -55,7 +55,8 @@ module.exports = (sails)=>{
  		var xmlSignedProperties='<etsi:SignedProperties Id="Signature620397-SignedProperties24123">';
  		xmlSignedProperties+='<etsi:SignedSignatureProperties>';
  		xmlSignedProperties+='<etsi:SigningTime>';
- 		xmlSignedProperties+=Date.today().toFormat('YYYY-MM-DDTHH24:MM:SS')+'-05:00';
+    // xmlSignedProperties+=Date.today().toFormat('YYYY-MM-DDTHH24:MM:SS')+'-05:00';
+ 		xmlSignedProperties+=(new Date('05-05-2017')).toFormat('YYYY-MM-DDTHH24:MM:SS')+'-05:00';
  		xmlSignedProperties+='</etsi:SigningTime>';
  		xmlSignedProperties+='<etsi:SigningCertificate>';
  		xmlSignedProperties+='<etsi:Cert>';

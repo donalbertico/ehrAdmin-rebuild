@@ -123,7 +123,7 @@ module.exports = {
  					dirMatriz:billInfo.dirMatriz
  				},
  				infoFactura:{
- 					fechaEmision:(new Date()).toFormat('DD/MM/YYYY'),
+ 					fechaEmision:(new Date(bill.createdAt)).toFormat('DD/MM/YYYY'),
  					obligadoContabilidad:"SI",
  					tipoIdentificacionComprador:bill.idType,
  					razonSocialComprador:bill.name,

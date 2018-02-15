@@ -57,6 +57,7 @@ module.exports = {
     }
 
     var col = User.getDatastore().manager.collection('user');
+    var prop = User.getDatastore().manager.collection('property');
     col.find(query).toArray((err,users)=>{
       if(err){
         console.error(err);

@@ -3,7 +3,7 @@ var ObjectID = require('mongodb').ObjectID;
 function parseQuery(inputs){
   var query={};
   if(inputs.id){
-    query['_id']=ObjectID(inputs.id);
+    query.shortId = {'$regex':`.*${inputs.id}.*`};
   }
   if(inputs.title){
     query.title={'$regex':`.*${inputs.title}.*`};
@@ -12,7 +12,7 @@ function parseQuery(inputs){
     query.state = inputs.state;
   }
   if (inputs.from && inputs.to) {
-    query.createdAt = {'$gte' : inputs.from, '$lt' : inputs.to};
+    query.lastPublishedDate = {'$gte' : inputs.from, '$lt' : inputs.to};
   }
   if(Object.keys(query).length<1){
     return null;
