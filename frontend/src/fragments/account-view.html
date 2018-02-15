@@ -12,6 +12,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
@@ -72,6 +73,18 @@
       span.stat{
         width: 10rem;
       }
+      paper-card.stat{
+        height: 150px;
+        width: 150px;
+        margin: 8px;
+      }
+      .emails{
+        height: calc( 100vh - 310px );
+        overflow: auto;
+      }
+      .emails prism-table{
+        background-color: #fff;
+      }
     </style>
     <app-route
         route="{{route}}"
@@ -88,6 +101,7 @@
           <a name="users" href="/account/users">Usuarios</a>
           <a name="users" href="/account/payments">Pagos por Verificar</a>
           <a name="users" href="/account/props">Propiedades</a>
+          <a name="users" href="/account/emails">Correos</a>
         </iron-selector>
       </app-drawer>
       <div>
@@ -230,6 +244,91 @@
               </div>
             </div>
           </section>
+          <section name="emails">
+            <div class="vertical h-100">
+              <div class="vertical dark-primary">
+                <div class="p1 horizontal">
+                  <span class="font-display1">Correos</span>
+                  <paper-spinner active="[[emailsLoading]]"></paper-spinner>
+                </div>
+                <paper-tabs selected="{{emailsPage}}">
+                  <paper-tab>Estadísticas</paper-tab>
+                  <paper-tab>Listas</paper-tab>
+                </paper-tabs>
+              </div>
+              <div class="vertical flex">
+                <iron-pages selected="[[emailsPage]]">
+                  <section class="vertical">
+                    <div class="p1 horizontal">
+                      <paper-radio-group selected="{{emailsTime}}">
+                        <paper-radio-button name="week">La última semana</paper-radio-button>
+                        <paper-radio-button name="month">El último mes</paper-radio-button>
+                      </paper-radio-group>
+                    </div>
+                    <div class="horizontal wrap w-100">
+                        <paper-card class="stat">
+                          <div class="card-content vertical">
+                            <span class="font-display2">[[emailStats.total]]</span>
+                            <span>Contactos con propietarios</span>
+                          </div>
+                        </paper-card>
+                        <paper-card class="stat">
+                          <div class="card-content vertical">
+                            <span class="font-display2">[[emailStats.addresses]]</span>
+                            <span>Nuevos Correos</span>
+                          </div>
+                        </paper-card>
+                        <paper-card class="stat">
+                          <div class="card-content vertical">
+                            <span class="font-display2">[[emailStats.props]]</span>
+                            <span>Propiedades consultadas</span>
+                          </div>
+                        </paper-card>
+                    </div>
+                  </section>
+                  <section>
+                    <div class="vertical h-100">
+                      <div class="vertical p1 light-primary">
+                        <span class="font-title p1">Filtros:</span>
+                        <div class="horizontal p1">
+                          <paper-input label="Email" value="{{emailsQuery.email}}"></paper-input>
+                          <vaadin-date-picker value="{{emailsQuery.from}}" label="Desde" class="m1-l"></vaadin-date-picker>
+                          <vaadin-date-picker value="{{emailsQuery.to}}" label="Hasta" class="m1-l"></vaadin-date-picker>
+                          <paper-button raised class="accent m1-l self-center" on-tap="searchEmails">Buscar</paper-button>
+                          <paper-button raised class="accent m1-l self-center" on-tap="downloadEmailList">Descargar</paper-button>
+                        </div>
+                      </div>
+                      <div class="vertical">
+                        <span class="font-title p1">Total: [[emailsCount]] direcciones</span>
+                        <div class="vertical p1 emails">
+                          <prism-table shadow>
+                              <prism-thead>
+                                  <prism-tr>
+                                      <prism-th>Email</prism-th>
+                                      <prism-th>Nombre</prism-th>
+                                      <prism-th>Teléfono</prism-th>
+                                      <prism-th>Fecha</prism-th>
+                                  </prism-tr>
+                              </prism-thead>
+                              <prism-tbody>
+                                <template is="dom-repeat" items="[[emails]]">
+                                  <prism-tr>
+                                      <prism-td title="Email">[[item.email]]</prism-td>
+                                      <prism-td title="Nombre">[[item.name]]</prism-td>
+                                      <prism-td title="Teléfono">[[item.phone]]</prism-td>
+                                      <prism-td title="Fecha">[[item.date]]</prism-td>
+                                  </prism-tr>
+                                </template>
+                              </prism-tbody>
+                          </prism-table>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </iron-pages>
+              </div>
+            </div>
+          </section>
         </iron-pages>
       </div>
       <paper-dialog id="benefitsDialog" class="vertical">
@@ -366,6 +465,43 @@
           benefit : {
             type : String,
             value : 'PL001'
+          },
+          emailsPage:{
+            type:String,
+            value:'0'
+          },
+          emailsTime:{
+            type:String,
+            value:'week',
+            observer:'_emailsTimeChanged'
+          },
+          emailsQuery:{
+            type:Object,
+            value:()=>{
+              return {
+                from: null,
+                to:null,
+                email:null
+              }
+            }
+          },
+          emails:{
+            type:Array,
+            statePath:'search.emails.records'
+          },
+          emailsCount:{
+            type:Number,
+            statePath:(state)=>{
+              return state.search.emails.records.length;
+            }
+          },
+          emailStats:{
+            type:Object,
+            statePath:'search.emails.stats'
+          },
+          emailsLoading:{
+            type:Boolean,
+            value:false
           }
         }
       }
@@ -434,6 +570,9 @@
           if(page == 'payments'){
             this.dispatch('loadPayments');
           }
+          if(page ==='emails'){
+            this.loadEmailStats();
+          }
         }
       }
       setBenefeciary(e){
@@ -488,6 +627,39 @@
           showMessage('Beneficio donado');
           this.$.wait.close();
         });
+      }
+      _emailsTimeChanged(newVal,oldVal){
+        if(!newVal)return;
+        this.loadEmailStats();
+      }
+      loadEmailStats(){
+        this.emailsLoading=true;
+        this.dispatch('getEmailStats',this.emailsTime,(error)=>{
+          if(error)return showMessage('Error cargando las estadísticas de los emails');
+          this.emailsLoading=false;
+        })
+      }
+      searchEmails(){
+        this.emailsLoading=true;
+        this.dispatch('updateEmailQuery',this.emailsQuery);
+        this.dispatch('getEmailList',this.emailsQuery,(err)=>{
+          if(err)return showMessage('Hubo un error obteninedo la lista');
+          this.emailsLoading=false;
+        });
+      }
+      downloadEmailList(){
+        var emailsQuery = this.emailsQuery;
+        var result = window.location.origin + '/stats/get-email-list?';
+        if(emailsQuery.from){
+          result+='from='+emailsQuery.from;
+        }
+        if(emailsQuery.to){
+          result+='to='+emailsQuery.to;
+        }
+        if(emailsQuery.email){
+          result+='email='+emailsQuery.email;
+        }
+        window.open(result, '_blank');
       }
     }
     window.customElements.define(AccountView.is, AccountView);

@@ -179,6 +179,7 @@
               .then(handleReqError)
               .then((response)=>{
                 response.json().then((json)=>{
+                  console.log(json);
                   dispatch({type:'LOAD_PAYMENTS',status:'success',payments:json});
                 });
               })
@@ -230,6 +231,51 @@
                 callback(e.message);
               });
             }
+          },
+          getEmailStats:(time,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/stats/email-stats',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({time:time}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_EMAILS_STATS',stats:json})
+                  callback(null);
+                });
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          getEmailList:(query,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/stats/get-email-list',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify(query),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_EMAILS',emails:json})
+                  callback(null);
+                });
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          updateEmailQuery:(query)=>{
+            return {type:'UPDATE_EMAILS_QUERY',query:query}
           }
         }
       }

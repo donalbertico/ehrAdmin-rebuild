@@ -37,11 +37,28 @@ const propSearch = (state,action)=>{
   }
 }
 
+const emailsSearch = (state,action)=>{
+  switch (action.type) {
+    case 'LOAD_EMAILS_STATS':
+      return Object.assign({},state,{stats:action.stats});
+      break;
+    case 'UPDATE_EMAILS_QUERY':
+      return Object.assign({},state,{query:action.query});
+      break;
+    case 'LOAD_EMAILS':
+      return Object.assign({},state,{records:[...action.emails]});
+      break;
+    default:
+      return state;
+  }
+};
+
 const search=(state,action)=>{
   return {
     users:userSearch(state.users,action),
     props:propSearch(state.props,action),
-    payments:paymentsSearch(state.payments,action)
+    payments:paymentsSearch(state.payments,action),
+    emails:emailsSearch(state.emails,action)
   }
 }
 
