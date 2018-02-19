@@ -11,6 +11,7 @@
     "src/elements/*",
     "src/locales/*",
     "src/redux/**/*",
+    "src/js/date-utils.min.js",
     "images/**/*",
     "src/shared-styles.html"
   ],
