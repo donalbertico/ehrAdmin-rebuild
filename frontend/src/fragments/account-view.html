@@ -85,6 +85,12 @@
       .emails prism-table{
         background-color: #fff;
       }
+      div.container{
+        padding: 2rem;
+      }
+      paper-card.spaced{
+        margin-bottom: 1rem;
+      }
     </style>
     <app-route
         route="{{route}}"
@@ -127,14 +133,13 @@
                         <prism-tr>
                             <prism-th>Nombre</prism-th>
                             <prism-th>Email</prism-th>
-                            <prism-th>Agregado</prism-th>
                             <prism-th>Acción</prism-th>
                         </prism-tr>
                     </prism-thead>
                     <prism-tbody>
                       <template is="dom-repeat" items="[[users]]" index-as="index">
                         <prism-tr>
-                            <prism-td title="Nombre">[[item.firstName]] [[item.lastName]]</prism-td>
+                            <prism-td title="Nombre"><a id="[[item.id]]" href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
                             <prism-td title="Email">[[item.email]]</prism-td>
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
@@ -230,7 +235,7 @@
                     <prism-tbody>
                       <template is="dom-repeat" items="[[props]]" index-as="index">
                         <prism-tr>
-                            <prism-td title="Id">[[item.id]]</prism-td>
+                            <prism-td title="Id"><a id="[[item.id]]" href="/account/prop/[[item.id]]" on-click="loadProp">[[item.shortId]]</a></prism-td>
                             <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
                             <prism-td title="Nombre">[[item.title]]</prism-td>
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
@@ -329,6 +334,84 @@
               </div>
             </div>
           </section>
+          <section name="user">
+            <div class="vertical h-100">
+              <div class="vertical dark-primary">
+                <div class="p1 vertical">
+                  <span class="font-display1">[[selectedUser.firstName]] [[selectedUser.lastName]]</span>
+                  <!-- <template is="dom-if" if="selectedUser.isPlus" restamp="true">
+                    Cliente Plus
+                  </template> -->
+                  <span>Propiedades : [[selectedUser.properties.length]]</span>
+                </div>
+              </div>
+              <div class="container vertical">
+                <paper-card class="spaced">
+                  <div class="card-content vertical">
+                    <span>
+                      [[selectedUser.email]]
+                      <template is="dom-if" if="[[selectedUser.mailVerified]]" restamp="true">
+                        <span>(verificado)</span>
+                      </template>
+                      <template is="dom-if" if="[[!selectedUser.mailVerified]]" restamp="true">
+                        <span>(no verificado)</span>
+                      </template>
+                    </span>
+                    <template is="dom-repeat" items="[[selectedUser.phones]]" index-as="index">
+                      [[item]]
+                    </template>
+                    <span class="font-title">Información</span>
+                    <span>id : [[selectedUser.extraInfo.id]]</span>
+                    <span>nacimiento : [[selectedUser.extraInfo.birthDate]]</span>
+                    <span>[[selectedUser.extraInfo.location.address]] - [[selectedUser.extraInfo.location.city]]</span>
+                  </div>
+                </paper-card>
+                <paper-card>
+                  <div class="card-content">
+                    <prism-table>
+                        <prism-thead>
+                            <prism-tr>
+                                <prism-th>Titulo</prism-th>
+                                <prism-th>Ciudad</prism-th>
+                                <prism-th>Estado</prism-th>
+                            </prism-tr>
+                        </prism-thead>
+                        <prism-tbody>
+                          <template is="dom-repeat" items="[[selectedUser.properties]]" index-as="index">
+                            <prism-tr>
+                                <prism-td title="Titulo"><a id="[[item.id]]" href="/account/prop/[[item.id]]" on-click="loadProp">[[item.title]]</a></prism-td>
+                                <prism-td title="Ciudad">[[item.city]]</prism-td>
+                                <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
+                            </prism-tr>
+                          </template>
+                        </prism-tbody>
+                    </prism-table>
+                  </div>
+                </paper-card>
+              </div>
+            </div>
+          </section>
+          <section name="prop">
+            <div class="vertical h-100">
+              <div class="vertical dark-primary">
+                <div class="p1 vertical">
+                  <span class="font-display1">
+                    [[selectedProp.title]]
+                    <span>[[localize('state','value',selectedPropState)]]</span>
+                  </span>
+                  <span>[selectedProp.city]]</span>
+                </div>
+              </div>
+              <div class="container">
+                <paper-card>
+                  <div class="card-content horizontal">
+                    <span><a id="[[selectedProp.owner.id]]" href="/account/user/[[selectedProp.owner.id]]" on-click="loadUser">[[selectedProp.owner.firstName]][[selectedProp.owner.lastName]]</a></span>
+                    <span>[[selectedProp.owner.email]]</span>
+                  </div>
+                </paper-card>
+              </div>
+            </div>
+          </section>
         </iron-pages>
       </div>
       <paper-dialog id="benefitsDialog" class="vertical">
@@ -399,6 +482,24 @@
           language:{
             type:String,
             value:'es'
+          },
+          selectedUser:{
+            type:Object,
+            statePath:'search.users.selectedUser'
+          },
+          selectedProp:{
+            type:Object,
+            statePath:'search.props.selectedProp'
+          },
+          selectedPropState:{
+            type:String,
+            statePath:(state) =>{
+              if(state.props){
+                return state.props.selectedProp.state;
+              }else{
+                return 'n';
+              }
+            }
           },
           users:{
             type:Array,
@@ -646,6 +747,14 @@
           if(err)return showMessage('Hubo un error obteninedo la lista');
           this.emailsLoading=false;
         });
+      }
+      loadUser(e){
+        console.log(e.target.id);
+        this.dispatch('loadSingleUser',e.target.id);
+      }
+      loadProp(e){
+        console.log(e.target.id);
+        this.dispatch('loadSingleProp',e.target.id);
       }
       downloadEmailList(){
         var emailsQuery = this.emailsQuery;

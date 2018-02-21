@@ -1,10 +1,10 @@
 module.exports = {
 
 
-  friendlyName: 'Get single user',
+  friendlyName: 'Get single prop',
 
 
-  description: 'Gets all the info for a single user',
+  description: 'Gets all the info for a single property',
 
 
   inputs: {
@@ -29,9 +29,9 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    User.findOne(inputs.id).populate('properties').exec((err,found)=>{
+    console.log('cargando');
+    Property.findOne(inputs.id).populate('owner').exec((err,found)=>{
       if(err) exits.error(err);
-      console.log(found);
       return exits.success(found);
     });
   }
