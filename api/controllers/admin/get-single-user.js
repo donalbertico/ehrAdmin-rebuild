@@ -29,10 +29,19 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    User.findOne(inputs.id).populate('properties').exec((err,found)=>{
+    User.findOne(inputs.id).populate('properties').populate('enterprise').populate('payments').exec((err,found)=>{
       if(err) exits.error(err);
-      console.log(found);
-      return exits.success(found);
+      found.isPlus = User.isPlus(found);
+      if(found.collaborateWith){
+        Enterprise.findOne(found.collaborateWith,(err,enterprise)=>{
+          if(err) exits.error(err);
+          found.enterprise = enterprise;
+          return exits.success(found);
+        });
+      }else{
+        found.enterprise = found.enterprise[0];
+        return exits.success(found);
+      }
     });
   }
 

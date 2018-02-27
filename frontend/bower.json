@@ -16,7 +16,7 @@
     "paper-icon-button": "PolymerElements/paper-icon-button#^2.0.1",
     "polymer": "^2.3.1",
     "webcomponentsjs": "^1.0.21",
-    "iron-image": "PolymerElements/iron-image#^2.1.1",
+    "iron-image": "^2.2.0",
     "paper-button": "PolymerElements/paper-button",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "paper-input": "PolymerElements/paper-input#^2.0.5",
