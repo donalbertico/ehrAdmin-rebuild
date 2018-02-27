@@ -277,6 +277,46 @@
           },
           updateEmailQuery:(query)=>{
             return {type:'UPDATE_EMAILS_QUERY',query:query}
+          },
+          loadSingleUser:(id)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/get-single-user',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'SELECT_USER',user:json});
+                });
+              })
+              .catch((e)=>{
+                console.log(e.message);
+              });
+            }
+          },
+          loadSingleProp:(id)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/get-single-prop',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'SELECT_PROP',prop:json});
+                });
+              })
+              .catch((e)=>{
+                console.log(e.message);
+              });
+            }
           }
         }
       }

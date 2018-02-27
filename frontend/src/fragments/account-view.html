@@ -16,6 +16,7 @@
 <link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/search-actions.html">
@@ -85,6 +86,17 @@
       .emails prism-table{
         background-color: #fff;
       }
+      div.container{
+        padding: 2rem;
+      }
+      paper-card.spaced{
+        margin-bottom: 1rem;
+      }
+      iron-image.photo{
+        height: 100px;
+        width: 100px;
+        border-radius: 50%;
+      }
     </style>
     <app-route
         route="{{route}}"
@@ -127,15 +139,16 @@
                         <prism-tr>
                             <prism-th>Nombre</prism-th>
                             <prism-th>Email</prism-th>
-                            <prism-th>Agregado</prism-th>
+                            <prism-th>Fecha</prism-th>
                             <prism-th>Acción</prism-th>
                         </prism-tr>
                     </prism-thead>
                     <prism-tbody>
                       <template is="dom-repeat" items="[[users]]" index-as="index">
                         <prism-tr>
-                            <prism-td title="Nombre">[[item.firstName]] [[item.lastName]]</prism-td>
+                            <prism-td title="Nombre"><a id="[[item.id]]" href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
                             <prism-td title="Email">[[item.email]]</prism-td>
+                            <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
                               <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
@@ -224,16 +237,18 @@
                             <prism-th>Fecha</prism-th>
                             <prism-th>Titulo</prism-th>
                             <prism-th>Estado</prism-th>
+                            <prism-th>Ciudad</prism-th>
                             <prism-th>Acción</prism-th>
                         </prism-tr>
                     </prism-thead>
                     <prism-tbody>
                       <template is="dom-repeat" items="[[props]]" index-as="index">
                         <prism-tr>
-                            <prism-td title="Id">[[item.id]]</prism-td>
+                            <prism-td title="Id"><a id="[[item.id]]" href="/account/prop/[[item.id]]" on-click="loadProp">[[item.shortId]]</a></prism-td>
                             <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
                             <prism-td title="Nombre">[[item.title]]</prism-td>
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
+                            <prism-td title="Ciudad">[[item.city]]</prism-td>
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="unPublish">Dejar de publicar</paper-button>
                             </prism-td>
@@ -329,6 +344,136 @@
               </div>
             </div>
           </section>
+          <section name="user">
+            <div class="vertical h-100">
+              <div class="vertical dark-primary">
+                <div class="horizontal">
+                  <div class="p1 vertical flex">
+                    <span class="font-display1">[[selectedUser.firstName]] [[selectedUser.lastName]]
+                    </span>
+                    <span>Propiedades : [[selectedUser.properties.length]]</span>
+                    <template is="dom-if" if="[[selectedUser.isPlus]]" restamp="true">
+                      <span>Cliente Plus : [[localize('date','value',selectedUser.plusUntil)]]</span>
+                    </template>
+                    <span>Tokens : [[selectedUser.promoteTokens]]</span>
+                  </div>
+                  <iron-image src="[[photoUrl]]" preload sizing="cover" class="photo self-end" placeholder="/images/user_no_photo.jpg"></iron-image>
+                </div>
+              </div>
+              <div class="container vertical">
+                <paper-card class="spaced">
+                  <div class="card-content vertical">
+                    <span>
+                      [[selectedUser.email]]
+                      <template is="dom-if" if="[[selectedUser.mailVerified]]" restamp="true">
+                        <span>(verificado)</span>
+                      </template>
+                      <template is="dom-if" if="[[!selectedUser.mailVerified]]" restamp="true">
+                        <span>(no verificado)</span>
+                      </template>
+                    </span>
+                    <template is="dom-repeat" items="[[selectedUser.phones]]" index-as="index">
+                      [[item]]
+                    </template>
+                    <span class="font-title">Información</span>
+                    <span>id : [[selectedUser.extraInfo.id]]</span>
+                    <span>nacimiento : [[selectedUser.extraInfo.birthDate]]</span>
+                    <span>[[selectedUser.extraInfo.location.address]] - [[selectedUser.extraInfo.location.city]]</span>
+                  </div>
+                </paper-card>
+                <template is="dom-if" if="[[selectedUser.enterprise]]" restamp="true">
+                  <paper-card class="spaced">
+                    <div class="card-content vertical">
+                      <span><span class="font-title">[[selectedUser.enterprise.name]]</span> [[localize('enterprise','value',selectedUserEnterprise)]]</span>
+                      <span>[[selectedUser.enterprise.location.address]]</span>
+                      <span>[[selectedUser.enterprise.location.city]]</span>
+                    </div>
+                  </paper-card>
+                </template>
+                <paper-card class="spaced">
+                  <div class="card-content vertical">
+                    <span class="font-title">Pagos</span>
+                    <prism-table>
+                        <prism-thead>
+                            <prism-tr>
+                                <prism-th>Fecha</prism-th>
+                                <prism-th>Tipo</prism-th>
+                                <prism-th>Metodo</prism-th>
+                                <prism-th>Verificado</prism-th>
+                            </prism-tr>
+                        </prism-thead>
+                        <prism-tbody>
+                          <template is="dom-repeat" items="[[selectedUser.payments]]" index-as="index">
+                            <prism-tr>
+                                <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                                <prism-td title="Tipo">[[item.type]]</prism-td>
+                                <prism-td title="Metodo">[[item.method]]</prism-td>
+                                <prism-td title="Verificado">[[item.verified]]</prism-td>
+                            </prism-tr>
+                          </template>
+                        </prism-tbody>
+                    </prism-table>
+                  </div>
+                </paper-card>
+                <paper-card>
+                  <div class="card-content">
+                    <prism-table>
+                        <prism-thead>
+                            <prism-tr>
+                                <prism-th>Titulo</prism-th>
+                                <prism-th>Ciudad</prism-th>
+                                <prism-th>Estado</prism-th>
+                            </prism-tr>
+                        </prism-thead>
+                        <prism-tbody>
+                          <template is="dom-repeat" items="[[selectedUser.properties]]" index-as="index">
+                            <prism-tr>
+                                <prism-td title="Titulo"><a id="[[item.id]]" href="/account/prop/[[item.id]]" on-click="loadProp">[[item.title]]</a></prism-td>
+                                <prism-td title="Ciudad">[[item.city]]</prism-td>
+                                <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
+                            </prism-tr>
+                          </template>
+                        </prism-tbody>
+                    </prism-table>
+                  </div>
+                </paper-card>
+              </div>
+            </div>
+          </section>
+          <section name="prop">
+            <div class="vertical h-100">
+              <div class="vertical dark-primary">
+                <div class="p1 vertical">
+                  <div class="horizontal">
+                    <span class="font-display1 flex">
+                      <span>[[selectedProp.title]] - [[localize('type','value',selectedPropType)]]</span>
+                    </span>
+                    <span class="font-subhead">[[localize('state','value',selectedPropState)]]</span>
+                  </div>
+                  <span>[[selectedProp.city]]</span>
+                </div>
+              </div>
+              <div class="container">
+                <paper-card class="spaced">
+                  <div class="card-content vertical">
+                    <span><b>Descipción :  </b>[[selectedProp.description]]</span>
+                    <span><b>Precio :  </b>$[[selectedProp.payment]] / [[selectedProp.paymentPeriod]]</span>
+                    <span><b>Area :  </b>[[selectedProp.area]]m</span>
+                    <span><b>Descripción del barrio :  </b>[[selectedProp.zoneDescription]]</span>
+                    <span><b>Descuento :  </b>[[selectedProp.discount]]%</span>
+                    <span><b>Dirección :  </b>[[selectedProp.address]] [[selectedProp.locality]]</span>
+                  </div>
+                </paper-card>
+                <paper-card>
+                  <div class="card-content vertical">
+                    <span class="font-title">Usuario</span>
+                    <span><a id="[[selectedProp.owner.id]]" href="/account/user/[[selectedProp.owner.id]]" on-click="loadUser">[[selectedProp.owner.firstName]][[selectedProp.owner.lastName]]</a></span>
+                    <span>[[selectedProp.owner.email]]</span>
+                  </div>
+                </paper-card>
+              </div>
+            </div>
+          </section>
         </iron-pages>
       </div>
       <paper-dialog id="benefitsDialog" class="vertical">
@@ -400,6 +545,44 @@
             type:String,
             value:'es'
           },
+          selectedUser:{
+            type:Object,
+            statePath:'search.users.selectedUser'
+          },
+          selectedProp:{
+            type:Object,
+            statePath:'search.props.selectedProp'
+          },
+          selectedPropState:{
+            type:String,
+            statePath:(state) =>{
+              if(state.search.props.selectedProp){
+                return state.search.props.selectedProp.state;
+              }else{
+                return 'n';
+              }
+            }
+          },
+          selectedUserEnterprise:{
+            type:String,
+            statePath:(state) =>{
+              if(state.search.users.selectedUser.enterprise){
+                return state.search.users.selectedUser.enterprise.type;
+              }else{
+                return 'r';
+              }
+            }
+          },
+          selectedPropType:{
+            type:String,
+            statePath:(state) =>{
+              if(state.search.props.selectedProp){
+                return state.search.props.selectedProp.type;
+              }else{
+                return 'n';
+              }
+            }
+          },
           users:{
             type:Array,
             statePath:'search.users.entities'
@@ -444,16 +627,27 @@
             type:Boolean,
             value:false
           },
+          photoUrl:{
+            type:String,
+            computed:'_computePhotoUrl(selectedUser.extraInfo.photo)'
+          },
           resources:{
             value:function(){
               return{
                 'en':{
                   'date' : '{value,date,medium}',
-                  'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada} e {expirada}}'
+                  'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
+                  'enterprise' : '{value,select, r {Bienes Raíces} h {Hotel}}',
+                  'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                  'date':'{value,date,medium}'
+
                 },
                 'es':{
                   'date' : '{value,date,medium}',
-                  'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada} e {expirada}}'
+                  'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
+                  'enterprise' : '{value,select, r {Bienes Raíces} h {Hotel}}',
+                  'type':'{value , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                  'date':'{value,date,medium}'
                 }
               }
             }
@@ -587,6 +781,17 @@
         this.set('payment',e.target.id);
         this.$.benefitsPDialog.open();
       }
+      _computePhotoUrl(photo){
+        if(photo){
+          if(photo.indexOf('http')>=0){
+            return photo;
+          }else{
+            return 'http://res.cloudinary.com/hmeefwd4l/image/upload/'+photo+'.jpg';
+          }
+        }else{
+          return null;
+        }
+      }
       benefy(e){
         this.$.wait.open();
         this.$.benefitsDialog.close();
@@ -646,6 +851,14 @@
           if(err)return showMessage('Hubo un error obteninedo la lista');
           this.emailsLoading=false;
         });
+      }
+      loadUser(e){
+        console.log(e.target.id);
+        this.dispatch('loadSingleUser',e.target.id);
+      }
+      loadProp(e){
+        console.log(e.target.id);
+        this.dispatch('loadSingleProp',e.target.id);
       }
       downloadEmailList(){
         var emailsQuery = this.emailsQuery;

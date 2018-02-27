@@ -17,7 +17,7 @@ const userSearch = (state,action)=>{
       return Object.assign({},state,{selectedUser:newSelectedUser});
       break;
     case 'SELECT_USER':
-      return Object.assign({},state,{selectedUser:Object.assign({},action.selectedUser)});
+      return Object.assign({},state,{selectedUser:Object.assign({},action.user)});
       break;
     default:
       return state;
@@ -31,6 +31,9 @@ const propSearch = (state,action)=>{
       break;
     case 'LOAD_STATS':
       return Object.assign({},state,{stats:action.stats});
+      break;
+    case 'SELECT_PROP':
+      return Object.assign({},state,{selectedProp:Object.assign({},action.prop)});
       break;
     default:
       return state;

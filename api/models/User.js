@@ -139,7 +139,7 @@ module.exports = {
     collaborateWith : {model : 'enterprise'},
 
     //misc
-    plusUntil : {type: 'json', defaultsTo:null},
+    plusUntil : {type: 'number', defaultsTo:0},
     promoteTokens : {type: 'number', defaultsTo:0},
     mailChimpId: {type:'string',allowNull:true},
     qbId: {type:'string',unique:true},
@@ -264,7 +264,7 @@ module.exports = {
           var newDate = userBenefits.plusUntil || found.plusUntil || new Date();
           newDate = new Date(newDate);
           newDate.add(benefits.add);
-          userBenefits = {plusUntil : newDate};
+          userBenefits = {plusUntil : newDate.getTime()};
         }else{
           var tokens = userBenefits.promoteTokens|| found.promoteTokens || 0;
           tokens += benefits.add.tokens;
