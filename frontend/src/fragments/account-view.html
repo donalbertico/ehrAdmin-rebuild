@@ -17,6 +17,7 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/search-actions.html">
@@ -98,6 +99,20 @@
         border-radius: 50%;
       }
     </style>
+    <script>
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "//connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <iron-ajax
+    auto
+    url="/getKeys"
+    handle-as="json"
+    on-response="setKeys"></iron-ajax>
     <app-route
         route="{{route}}"
         pattern="/:page"
@@ -134,12 +149,29 @@
                   <paper-input class="m1-r" label="Apellido" value="{{userQuery.lastName}}"></paper-input>
                   <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
                 </div>
+                <div class="card horizontal">
+                  <paper-dropdown-menu label="Propiedades">
+                    <paper-listbox   slot="dropdown-content" attr-for-selected="users" selected="{{filters.props}}">
+                      <paper-item users="a">Ascendente</paper-item>
+                      <paper-item users="d">Descendente</paper-item>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                  <!-- <paper-dropdown-menu id="Dropdown" label="Propiedades">
+                    <paper-listbox slot="dropdown-content" attr-for-selected="state" selected="{{propsQuery.state}}">
+                      <paper-item state="a">Ascendente</paper-item>
+                      <paper-item state="v">Descendente</paper-item>
+                    </paper-listbox>
+                  </paper-dropdown-menu> -->
+                  <paper-button raised class="accent self-center" on-tap="sortByProps">Filtrar</paper-button>
+                </div>
                 <prism-table>
                     <prism-thead>
                         <prism-tr>
                             <prism-th>Nombre</prism-th>
                             <prism-th>Email</prism-th>
                             <prism-th>Fecha</prism-th>
+                            <prism-th>Propiedades</prism-th>
+                            <prism-th>log in</prism-th>
                             <prism-th>Acción</prism-th>
                         </prism-tr>
                     </prism-thead>
@@ -149,6 +181,8 @@
                             <prism-td title="Nombre"><a id="[[item.id]]" href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
                             <prism-td title="Email">[[item.email]]</prism-td>
                             <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                            <prism-td title="Propiedades">[[item.properties.length]]</prism-td>
+                            <prism-td title="login">[[item.passports.0.protocol]]</prism-td>
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
                               <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
@@ -251,6 +285,7 @@
                             <prism-td title="Ciudad">[[item.city]]</prism-td>
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="unPublish">Dejar de publicar</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="shareFacebook">Compartir</paper-button>
                             </prism-td>
                         </prism-tr>
                       </template>
@@ -462,6 +497,7 @@
                     <span><b>Descripción del barrio :  </b>[[selectedProp.zoneDescription]]</span>
                     <span><b>Descuento :  </b>[[selectedProp.discount]]%</span>
                     <span><b>Dirección :  </b>[[selectedProp.address]] [[selectedProp.locality]]</span>
+                    <a href="https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]">https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]</a>
                   </div>
                 </paper-card>
                 <paper-card>
@@ -560,6 +596,14 @@
                 return state.search.props.selectedProp.state;
               }else{
                 return 'n';
+              }
+            }
+          },
+          filters:{
+            type:Object,
+            value:()=>{
+              return {
+                props : 'a'
               }
             }
           },
@@ -873,6 +917,50 @@
           result+='email='+emailsQuery.email;
         }
         window.open(result, '_blank');
+      }
+      sortByProps(){
+        var users = this.users.slice();
+        console.log(this.filters);
+        if(this.filters.props == 'a'){
+          users.sort((a,b)=>{
+            if(b.properties.length>a.properties.length){
+              return -1;
+            }
+            if(b.properties.length<a.properties.length){
+              return 1;
+            }
+            return 0;
+          });
+        }else{
+          users.sort((a,b)=>{
+            if(b.properties.length>a.properties.length){
+              return 1;
+            }
+            if(b.properties.length<a.properties.length){
+              return -1;
+            }
+            return 0;
+          });
+        }
+        console.log(users[0].properties.length,this.users[0].properties.length);
+        this.set('users',users);
+      }
+      shareFacebook(e){
+        FB.ui({
+              method: 'share',
+              href: 'https://www.ecuadorhouserentals.com/prop/'+e.target.id,
+            }, function(response){});
+      }
+      setKeys(e){
+        var keys = e.detail.__data.response;
+        window.fbAsyncInit = ()=> {
+          FB.init({
+            appId      : keys.facebook,
+            xfbml      : true,
+            version    : 'v2.8',
+            status     : true
+          });
+        };
       }
     }
     window.customElements.define(AccountView.is, AccountView);
