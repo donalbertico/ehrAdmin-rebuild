@@ -5,7 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
  var keys={
-   facebook:sails.config.custom.passport.facebook.options.clientID,
+   facebook:sails.config.custom.facebook.options.clientID,
  };
 module.exports = {
   callback: function (req, res) {
