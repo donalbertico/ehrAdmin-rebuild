@@ -9,6 +9,9 @@ function parseQuery(inputs){
   if(inputs.lastName){
     query.lastName=inputs.lastName;
   }
+  if (inputs.from && inputs.to) {
+    query.createdAt = {'>' : inputs.from, '<' : inputs.to};
+  }
   if(Object.keys(query).length<1){
     return null;
   }
@@ -33,6 +36,12 @@ module.exports = {
     },
     lastName:{
       type:'string'
+    },
+    from :{
+      type :'number'
+    },
+    to :{
+      type :'number'
     }
   },
 
@@ -51,25 +60,15 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
+    console.log('searching',inputs);
+
     var query=parseQuery(inputs);
+    console.log(query);
     if(!query){
       query={};
     }
-    // var col = User.getDatastore().manager.collection('user');
-    // var prop = User.getDatastore().manager.collection('property');
-    // col.find(query).toArray((err,users)=>{
-    //   if(err){
-    //     console.error(err);
-    //     return exits.error({message:'server_error'});
-    //   }
-    //   users=users.map((item)=>{
-    //     item.id=item._id.toHexString();
-    //     delete item._id;
-    //     return item;
-    //   });
-    //   return exits.success(users);
-    // });
     User.find(query).populate('properties').populate('passports').sort('createdAt DESC').exec((err,users)=>{
+      console.log(err);
       if(err)return exits.error(err);
       exits.success(users);
     });

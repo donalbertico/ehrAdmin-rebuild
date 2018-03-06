@@ -143,11 +143,17 @@
             <div class="horizontal">
               <div class="vertical flex">
                 <span class="font-headline s m1-b">Filtros</span>
-                <div class="card horizontal">
-                  <paper-input class="m1-r" label="Email" value="{{userQuery.email}}"></paper-input>
-                  <paper-input class="m1-r" label="Nombre" value="{{userQuery.firstName}}"></paper-input>
-                  <paper-input class="m1-r" label="Apellido" value="{{userQuery.lastName}}"></paper-input>
-                  <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
+                <div class="card vertical">
+                  <div class="horizontal">
+                    <paper-input class="m1-r" label="Email" value="{{userQuery.email}}"></paper-input>
+                    <paper-input class="m1-r" label="Nombre" value="{{userQuery.firstName}}"></paper-input>
+                    <paper-input class="m1-r" label="Apellido" value="{{userQuery.lastName}}"></paper-input>
+                  </div>
+                  <div class="">
+                    <vaadin-date-picker id="propFrom" value="{{userQuery.from}}" label="Desde"></vaadin-date-picker>
+                    <vaadin-date-picker id="propTo" value="{{userQuery.to}}" label="Hasta"></vaadin-date-picker>
+                    <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
+                  </div>
                 </div>
                 <div class="card horizontal">
                   <paper-dropdown-menu label="Propiedades">
@@ -186,6 +192,7 @@
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
                               <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="setUserDelete">Eliminar</paper-button>
                             </prism-td>
                         </prism-tr>
                       </template>
@@ -213,6 +220,7 @@
                         <prism-td title="Usuario">[[item.payer.email]]</prism-td>
                         <prism-td title="Accion">
                           <paper-button id="[[item.id]]" raised class="primary" on-click="setPayment">Aprobar</paper-button>
+                          <paper-button id="[[item.id]]" raised class="primary" on-click="setDeletePayment">Eliminar</paper-button>
                         </prism-td>
                     </prism-tr>
                   </template>
@@ -284,8 +292,14 @@
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
                             <prism-td title="Ciudad">[[item.city]]</prism-td>
                             <prism-td title="Accion">
+                              <template is="dom-if" if="[[!item.shared]]" restamp="true">
+                                <paper-button id="[[item.id]]" class="accent" raised on-tap="shareFacebook">Compartir</paper-button>
+                              </template>
+                              <template is="dom-if" if="[[item.shared]]" restamp="true">
+                                <paper-button id="[[item.id]]" raised on-tap="shareFacebook">Compartir</paper-button>
+                              </template>
                               <paper-button id="[[item.id]]" raised on-tap="unPublish">Dejar de publicar</paper-button>
-                              <paper-button id="[[item.id]]" raised on-tap="shareFacebook">Compartir</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="setDeleteProp">Eliminar</paper-button>
                             </prism-td>
                         </prism-tr>
                       </template>
@@ -566,9 +580,32 @@
           <paper-button on-tap="donate">Donar</paper-button>
         </div>
       </paper-dialog>
+      <paper-dialog id="userDelete" class="vertical">
+        <span class="font-display1">Eliminando usuario</span>
+        <span>Estas seguro que deseas eliminar este usuario</span>
+        <div class="horizontl self-end">
+          <paper-button on-tap="deleteUser">Eliminar</paper-button>
+          <paper-button on-tap="donate">Cancelar</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="propDelete" class="vertical">
+        <span class="font-display1">Eliminando propiedad</span>
+        <span>Estas seguro que deseas eliminar esta propiedad</span>
+        <div class="horizontl self-end">
+          <paper-button on-tap="deleteProp">Eliminar</paper-button>
+          <paper-button on-tap="donate">Cancelar</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="paymentDelete" class="vertical">
+        <span class="font-display1">Eliminando pago</span>
+        <span>Estas seguro que deseas eliminar este pago</span>
+        <div class="horizontl self-end">
+          <paper-button on-tap="deletePayment">Eliminar</paper-button>
+          <paper-button on-tap="donate">Cancelar</paper-button>
+        </div>
+      </paper-dialog>
       <paper-dialog id="wait" modal>
         <span>Espere...</span>
-
       </paper-dialog>
     </app-drawer-layout>
   </template>
@@ -760,6 +797,11 @@
             userQuery[key]=this.userQuery[key];
           }
         });
+        if(userQuery.from && userQuery.to){
+          userQuery.from = new Date(userQuery.from).getTime();
+          userQuery.to = new Date(userQuery.to).getTime();
+        }
+        console.log(userQuery);
         this.dispatch('searchUsers',userQuery,(e)=>{
           if(e)return showMessage('Error en la búsqueda');
         });
@@ -821,9 +863,45 @@
         this.set('beneficiary',e.target.id);
         this.$.luckyDialog.open();
       }
+      setUserDelete(e){
+        this.set('userToDelete',e.target.id);
+        this.$.userDelete.open();
+      }
+      setDeleteProp(e){
+        this.set('propToDelete',e.target.id);
+        this.$.propDelete.open();
+      }
+      setDeletePayment(e){
+        this.set('paymentToDelete',e.target.id);
+        this.$.paymentDelete.open();
+      }
       setPayment(e){
         this.set('payment',e.target.id);
         this.$.benefitsPDialog.open();
+      }
+      deleteUser(e){
+        this.dispatch('deleteUser',this.userToDelete,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Usuario eliminado');
+          this.searchUsers();
+          this.$.userDelete.close();
+        })
+      }
+      deleteProp(e){
+        this.dispatch('deleteProp',this.propToDelete,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Propiedad eliminado');
+          this.searchProps();
+          this.$.propDelete.close();
+        })
+      }
+      deletePayment(e){
+        this.dispatch('deletePayment',this.paymentToDelete,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Pago eliminado');
+          this.loadPayments();
+          this.$.paymentDelete.close();
+        })
       }
       _computePhotoUrl(photo){
         if(photo){
@@ -920,7 +998,6 @@
       }
       sortByProps(){
         var users = this.users.slice();
-        console.log(this.filters);
         if(this.filters.props == 'a'){
           users.sort((a,b)=>{
             if(b.properties.length>a.properties.length){
@@ -942,14 +1019,21 @@
             return 0;
           });
         }
-        console.log(users[0].properties.length,this.users[0].properties.length);
         this.set('users',users);
       }
       shareFacebook(e){
+        var id = e.target.id;
         FB.ui({
               method: 'share',
-              href: 'https://www.ecuadorhouserentals.com/prop/'+e.target.id,
-            }, function(response){});
+              href: 'https://www.ecuadorhouserentals.com/prop/'+id,
+            }, (response)=>{
+              console.log(id);
+              this.dispatch('markAsShared',id,(err)=>{
+                if(err) showMessage(err);
+                showMessage('Compartido');
+                this.searchProps();
+              })
+            });
       }
       setKeys(e){
         var keys = e.detail.__data.response;

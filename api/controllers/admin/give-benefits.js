@@ -21,7 +21,9 @@ module.exports = {
     var  details = [{code:inputs.code}];
     User.findOne(inputs.user,(err,found)=>{
       if(err)exits.error(err);
+      console.log(details);
       User.applyBenefits(found.id,details,(err,type)=>{
+        console.log(err);
         if(err) exits.error(err);
         sails.hooks.mail.send(
                               'bonusBenefits',

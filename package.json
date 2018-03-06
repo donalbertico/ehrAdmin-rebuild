@@ -11,6 +11,7 @@
     "bcryptjs": "^2.4.3",
     "bower": "^1.8.0",
     "checkdigit": "^1.1.1",
+    "cloudinary": "^1.10.0",
     "connect-redis": "^3.3.0",
     "date-utils": "^1.2.21",
     "fb": "^2.0.0",

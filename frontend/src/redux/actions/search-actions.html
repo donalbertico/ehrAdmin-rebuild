@@ -34,11 +34,7 @@
                 method:'POST',
                 headers: sh,
                 credentials: 'include',
-                body:JSON.stringify({
-                  firstName:query.firstName,
-                  lastName:query.lastName,
-                  email:query.email
-                })
+                body:JSON.stringify(query)
               });
               window.fetch(request)
               .then(handleReqError)
@@ -315,6 +311,79 @@
               })
               .catch((e)=>{
                 console.log(e.message);
+              });
+            }
+          },
+          deleteUser:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/delete-user',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          deleteProp:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/delete-prop',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          deletePayment:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/delete-payment',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          markAsShared:(id,callback)=>{
+            console.log(id);
+            return (dispatch) =>{
+              let request = new Request('/admin/mark-shared-prop',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
               });
             }
           }

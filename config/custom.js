@@ -49,6 +49,11 @@ module.exports.custom = {
       appsecret_proof:process.env.FACEBOOK_APPSECRET
     }
   },
+  cloudinary:{
+   cloud_name: process.env.CLOUDINARY_NAME,
+   api_key: process.env.CLOUDINARY_KEY,
+   api_secret: process.env.CLOUDINARY_SECRET
+  },
   bill:{
     ruc: '1792569036001',
     razonSocial:'CONFORTDIL CIA.LTDA.',

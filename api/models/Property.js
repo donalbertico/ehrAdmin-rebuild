@@ -1,4 +1,6 @@
+var cloudinary = require('cloudinary');
 require('date-utils');
+
 /**
  * Property.js
  *
@@ -196,6 +198,15 @@ module.exports = {
       values.lastPublishedDate=values.publishedDates[0]
     }
     next(null,values);
+  },
+  afterDestroy : function(destroyedRecords,next){
+    console.log('destroying prop');
+    var photos = [],s,t;
+    for (var i = destroyedRecords.length - 1; i >= 0; i--) {
+      if(destroyedRecords[i].photos.length>0){
+         cloudinary.api.delete_resources(destroyedRecords[i].photos);
+      }
+    }
+    next();
   }
-
 };
