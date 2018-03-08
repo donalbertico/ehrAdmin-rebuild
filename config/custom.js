@@ -40,13 +40,7 @@ module.exports.custom = {
     protocol: 'facebook',
     strategy: require('passport-custom'),
     options: {
-      clientID: process.env.FACEBOOK_ID,
-      clientSecret: process.env.FACEBOOK_SECRET,
-      scope: ['email'], /* email is necessary for login behavior */
-      custom:true,
-      profileFields: ['id', 'first_name','last_name','picture', 'email'],
-      enableProof:true,
-      appsecret_proof:process.env.FACEBOOK_APPSECRET
+      clientID: process.env.FACEBOOK_ID
     }
   },
   cloudinary:{

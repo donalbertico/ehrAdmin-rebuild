@@ -1037,6 +1037,7 @@
       }
       setKeys(e){
         var keys = e.detail.__data.response;
+        console.log(keys.facebook);
         window.fbAsyncInit = ()=> {
           FB.init({
             appId      : keys.facebook,
