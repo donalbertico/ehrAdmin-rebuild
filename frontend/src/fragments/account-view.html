@@ -152,6 +152,15 @@
                   <div class="">
                     <vaadin-date-picker id="propFrom" value="{{userQuery.from}}" label="Desde"></vaadin-date-picker>
                     <vaadin-date-picker id="propTo" value="{{userQuery.to}}" label="Hasta"></vaadin-date-picker>
+                    <paper-dropdown-menu label="Tipo">
+                      <paper-listbox   slot="dropdown-content" attr-for-selected="users" selected="{{userQuery.type}}">
+                        <paper-item users="a">Todos</paper-item>
+                        <paper-item users="r">Corredor</paper-item>
+                        <paper-item users="n">Normal</paper-item>
+                        <paper-item users="h">Hotel</paper-item>
+                        <paper-item users="e">Empresa de bienes Raices</paper-item>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
                     <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
                   </div>
                 </div>
@@ -404,7 +413,7 @@
                     <template is="dom-if" if="[[selectedUser.isPlus]]" restamp="true">
                       <span>Cliente Plus : [[localize('date','value',selectedUser.plusUntil)]]</span>
                     </template>
-                    <span>Cliente Plus : [[localize('date','value',selectedUser.plusUntil)]]</span>          
+                    <span>Cliente Plus : [[localize('date','value',selectedUser.plusUntil)]]</span>
                     <span>Tokens : [[selectedUser.promoteTokens]]</span>
                   </div>
                   <iron-image src="[[photoUrl]]" preload sizing="cover" class="photo self-end" placeholder="/images/user_no_photo.jpg"></iron-image>
@@ -719,7 +728,7 @@
                 'en':{
                   'date' : '{value,date,medium}',
                   'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
-                  'enterprise' : '{value,select, r {Bienes Raíces} h {Hotel}}',
+                  'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
                   'date':'{value,date,medium}'
 
@@ -727,7 +736,7 @@
                 'es':{
                   'date' : '{value,date,medium}',
                   'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
-                  'enterprise' : '{value,select, r {Bienes Raíces} h {Hotel}}',
+                  'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{value , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
                   'date':'{value,date,medium}'
                 }
@@ -1024,21 +1033,20 @@
       }
       shareFacebook(e){
         var id = e.target.id;
-        FB.ui({
-              method: 'share',
-              href: 'https://www.ecuadorhouserentals.com/prop/'+id,
-            }, (response)=>{
-              console.log(id);
-              this.dispatch('markAsShared',id,(err)=>{
-                if(err) showMessage(err);
-                showMessage('Compartido');
-                this.searchProps();
-              })
-            });
+        window.open('https://www.ecuadorhouserentals.com/prop/'+id);
+        // FB.ui({
+        //       method: 'share',
+        //       href: 'https://www.ecuadorhouserentals.com/prop/'+id,
+        //     }, (response)=>{
+        //       this.dispatch('markAsShared',id,(err)=>{
+        //         if(err) showMessage(err);
+        //         showMessage('Compartido');
+        //         this.searchProps();
+        //       })
+        //     });
       }
       setKeys(e){
         var keys = e.detail.__data.response;
-        console.log(keys.facebook);
         window.fbAsyncInit = ()=> {
           FB.init({
             appId      : keys.facebook,
