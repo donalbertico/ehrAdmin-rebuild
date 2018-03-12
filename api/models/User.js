@@ -263,9 +263,7 @@ module.exports = {
         if (benefits.type == 'plan') {
           var newDate = userBenefits.plusUntil || found.plusUntil || new Date();
           newDate = new Date(newDate);
-          console.log(newDate);
           newDate.add(benefits.add);
-          console.log(newDate);
           userBenefits = {plusUntil : newDate.getTime()};
         }else{
           var tokens = userBenefits.promoteTokens|| found.promoteTokens || 0;
@@ -274,7 +272,6 @@ module.exports = {
         }
         type = benefits.type;
       });
-      console.log('beneficiando',userBenefits);
       User.update(found.id,userBenefits,(err)=>{
         if(err) return cb(err);
         return cb(null,type);
