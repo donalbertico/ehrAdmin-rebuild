@@ -70,7 +70,7 @@ module.exports = {
     if(!query){
       query={};
     }
-    if(inputs.type == 'h' || inputs.type =='r' || || inputs.type =='e'){
+    if(inputs.type == 'h' || inputs.type =='r' || inputs.type =='e'){
       var users = [];
       Enterprise.find({type : inputs.type}).populate('collaborators').populate('deputy').exec((err,enterprises)=>{
         if(err)return exits.error(err);
