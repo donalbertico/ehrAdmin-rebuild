@@ -386,6 +386,24 @@
                 callback(e.message);
               });
             }
+          },
+          verifyEmail:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/verify-user-email',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
           }
         }
       }

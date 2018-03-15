@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/app-layout/app-route/app-route.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
@@ -118,8 +119,8 @@
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
-    <app-route route="{{route}}" pattern="/account/payments" on-active-changed="loadPayments" data="{{data}}" tail="{{tail}}"></app-route>
-    <app-route route="{{route}}" pattern="/account/props" on-active-changed="loadPropsStats" data="{{data}}" tail="{{tail}}"></app-route>
+    <app-route route="{{route}}" pattern="/account/payments" on-active-changed="loadPayments"></app-route>
+    <app-route route="{{route}}" pattern="/account/props/:id" on-active-changed="loadPropsStats" data="{{propData}}" tail="{{tail}}"></app-route>
     <app-drawer-layout>
       <app-drawer slot="drawer">
         <app-toolbar>Menu</app-toolbar>
@@ -202,6 +203,7 @@
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
                               <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="verifyEmail" hidden$="[[item.mailVerified]]">Verificar correo</paper-button>
                               <paper-button id="[[item.id]]" raised on-tap="setUserDelete">Eliminar</paper-button>
                             </prism-td>
                         </prism-tr>
@@ -646,6 +648,9 @@
               }
             }
           },
+          propData:{
+            type:Object
+          },
           filters:{
             type:Object,
             value:()=>{
@@ -811,7 +816,6 @@
           userQuery.from = new Date(userQuery.from).getTime();
           userQuery.to = new Date(userQuery.to).getTime();
         }
-        console.log(userQuery);
         this.dispatch('searchUsers',userQuery,(e)=>{
           if(e)return showMessage('Error en la búsqueda');
         });
@@ -942,12 +946,19 @@
           this.$.wait.close();
         });
       }
+      verifyEmail(e){
+        this.dispatch('verifyEmail',e.target.id,(err)=>{
+          showMessage('Mail verificado');
+        });
+      }
       loadPayments(){
         this.dispatch('loadPayments');
       }
       loadPropsStats(){
-        this.dispatch('loadPropsStats',(json)=>{
-        });
+        var prop = this.route.path.split('/prop/');
+        if(prop[1]){
+          this.dispatch('loadSingleProp',prop[1]);
+        }
       }
       unPublish(e){
         this.dispatch('unPublishProp',e.target.id,(err)=>{
@@ -989,7 +1000,6 @@
         this.dispatch('loadSingleUser',e.target.id);
       }
       loadProp(e){
-        console.log(e.target.id);
         this.dispatch('loadSingleProp',e.target.id);
       }
       downloadEmailList(){
