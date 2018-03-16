@@ -29,11 +29,19 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    User.update(inputs.id,{mailVerified : true},(err)=>{
-      console.log(err);
-      if(err) exits.error(err);
-      return exits.success();
-    });
+    User.update(inputs.id,{mailVerified:true},function(err,updated){
+        if(err){
+          console.log(err);
+          return exits.error({message:'server_error'});
+        }
+        var newDates=[Date.today().getTime()];
+        Property.update({owner:inputs.id,state:'p'},{state:'v',publishedDates:newDates},(err,updatedProps)=>{
+          if(err){
+            return exits.error({message:'server_error'});
+          }
+          return exits.success();
+        });
+      });
   }
 
 

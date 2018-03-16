@@ -299,7 +299,12 @@
                       <template is="dom-repeat" items="[[props]]" index-as="index">
                         <prism-tr>
                             <prism-td title="Id"><a id="[[item.id]]" href="/account/prop/[[item.id]]" on-click="loadProp">[[item.shortId]]</a></prism-td>
-                            <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
+                            <template is="dom-if" if="[[item.lastPublishedDate]]" restamp="true">
+                              <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
+                            </template>
+                            <template is="dom-if" if="[[!item.lastPublishedDate]]" restamp="true">
+                              <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                            </template>
                             <prism-td title="Nombre">[[item.title]]</prism-td>
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
                             <prism-td title="Ciudad">[[item.city]]</prism-td>
@@ -523,7 +528,7 @@
                     <span><b>Descripción del barrio :  </b>[[selectedProp.zoneDescription]]</span>
                     <span><b>Descuento :  </b>[[selectedProp.discount]]%</span>
                     <span><b>Dirección :  </b>[[selectedProp.address]] [[selectedProp.locality]]</span>
-                    <a href="https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]">https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]</a>
+                    <a target="_blank" href="https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]">https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]</a>
                   </div>
                 </paper-card>
                 <paper-card>
@@ -597,7 +602,7 @@
         <span>Estas seguro que deseas eliminar este usuario</span>
         <div class="horizontl self-end">
           <paper-button on-tap="deleteUser">Eliminar</paper-button>
-          <paper-button on-tap="donate">Cancelar</paper-button>
+          <paper-button on-tap="closeDialog">Cancelar</paper-button>
         </div>
       </paper-dialog>
       <paper-dialog id="propDelete" class="vertical">
@@ -605,7 +610,7 @@
         <span>Estas seguro que deseas eliminar esta propiedad</span>
         <div class="horizontl self-end">
           <paper-button on-tap="deleteProp">Eliminar</paper-button>
-          <paper-button on-tap="donate">Cancelar</paper-button>
+          <paper-button on-tap="closeDialog">Cancelar</paper-button>
         </div>
       </paper-dialog>
       <paper-dialog id="paymentDelete" class="vertical">
@@ -613,7 +618,7 @@
         <span>Estas seguro que deseas eliminar este pago</span>
         <div class="horizontl self-end">
           <paper-button on-tap="deletePayment">Eliminar</paper-button>
-          <paper-button on-tap="donate">Cancelar</paper-button>
+          <paper-button on-tap="closeDialog">Cancelar</paper-button>
         </div>
       </paper-dialog>
       <paper-dialog id="wait" modal>
@@ -1044,16 +1049,9 @@
       shareFacebook(e){
         var id = e.target.id;
         window.open('https://www.ecuadorhouserentals.com/prop/'+id);
-        // FB.ui({
-        //       method: 'share',
-        //       href: 'https://www.ecuadorhouserentals.com/prop/'+id,
-        //     }, (response)=>{
-        //       this.dispatch('markAsShared',id,(err)=>{
-        //         if(err) showMessage(err);
-        //         showMessage('Compartido');
-        //         this.searchProps();
-        //       })
-        //     });
+      }
+      closeDialog(e){
+        e.path[4].close();
       }
       setKeys(e){
         var keys = e.detail.__data.response;
