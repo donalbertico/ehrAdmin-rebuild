@@ -7,6 +7,14 @@ const paymentsSearch = (state,action)=>{
       return state;
   }
 }
+const auditsSearch = (state,action)=>{
+  switch (action.type) {
+    case 'LOAD_AUDITS':
+      return action.audits
+      break;
+      return state;
+  }
+}
 const userSearch = (state,action)=>{
   switch (action.type) {
     case 'LOAD_USERS':
@@ -61,6 +69,7 @@ const search=(state,action)=>{
     users:userSearch(state.users,action),
     props:propSearch(state.props,action),
     payments:paymentsSearch(state.payments,action),
+    audits:auditsSearch(state.audits,action),
     emails:emailsSearch(state.emails,action)
   }
 }

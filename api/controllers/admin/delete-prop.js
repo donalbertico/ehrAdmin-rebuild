@@ -28,10 +28,18 @@ module.exports = {
   },
 
 
-  fn: function (inputs, exits) {
-    Property.destroy(inputs.id).meta({fetch: true}).exec((err)=>{
+  fn: function (inputs, exits,env) {
+    var employee = env.req.session.user;
+    Property.destroy(inputs.id).meta({fetch: true}).exec((err,deleted)=>{
       if(err) exits.error(err);
-      return exits.success();
+      console.log('caquita',deleted[0]);
+      Audits.newDoc({description : 'propiedad borrada'},deleted[0].user,employee,'prop-deleted',(err)=>{
+        if(err) {
+          console.log(err);
+          return exits.error(err);
+        };
+        return exits.success();
+      });
     });
   }
 

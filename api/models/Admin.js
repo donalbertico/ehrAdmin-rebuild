@@ -29,7 +29,8 @@ module.exports = {
   datastore:'mongoAdmin',
   attributes: {
     username:{type:'string',unique:true},
-    password:{type:'string'}
+    password:{type:'string'},
+    audits:{collection:'Audits',via:'user'}
   },
   validatePassword: function (password,encrypted, next) {
     bcrypt.compare(password, encrypted, next);

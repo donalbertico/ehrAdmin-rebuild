@@ -19,6 +19,7 @@ module.exports = {
 
   fn: function (inputs, exits,env) {
     var  details = [{code:inputs.code}];
+    var employee = env.req.session.user;
     User.findOne(inputs.user,(err,found)=>{
       if(err)exits.error(err);
       console.log(details);
@@ -40,7 +41,13 @@ module.exports = {
                                   console.log(err);
                                   return exits.error(err);
                                 };
-                                  return exits.success(err);
+                                  Audits.newDoc(details,found.email,employee,'donation',(err)=>{
+                                    if(err) {
+                                      console.log(err);
+                                      return exits.error(err);
+                                    };
+                                    return exits.success();
+                                  });
                                }
                              );
       });

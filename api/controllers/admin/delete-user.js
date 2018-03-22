@@ -28,10 +28,17 @@ module.exports = {
   },
 
 
-  fn: function (inputs, exits) {
-    User.destroy(inputs.id).meta({fetch: true}).exec((err)=>{
+  fn: function (inputs, exits,env) {
+    var employee = env.req.session.user;
+    User.destroy(inputs.id).meta({fetch: true}).exec((err,destroyed)=>{
       if(err) exits.error(err);
-      return exits.success();
+      Audits.newDoc({description : 'usuario eliminadex'},destroyed[0].email,employee,'user-deleted',(err)=>{
+        if(err) {
+          console.log(err);
+          return exits.error(err);
+        };
+        return exits.success();
+      });
     });
   }
 

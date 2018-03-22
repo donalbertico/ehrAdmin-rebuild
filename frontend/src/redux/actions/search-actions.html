@@ -184,6 +184,28 @@
               });
             }
           },
+          loadAudits : (callback) => {
+            console.log('audtis');
+            return (dispatch) =>{
+              dispatch({type :'LOAD_AUDITS'});
+              let request = new Request('/audits/search',{
+                method:'GET',
+                headers: sh,
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  console.log(json);
+                  dispatch({type:'LOAD_AUDITS',status:'success',audits:json});
+                });
+              })
+              .catch((e)=>{
+                dispatch({type:'LOAD_AUDITS',status:'error',error:e});
+              });
+            }
+          },
           donateBenefit : (id,code,callback) => {
             return (dispatch) =>{
               let request = new Request('/admin/give-benefits',{

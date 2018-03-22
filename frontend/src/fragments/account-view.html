@@ -99,6 +99,9 @@
         width: 100px;
         border-radius: 50%;
       }
+      paper-dropdown-menu{
+        width: 27vh;
+      }
     </style>
     <script>
       (function(d, s, id){
@@ -130,6 +133,7 @@
           <a name="users" href="/account/payments">Pagos por Verificar</a>
           <a name="users" href="/account/props">Propiedades</a>
           <a name="users" href="/account/emails">Correos</a>
+          <a name="users" href="/account/audit">Funciones realizadas</a>
         </iron-selector>
       </app-drawer>
       <div>
@@ -282,6 +286,34 @@
                     <vaadin-date-picker id="propTo" value="{{propsQuery.to}}" label="Hasta"></vaadin-date-picker>
                     <paper-button raised class="accent self-center" on-tap="searchProps">Buscar</paper-button>
                   </div>
+                </div>
+                <div class="card horizontal">
+                  <paper-dropdown-menu label="Tipo">
+                    <paper-listbox   slot="dropdown-content" attr-for-selected="type" selected="{{filters.propType}}">
+                      <paper-item type="all">Todos</paper-item>
+                      <paper-item type="rro">[[localize('type','type','rro')]]</paper-item>
+                      <paper-item type="rsr">[[localize('type','type','rsr')]]</paper-item>
+                      <paper-item type="hih">[[localize('type','type','hih')]]</paper-item>
+                      <paper-item type="hth">[[localize('type','type','hth')]]</paper-item>
+                      <paper-item type="dde">[[localize('type','type','dde')]]</paper-item>
+                      <paper-item type="ddu">[[localize('type','type','ddu')]]</paper-item>
+                      <paper-item type="dpe">[[localize('type','type','dpe')]]</paper-item>
+                      <paper-item type="dsu">[[localize('type','type','dsu')]]</paper-item>
+                      <paper-item type="dlo">[[localize('type','type','dlo')]]</paper-item>
+                      <paper-item type="lfa">[[localize('type','type','lfa')]]</paper-item>
+                      <paper-item type="lla">[[localize('type','type','lla')]]</paper-item>
+                      <paper-item type="cof">[[localize('type','type','cof')]]</paper-item>
+                      <paper-item type="cse">[[localize('type','type','cse')]]</paper-item>
+                      <paper-item type="cst">[[localize('type','type','cst')]]</paper-item>
+                      <paper-item type="cga">[[localize('type','type','cga')]]</paper-item>
+                      <paper-item type="cba">[[localize('type','type','cba')]]</paper-item>
+                      <paper-item type="tsm">[[localize('type','type','tsm')]]</paper-item>
+                      <paper-item type="tdb">[[localize('type','type','tdb')]]</paper-item>
+                      <paper-item type="ths">[[localize('type','type','ths')]]</paper-item>
+                      <paper-item type="tma">[[localize('type','type','tma')]]</paper-item>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                  <paper-button raised class="accent self-center" on-tap="sortByType">Filtrar</paper-button>
                 </div>
                 <span>[[props.length]] Resultados</span>
                 <prism-table>
@@ -512,7 +544,7 @@
                 <div class="p1 vertical">
                   <div class="horizontal">
                     <span class="font-display1 flex">
-                      <span>[[selectedProp.title]] - [[localize('type','value',selectedPropType)]]</span>
+                      <span>[[selectedProp.title]] - [[localize('type','type',selectedPropType)]]</span>
                     </span>
                     <span class="font-subhead">[[localize('state','value',selectedPropState)]]</span>
                   </div>
@@ -540,6 +572,31 @@
                 </paper-card>
               </div>
             </div>
+          </section>
+          <section name="audit">
+            <span class="font-headline s m1-b">Auditoria</span>
+            <prism-table>
+                <prism-thead>
+                    <prism-tr>
+                        <prism-th>Fecha</prism-th>
+                        <prism-th>Objetivo</prism-th>
+                        <prism-th>Descripcion</prism-th>
+                        <prism-th>Usuario</prism-th>
+                        <prism-th>Tipo</prism-th>
+                    </prism-tr>
+                </prism-thead>
+                <prism-tbody>
+                  <template is="dom-repeat" items="[[audits]]" index-as="index">
+                    <prism-tr>
+                        <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                        <prism-td title="Objetivo">[[item.user]]</prism-td>
+                        <prism-td title="Descripcion">[[item.product.description]]</prism-td>
+                        <prism-td title="Usuario">[[item.employee.username]]</prism-td>
+                        <prism-td title="Type">[[item.type]]</prism-td>
+                    </prism-tr>
+                  </template>
+                </prism-tbody>
+            </prism-table>
           </section>
         </iron-pages>
       </div>
@@ -660,7 +717,8 @@
             type:Object,
             value:()=>{
               return {
-                props : 'a'
+                props : 'a',
+                propType : 'all'
               }
             }
           },
@@ -692,6 +750,10 @@
             type:Array,
             statePath: 'search.props.entities'
           },
+          propsAux:{
+            type:Array,
+            statePath: 'search.props.entities'
+          },
           userQuery:{
             type:Object,
             value:()=>{
@@ -720,6 +782,10 @@
             type:Array,
             statePath : 'search.payments'
           },
+          audits:{
+            type:Array,
+            statePath : 'search.audits'
+          },
           stats:{
             type:Object,
             statePath:'search.stats'
@@ -747,7 +813,7 @@
                   'date' : '{value,date,medium}',
                   'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
                   'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
-                  'type':'{value , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                  'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
                   'date':'{value,date,medium}'
                 }
               }
@@ -868,6 +934,9 @@
           this.page=page;
           if(page == 'payments'){
             this.dispatch('loadPayments');
+          }
+          if(page == 'audit'){
+            this.dispatch('loadAudits');
           }
           if(page ==='emails'){
             this.loadEmailStats();
@@ -1045,6 +1114,16 @@
           });
         }
         this.set('users',users);
+      }
+      sortByType(){
+        var type = this.filters.propType;
+        if(type == 'all'){
+          return this.set('props','propsAux')
+        }
+        var props = this.propsAux.filter((prop)=>{
+          return prop.type == type;
+        });
+        this.set('props',props);
       }
       shareFacebook(e){
         var id = e.target.id;

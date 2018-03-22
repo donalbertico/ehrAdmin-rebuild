@@ -49,8 +49,10 @@ module.exports = {
         if(!valid){
           return exits.conflict({message:'user_or_pass_invalid'});
         }
+        env.req.session.user = found.id;
         env.req.session.authenticated = true;
         env.res.cookie('authenticated', '1', { maxAge: 2 * 24 * 60 * 60 * 1000});
+        env.res.cookie('user', found.id, { maxAge: 2 * 24 * 60 * 60 * 1000});
         return exits.success();
       })
     });
