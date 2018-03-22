@@ -67,10 +67,8 @@ module.exports = {
       query={};
     }
     var col = User.getDatastore().manager.collection('property');
-    console.log(query);
     col.find(query).sort({'lastPublishedDate' : -1}).toArray((err,props)=>{
       if(err){
-        console.error(err);
         return exits.error({message:'server_error'});
       }
       props=props.map((item)=>{

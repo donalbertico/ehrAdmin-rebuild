@@ -29,7 +29,6 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    console.log('cargando');
     Property.findOne(inputs.id).populate('owner').exec((err,found)=>{
       if(err) exits.error(err);
       return exits.success(found);

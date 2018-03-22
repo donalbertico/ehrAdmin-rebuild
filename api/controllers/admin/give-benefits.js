@@ -22,9 +22,7 @@ module.exports = {
     var employee = env.req.session.user;
     User.findOne(inputs.user,(err,found)=>{
       if(err)exits.error(err);
-      console.log(details);
       User.applyBenefits(found.id,details,(err,type)=>{
-        console.log(err);
         if(err) exits.error(err);
         sails.hooks.mail.send(
                               'bonusBenefits',
@@ -38,12 +36,10 @@ module.exports = {
                               },
                                function(err) {
                                 if(err) {
-                                  console.log(err);
                                   return exits.error(err);
                                 };
                                   Audits.newDoc(details,found.email,employee,'donation',(err)=>{
                                     if(err) {
-                                      console.log(err);
                                       return exits.error(err);
                                     };
                                     return exits.success();

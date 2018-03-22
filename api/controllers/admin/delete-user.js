@@ -34,7 +34,6 @@ module.exports = {
       if(err) exits.error(err);
       Audits.newDoc({description : 'usuario eliminadex'},destroyed[0].email,employee,'user-deleted',(err)=>{
         if(err) {
-          console.log(err);
           return exits.error(err);
         };
         return exits.success();

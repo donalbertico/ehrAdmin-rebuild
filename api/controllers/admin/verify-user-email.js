@@ -31,7 +31,6 @@ module.exports = {
   fn: function (inputs, exits) {
     User.update(inputs.id,{mailVerified:true},function(err,updated){
         if(err){
-          console.log(err);
           return exits.error({message:'server_error'});
         }
         var newDates=[Date.today().getTime()];

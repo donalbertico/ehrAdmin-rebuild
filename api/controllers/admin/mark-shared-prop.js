@@ -30,7 +30,6 @@ module.exports = {
 
   fn: function (inputs, exits) {
     Property.update(inputs.id,{shared : true},(err)=>{
-      console.log(err);
       if(err) exits.error(err);
       return exits.success();
     });

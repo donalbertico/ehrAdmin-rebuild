@@ -28,7 +28,6 @@ module.exports = {
   fn: function (inputs, exits) {
     Audits.find({}).populate('employee').exec((err,audits)=>{
       if(err)return exits.error(err);
-      console.log(audits);
       return exits.success(audits);
     });
 

@@ -185,7 +185,6 @@
             }
           },
           loadAudits : (callback) => {
-            console.log('audtis');
             return (dispatch) =>{
               dispatch({type :'LOAD_AUDITS'});
               let request = new Request('/audits/search',{
@@ -197,7 +196,6 @@
               .then(handleReqError)
               .then((response)=>{
                 response.json().then((json)=>{
-                  console.log(json);
                   dispatch({type:'LOAD_AUDITS',status:'success',audits:json});
                 });
               })
@@ -223,7 +221,6 @@
                 callback(null);
               })
               .catch((e)=>{
-                console.log(e);
                 callback(e.message);
               });
             }
