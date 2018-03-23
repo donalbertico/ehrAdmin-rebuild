@@ -30,7 +30,7 @@ module.exports = {
   attributes: {
     username:{type:'string',unique:true},
     password:{type:'string'},
-    audits:{collection:'Audits',via:'user'}
+    audits:{collection:'Audits',via:'employee'}
   },
   validatePassword: function (password,encrypted, next) {
     bcrypt.compare(password, encrypted, next);
