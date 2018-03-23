@@ -22,7 +22,7 @@ module.exports = {
     var payment = {
       payer : inputs.user,
       method : 'Deposito Bancario',
-      details : [{code:inputs.code,}]
+      details : [{code:inputs.code}]
     }
     var employee = env.req.session.user;
     Payments.create(payment).meta({fetch:true}).exec((err,created)=>{
