@@ -11,7 +11,7 @@ var qb = new quick (sails.config.custom.qb_config.consumerKey,
                          sails.config.custom.qb_config.secret,
                          sails.config.custom.qb_config.realmId,
                          sails.config.custom.qb_config.qbTest, // use the sandbox (i.e. for testing)
-                         false);
+                         true);
 
 const iva = {
   code : '2',
