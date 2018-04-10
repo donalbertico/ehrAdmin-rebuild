@@ -254,6 +254,7 @@
             }
           },
           getEmailList:(query,callback)=>{
+            console.log(query);
             return (dispatch) =>{
               let request = new Request('/stats/get-email-list',{
                 method:'POST',
