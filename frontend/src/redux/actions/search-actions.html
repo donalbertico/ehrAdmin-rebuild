@@ -34,11 +34,7 @@
                 method:'POST',
                 headers: sh,
                 credentials: 'include',
-                body:JSON.stringify({
-                  firstName:query.firstName,
-                  lastName:query.lastName,
-                  email:query.email
-                })
+                body:JSON.stringify(query)
               });
               window.fetch(request)
               .then(handleReqError)
@@ -188,6 +184,26 @@
               });
             }
           },
+          loadAudits : (callback) => {
+            return (dispatch) =>{
+              dispatch({type :'LOAD_AUDITS'});
+              let request = new Request('/audits/search',{
+                method:'GET',
+                headers: sh,
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_AUDITS',status:'success',audits:json});
+                });
+              })
+              .catch((e)=>{
+                dispatch({type:'LOAD_AUDITS',status:'error',error:e});
+              });
+            }
+          },
           donateBenefit : (id,code,callback) => {
             return (dispatch) =>{
               let request = new Request('/admin/give-benefits',{
@@ -205,7 +221,6 @@
                 callback(null);
               })
               .catch((e)=>{
-                console.log(e);
                 callback(e.message);
               });
             }
@@ -316,6 +331,97 @@
               })
               .catch((e)=>{
                 console.log(e.message);
+              });
+            }
+          },
+          deleteUser:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/delete-user',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          deleteProp:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/delete-prop',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          deletePayment:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/delete-payment',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          markAsShared:(id,callback)=>{
+            console.log(id);
+            return (dispatch) =>{
+              let request = new Request('/admin/mark-shared-prop',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          verifyEmail:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/admin/verify-user-email',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
               });
             }
           }

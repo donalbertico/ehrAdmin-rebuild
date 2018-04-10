@@ -11,5 +11,6 @@
 module.exports.routes = {
   "GET /csrfToken": { action: "security/grant-csrf-token" },
   '/login' : 'AdminController.login',
-  '/logout' : 'AdminController.logout'
+  '/logout' : 'AdminController.logout',
+  'GET /getKeys': 'AuthController.getKeys',
 };

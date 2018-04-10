@@ -22,13 +22,20 @@ module.exports = {
     var payment = {
       payer : inputs.user,
       method : 'Deposito Bancario',
-      details : [{code:inputs.code,}]
+      details : [{code:inputs.code}]
     }
+    var employee = env.req.session.user;
     Payments.create(payment).meta({fetch:true}).exec((err,created)=>{
       if(err) return exits.error(err);
         Payments.verify(created.id,(err,response)=>{
           if(err) return exits.error(err);
-          return exits.success();
+          Audits.newDoc(payment.details,inputs.user,employee,'payment-verified',(err)=>{
+            if(err) {
+              console.log(err);
+              return exits.error(err);
+            };
+            return exits.success();
+          });
         });
     });
   }

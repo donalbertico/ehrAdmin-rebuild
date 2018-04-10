@@ -19,6 +19,7 @@ module.exports = {
 
   fn: function (inputs, exits,env) {
     var  details = [{code:inputs.code}];
+    var employee = env.req.session.user;
     User.findOne(inputs.user,(err,found)=>{
       if(err)exits.error(err);
       User.applyBenefits(found.id,details,(err,type)=>{
@@ -35,10 +36,14 @@ module.exports = {
                               },
                                function(err) {
                                 if(err) {
-                                  console.log(err);
                                   return exits.error(err);
                                 };
-                                  return exits.success(err);
+                                  Audits.newDoc(details,found.email,employee,'donation',(err)=>{
+                                    if(err) {
+                                      return exits.error(err);
+                                    };
+                                    return exits.success();
+                                  });
                                }
                              );
       });

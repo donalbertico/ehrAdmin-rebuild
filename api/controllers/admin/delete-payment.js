@@ -1,10 +1,10 @@
 module.exports = {
 
 
-  friendlyName: 'Get single prop',
+  friendlyName: 'delete payment',
 
 
-  description: 'Gets all the info for a single property',
+  description: 'delete a payment with its id',
 
 
   inputs: {
@@ -29,9 +29,9 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    Property.findOne(inputs.id).populate('owner').exec((err,found)=>{
+    Payments.destroy(inputs.id).meta({fetch: true}).exec((err)=>{
       if(err) exits.error(err);
-      return exits.success(found);
+      return exits.success();
     });
   }
 

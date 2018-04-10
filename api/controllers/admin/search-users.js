@@ -1,13 +1,19 @@
 function parseQuery(inputs){
   var query={};
   if(inputs.email){
-    query.email={'$regex':`.*${inputs.email}.*`};
+    query.email=inputs.email;
   }
   if(inputs.firstName){
-    query.firstName={'$regex':`.*${inputs.firstName}.*`};
+    query.firstName=inputs.firstName;
   }
   if(inputs.lastName){
-    query.lastName={'$regex':`.*${inputs.lastName}.*`};
+    query.lastName=inputs.lastName;
+  }
+  if (inputs.from && inputs.to) {
+    query.createdAt = {'>' : inputs.from, '<' : inputs.to};
+  }
+  if(inputs.type == 'n'){
+    query.collaborateWith = null;
   }
   if(Object.keys(query).length<1){
     return null;
@@ -33,6 +39,15 @@ module.exports = {
     },
     lastName:{
       type:'string'
+    },
+    from :{
+      type :'number'
+    },
+    to :{
+      type :'number'
+    },
+    type:{
+      type:'string'
     }
   },
 
@@ -55,21 +70,25 @@ module.exports = {
     if(!query){
       query={};
     }
-
-    var col = User.getDatastore().manager.collection('user');
-    var prop = User.getDatastore().manager.collection('property');
-    col.find(query).toArray((err,users)=>{
-      if(err){
-        console.error(err);
-        return exits.error({message:'server_error'});
-      }
-      users=users.map((item)=>{
-        item.id=item._id.toHexString();
-        delete item._id;
-        return item;
+    if(inputs.type == 'h' || inputs.type =='r' || inputs.type =='e'){
+      var users = [];
+      Enterprise.find({type : inputs.type}).populate('collaborators').populate('deputy').exec((err,enterprises)=>{
+        if(err)return exits.error(err);
+        enterprises.forEach((item)=>{
+          users.push(item.deputy);
+          item.collaborators.forEach((collaborator)=>{
+            users.push(collaborator);
+          });
+        });
+        exits.success(users);
       });
-      return exits.success(users);
-    });
+    }else{
+      User.find(query).populate('properties').populate('passports').sort('createdAt DESC').exec((err,users)=>{
+        if(err)return exits.error(err);
+        exits.success(users);
+      });
+    }
+
   }
 
 

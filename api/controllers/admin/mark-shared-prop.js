@@ -1,10 +1,10 @@
 module.exports = {
 
 
-  friendlyName: 'Get single prop',
+  friendlyName: 'mark prop as shared',
 
 
-  description: 'Gets all the info for a single property',
+  description: 'set shared attribute to true of given id',
 
 
   inputs: {
@@ -29,9 +29,9 @@ module.exports = {
 
 
   fn: function (inputs, exits) {
-    Property.findOne(inputs.id).populate('owner').exec((err,found)=>{
+    Property.update(inputs.id,{shared : true},(err)=>{
       if(err) exits.error(err);
-      return exits.success(found);
+      return exits.success();
     });
   }
 

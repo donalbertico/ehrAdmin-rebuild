@@ -29,7 +29,7 @@
     "app-localize-behavior": "^2.0.0",
     "web-animations-js": "^2.2.5",
     "lazy-imports": "Polymer/lazy-imports#^2.0.0",
-    "iron-ajax": "PolymerElements/iron-ajax#^2.0.6",
+    "iron-ajax": "^2.1.2",
     "fetch": "^2.0.3",
     "redux-thunk.min": "https://cdnjs.cloudflare.com/ajax/libs/redux-thunk/2.2.0/redux-thunk.min.js",
     "redux.min": "https://cdnjs.cloudflare.com/ajax/libs/redux/3.6.0/redux.min.js",

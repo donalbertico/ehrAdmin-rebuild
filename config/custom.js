@@ -35,6 +35,19 @@ module.exports.custom = {
     qbTest:true
   },
   mP : process.env.MP,
+  facebook: {
+    name: 'Facebook',
+    protocol: 'facebook',
+    strategy: require('passport-custom'),
+    options: {
+      clientID: process.env.FACEBOOK_ID
+    }
+  },
+  cloudinary:{
+   cloud_name: process.env.CLOUDINARY_NAME,
+   api_key: process.env.CLOUDINARY_KEY,
+   api_secret: process.env.CLOUDINARY_SECRET
+  },
   bill:{
     ruc: '1792569036001',
     razonSocial:'CONFORTDIL CIA.LTDA.',

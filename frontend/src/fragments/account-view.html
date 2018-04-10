@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
@@ -17,6 +18,7 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/search-actions.html">
@@ -97,14 +99,31 @@
         width: 100px;
         border-radius: 50%;
       }
+      paper-dropdown-menu{
+        width: 27vh;
+      }
     </style>
+    <script>
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "//connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <iron-ajax
+    auto
+    url="/getKeys"
+    handle-as="json"
+    on-response="setKeys"></iron-ajax>
     <app-route
         route="{{route}}"
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
-    <app-route route="{{route}}" pattern="/account/payments" on-active-changed="loadPayments" data="{{data}}" tail="{{tail}}"></app-route>
-    <app-route route="{{route}}" pattern="/account/props" on-active-changed="loadPropsStats" data="{{data}}" tail="{{tail}}"></app-route>
+    <app-route route="{{route}}" pattern="/account/payments" on-active-changed="loadPayments"></app-route>
+    <app-route route="{{route}}" pattern="/account/props/:id" on-active-changed="loadPropsStats" data="{{propData}}" tail="{{tail}}"></app-route>
     <app-drawer-layout>
       <app-drawer slot="drawer">
         <app-toolbar>Menu</app-toolbar>
@@ -114,6 +133,7 @@
           <a name="users" href="/account/payments">Pagos por Verificar</a>
           <a name="users" href="/account/props">Propiedades</a>
           <a name="users" href="/account/emails">Correos</a>
+          <a name="users" href="/account/audit">Funciones realizadas</a>
         </iron-selector>
       </app-drawer>
       <div>
@@ -128,18 +148,51 @@
             <div class="horizontal">
               <div class="vertical flex">
                 <span class="font-headline s m1-b">Filtros</span>
-                <div class="card horizontal">
-                  <paper-input class="m1-r" label="Email" value="{{userQuery.email}}"></paper-input>
-                  <paper-input class="m1-r" label="Nombre" value="{{userQuery.firstName}}"></paper-input>
-                  <paper-input class="m1-r" label="Apellido" value="{{userQuery.lastName}}"></paper-input>
-                  <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
+                <div class="card vertical">
+                  <div class="horizontal">
+                    <paper-input class="m1-r" label="Email" value="{{userQuery.email}}"></paper-input>
+                    <paper-input class="m1-r" label="Nombre" value="{{userQuery.firstName}}"></paper-input>
+                    <paper-input class="m1-r" label="Apellido" value="{{userQuery.lastName}}"></paper-input>
+                  </div>
+                  <div class="">
+                    <vaadin-date-picker id="propFrom" value="{{userQuery.from}}" label="Desde"></vaadin-date-picker>
+                    <vaadin-date-picker id="propTo" value="{{userQuery.to}}" label="Hasta"></vaadin-date-picker>
+                    <paper-dropdown-menu label="Tipo">
+                      <paper-listbox   slot="dropdown-content" attr-for-selected="users" selected="{{userQuery.type}}">
+                        <paper-item users="a">Todos</paper-item>
+                        <paper-item users="r">Corredor</paper-item>
+                        <paper-item users="n">Normal</paper-item>
+                        <paper-item users="h">Hotel</paper-item>
+                        <paper-item users="e">Empresa de bienes Raices</paper-item>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
+                    <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
+                  </div>
                 </div>
+                <div class="card horizontal">
+                  <paper-dropdown-menu label="Propiedades">
+                    <paper-listbox   slot="dropdown-content" attr-for-selected="users" selected="{{filters.props}}">
+                      <paper-item users="a">Ascendente</paper-item>
+                      <paper-item users="d">Descendente</paper-item>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                  <!-- <paper-dropdown-menu id="Dropdown" label="Propiedades">
+                    <paper-listbox slot="dropdown-content" attr-for-selected="state" selected="{{propsQuery.state}}">
+                      <paper-item state="a">Ascendente</paper-item>
+                      <paper-item state="v">Descendente</paper-item>
+                    </paper-listbox>
+                  </paper-dropdown-menu> -->
+                  <paper-button raised class="accent self-center" on-tap="sortByProps">Filtrar</paper-button>
+                </div>
+                <span>[[users.length]] Resultados</span>
                 <prism-table>
                     <prism-thead>
                         <prism-tr>
                             <prism-th>Nombre</prism-th>
                             <prism-th>Email</prism-th>
                             <prism-th>Fecha</prism-th>
+                            <prism-th>Propiedades</prism-th>
+                            <prism-th>log in</prism-th>
                             <prism-th>Acción</prism-th>
                         </prism-tr>
                     </prism-thead>
@@ -149,9 +202,13 @@
                             <prism-td title="Nombre"><a id="[[item.id]]" href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
                             <prism-td title="Email">[[item.email]]</prism-td>
                             <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                            <prism-td title="Propiedades">[[item.properties.length]]</prism-td>
+                            <prism-td title="login">[[item.passports.0.protocol]]</prism-td>
                             <prism-td title="Accion">
                               <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
                               <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="verifyEmail" hidden$="[[item.mailVerified]]">Verificar correo</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="setUserDelete">Eliminar</paper-button>
                             </prism-td>
                         </prism-tr>
                       </template>
@@ -179,6 +236,7 @@
                         <prism-td title="Usuario">[[item.payer.email]]</prism-td>
                         <prism-td title="Accion">
                           <paper-button id="[[item.id]]" raised class="primary" on-click="setPayment">Aprobar</paper-button>
+                          <paper-button id="[[item.id]]" raised class="primary" on-click="setDeletePayment">Eliminar</paper-button>
                         </prism-td>
                     </prism-tr>
                   </template>
@@ -229,6 +287,34 @@
                     <paper-button raised class="accent self-center" on-tap="searchProps">Buscar</paper-button>
                   </div>
                 </div>
+                <div class="card horizontal">
+                  <paper-dropdown-menu label="Tipo">
+                    <paper-listbox   slot="dropdown-content" attr-for-selected="type" selected="{{filters.propType}}">
+                      <paper-item type="all">Todos</paper-item>
+                      <paper-item type="rro">[[localize('type','type','rro')]]</paper-item>
+                      <paper-item type="rsr">[[localize('type','type','rsr')]]</paper-item>
+                      <paper-item type="hih">[[localize('type','type','hih')]]</paper-item>
+                      <paper-item type="hth">[[localize('type','type','hth')]]</paper-item>
+                      <paper-item type="dde">[[localize('type','type','dde')]]</paper-item>
+                      <paper-item type="ddu">[[localize('type','type','ddu')]]</paper-item>
+                      <paper-item type="dpe">[[localize('type','type','dpe')]]</paper-item>
+                      <paper-item type="dsu">[[localize('type','type','dsu')]]</paper-item>
+                      <paper-item type="dlo">[[localize('type','type','dlo')]]</paper-item>
+                      <paper-item type="lfa">[[localize('type','type','lfa')]]</paper-item>
+                      <paper-item type="lla">[[localize('type','type','lla')]]</paper-item>
+                      <paper-item type="cof">[[localize('type','type','cof')]]</paper-item>
+                      <paper-item type="cse">[[localize('type','type','cse')]]</paper-item>
+                      <paper-item type="cst">[[localize('type','type','cst')]]</paper-item>
+                      <paper-item type="cga">[[localize('type','type','cga')]]</paper-item>
+                      <paper-item type="cba">[[localize('type','type','cba')]]</paper-item>
+                      <paper-item type="tsm">[[localize('type','type','tsm')]]</paper-item>
+                      <paper-item type="tdb">[[localize('type','type','tdb')]]</paper-item>
+                      <paper-item type="ths">[[localize('type','type','ths')]]</paper-item>
+                      <paper-item type="tma">[[localize('type','type','tma')]]</paper-item>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                  <paper-button raised class="accent self-center" on-tap="sortByType">Filtrar</paper-button>
+                </div>
                 <span>[[props.length]] Resultados</span>
                 <prism-table>
                     <prism-thead>
@@ -245,12 +331,24 @@
                       <template is="dom-repeat" items="[[props]]" index-as="index">
                         <prism-tr>
                             <prism-td title="Id"><a id="[[item.id]]" href="/account/prop/[[item.id]]" on-click="loadProp">[[item.shortId]]</a></prism-td>
-                            <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
+                            <template is="dom-if" if="[[item.lastPublishedDate]]" restamp="true">
+                              <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
+                            </template>
+                            <template is="dom-if" if="[[!item.lastPublishedDate]]" restamp="true">
+                              <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                            </template>
                             <prism-td title="Nombre">[[item.title]]</prism-td>
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
                             <prism-td title="Ciudad">[[item.city]]</prism-td>
                             <prism-td title="Accion">
+                              <template is="dom-if" if="[[!item.shared]]" restamp="true">
+                                <paper-button id="[[item.id]]" class="accent" raised on-tap="shareFacebook">Compartir</paper-button>
+                              </template>
+                              <template is="dom-if" if="[[item.shared]]" restamp="true">
+                                <paper-button id="[[item.id]]" raised on-tap="shareFacebook">Compartir</paper-button>
+                              </template>
                               <paper-button id="[[item.id]]" raised on-tap="unPublish">Dejar de publicar</paper-button>
+                              <paper-button id="[[item.id]]" raised on-tap="setDeleteProp">Eliminar</paper-button>
                             </prism-td>
                         </prism-tr>
                       </template>
@@ -449,7 +547,7 @@
                 <div class="p1 vertical">
                   <div class="horizontal">
                     <span class="font-display1 flex">
-                      <span>[[selectedProp.title]] - [[localize('type','value',selectedPropType)]]</span>
+                      <span>[[selectedProp.title]] - [[localize('type','type',selectedPropType)]]</span>
                     </span>
                     <span class="font-subhead">[[localize('state','value',selectedPropState)]]</span>
                   </div>
@@ -465,6 +563,7 @@
                     <span><b>Descripción del barrio :  </b>[[selectedProp.zoneDescription]]</span>
                     <span><b>Descuento :  </b>[[selectedProp.discount]]%</span>
                     <span><b>Dirección :  </b>[[selectedProp.address]] [[selectedProp.locality]]</span>
+                    <a target="_blank" href="https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]">https://www.ecuadorhouserentals.com/prop/[[selectedProp.id]]</a>
                   </div>
                 </paper-card>
                 <paper-card>
@@ -476,6 +575,31 @@
                 </paper-card>
               </div>
             </div>
+          </section>
+          <section name="audit">
+            <span class="font-headline s m1-b">Auditoria</span>
+            <prism-table>
+                <prism-thead>
+                    <prism-tr>
+                        <prism-th>Fecha</prism-th>
+                        <prism-th>Objetivo</prism-th>
+                        <prism-th>Descripcion</prism-th>
+                        <prism-th>Usuario</prism-th>
+                        <prism-th>Tipo</prism-th>
+                    </prism-tr>
+                </prism-thead>
+                <prism-tbody>
+                  <template is="dom-repeat" items="[[audits]]" index-as="index">
+                    <prism-tr>
+                        <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                        <prism-td title="Objetivo">[[item.user]]</prism-td>
+                        <prism-td title="Descripcion">[[item.product.description]]</prism-td>
+                        <prism-td title="Usuario">[[item.employee.username]]</prism-td>
+                        <prism-td title="Type">[[item.type]]</prism-td>
+                    </prism-tr>
+                  </template>
+                </prism-tbody>
+            </prism-table>
           </section>
         </iron-pages>
       </div>
@@ -533,9 +657,32 @@
           <paper-button on-tap="donate">Donar</paper-button>
         </div>
       </paper-dialog>
+      <paper-dialog id="userDelete" class="vertical">
+        <span class="font-display1">Eliminando usuario</span>
+        <span>Estas seguro que deseas eliminar este usuario</span>
+        <div class="horizontl self-end">
+          <paper-button on-tap="deleteUser">Eliminar</paper-button>
+          <paper-button on-tap="closeDialog">Cancelar</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="propDelete" class="vertical">
+        <span class="font-display1">Eliminando propiedad</span>
+        <span>Estas seguro que deseas eliminar esta propiedad</span>
+        <div class="horizontl self-end">
+          <paper-button on-tap="deleteProp">Eliminar</paper-button>
+          <paper-button on-tap="closeDialog">Cancelar</paper-button>
+        </div>
+      </paper-dialog>
+      <paper-dialog id="paymentDelete" class="vertical">
+        <span class="font-display1">Eliminando pago</span>
+        <span>Estas seguro que deseas eliminar este pago</span>
+        <div class="horizontl self-end">
+          <paper-button on-tap="deletePayment">Eliminar</paper-button>
+          <paper-button on-tap="closeDialog">Cancelar</paper-button>
+        </div>
+      </paper-dialog>
       <paper-dialog id="wait" modal>
         <span>Espere...</span>
-
       </paper-dialog>
     </app-drawer-layout>
   </template>
@@ -563,6 +710,18 @@
                 return state.search.props.selectedProp.state;
               }else{
                 return 'n';
+              }
+            }
+          },
+          propData:{
+            type:Object
+          },
+          filters:{
+            type:Object,
+            value:()=>{
+              return {
+                props : 'a',
+                propType : 'all'
               }
             }
           },
@@ -594,6 +753,10 @@
             type:Array,
             statePath: 'search.props.entities'
           },
+          propsAux:{
+            type:Array,
+            statePath: 'search.props.entities'
+          },
           userQuery:{
             type:Object,
             value:()=>{
@@ -622,6 +785,10 @@
             type:Array,
             statePath : 'search.payments'
           },
+          audits:{
+            type:Array,
+            statePath : 'search.audits'
+          },
           stats:{
             type:Object,
             statePath:'search.stats'
@@ -640,7 +807,7 @@
                 'en':{
                   'date' : '{value,date,medium}',
                   'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
-                  'enterprise' : '{value,select, r {Bienes Raíces} h {Hotel}}',
+                  'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
                   'date':'{value,date,medium}'
 
@@ -648,8 +815,8 @@
                 'es':{
                   'date' : '{value,date,medium}',
                   'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
-                  'enterprise' : '{value,select, r {Bienes Raíces} h {Hotel}}',
-                  'type':'{value , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                  'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
+                  'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
                   'date':'{value,date,medium}'
                 }
               }
@@ -720,6 +887,10 @@
             userQuery[key]=this.userQuery[key];
           }
         });
+        if(userQuery.from && userQuery.to){
+          userQuery.from = new Date(userQuery.from).getTime();
+          userQuery.to = new Date(userQuery.to).getTime();
+        }
         this.dispatch('searchUsers',userQuery,(e)=>{
           if(e)return showMessage('Error en la búsqueda');
         });
@@ -768,6 +939,9 @@
           if(page == 'payments'){
             this.dispatch('loadPayments');
           }
+          if(page == 'audit'){
+            this.dispatch('loadAudits');
+          }
           if(page ==='emails'){
             this.loadEmailStats();
           }
@@ -781,9 +955,45 @@
         this.set('beneficiary',e.target.id);
         this.$.luckyDialog.open();
       }
+      setUserDelete(e){
+        this.set('userToDelete',e.target.id);
+        this.$.userDelete.open();
+      }
+      setDeleteProp(e){
+        this.set('propToDelete',e.target.id);
+        this.$.propDelete.open();
+      }
+      setDeletePayment(e){
+        this.set('paymentToDelete',e.target.id);
+        this.$.paymentDelete.open();
+      }
       setPayment(e){
         this.set('payment',e.target.id);
         this.$.benefitsPDialog.open();
+      }
+      deleteUser(e){
+        this.dispatch('deleteUser',this.userToDelete,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Usuario eliminado');
+          this.searchUsers();
+          this.$.userDelete.close();
+        })
+      }
+      deleteProp(e){
+        this.dispatch('deleteProp',this.propToDelete,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Propiedad eliminado');
+          this.searchProps();
+          this.$.propDelete.close();
+        })
+      }
+      deletePayment(e){
+        this.dispatch('deletePayment',this.paymentToDelete,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Pago eliminado');
+          this.loadPayments();
+          this.$.paymentDelete.close();
+        })
       }
       _computePhotoUrl(photo){
         if(photo){
@@ -814,12 +1024,19 @@
           this.$.wait.close();
         });
       }
+      verifyEmail(e){
+        this.dispatch('verifyEmail',e.target.id,(err)=>{
+          showMessage('Mail verificado');
+        });
+      }
       loadPayments(){
         this.dispatch('loadPayments');
       }
       loadPropsStats(){
-        this.dispatch('loadPropsStats',(json)=>{
-        });
+        var prop = this.route.path.split('/prop/');
+        if(prop[1]){
+          this.dispatch('loadSingleProp',prop[1]);
+        }
       }
       unPublish(e){
         this.dispatch('unPublishProp',e.target.id,(err)=>{
@@ -861,7 +1078,6 @@
         this.dispatch('loadSingleUser',e.target.id);
       }
       loadProp(e){
-        console.log(e.target.id);
         this.dispatch('loadSingleProp',e.target.id);
       }
       downloadEmailList(){
@@ -880,6 +1096,59 @@
           result+='city='+emailsQuery.city;
         }
         window.open(result, '_blank');
+      }
+      sortByProps(){
+        var users = this.users.slice();
+        if(this.filters.props == 'a'){
+          users.sort((a,b)=>{
+            if(b.properties.length>a.properties.length){
+              return -1;
+            }
+            if(b.properties.length<a.properties.length){
+              return 1;
+            }
+            return 0;
+          });
+        }else{
+          users.sort((a,b)=>{
+            if(b.properties.length>a.properties.length){
+              return 1;
+            }
+            if(b.properties.length<a.properties.length){
+              return -1;
+            }
+            return 0;
+          });
+        }
+        this.set('users',users);
+      }
+      sortByType(){
+        var type = this.filters.propType;
+        if(type == 'all'){
+          return this.set('props','propsAux')
+        }
+        var props = this.propsAux.filter((prop)=>{
+          return prop.type == type;
+        });
+        this.set('props',props);
+      }
+      shareFacebook(e){
+        var id = e.target.id;
+        window.open('https://www.ecuadorhouserentals.com/prop/'+id);
+      }
+      closeDialog(e){
+        e.path[4].close();
+      }
+      setKeys(e){
+        var keys = e.detail.__data.response;
+        window.fbAsyncInit = ()=> {
+          FB.init({
+            appId      : keys.facebook,
+            xfbml      : true,
+            version    : 'v2.8',
+            status     : true
+          });
+        };
       }
     }
     window.customElements.define(AccountView.is, AccountView);

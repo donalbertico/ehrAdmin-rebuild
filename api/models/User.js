@@ -277,5 +277,20 @@ module.exports = {
         return cb(null,type);
       });
     });
+  },
+  afterDestroy: (destroyedRecords, next)=>{
+      // Destroy any child whose passport and properties has an ID of one of the
+      // deleted passport and properties models
+      var id = destroyedRecords.id;
+      Passport.destroy({user: id},function(err,destroyed){
+        if(err)return next(err);
+          Property.destroy({owner: id}).meta({fetch:true}).exec((err,dest)=>{
+            if(err)return next(err);
+            Enterprise.destroy({deputy:id}).meta({fetch:true}).exec((err, des)=>{
+              if(err)return next(err);
+              return next();
+            });
+          });
+      });
   }
 };
