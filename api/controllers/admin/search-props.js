@@ -3,10 +3,12 @@ var ObjectID = require('mongodb').ObjectID;
 function parseQuery(inputs){
   var query={};
   if(inputs.id){
-    query.shortId = {'$regex':`.*${inputs.id}.*`};
+    query.shortId = inputs.id;
+    // query.shortId = {'$regex':`.*${inputs.id}.*`};
   }
   if(inputs.title){
-    query.title={'$regex':`.*${inputs.title}.*`};
+    query.title=inputs.title;
+    // query.title={'$regex':`.*${inputs.title}.*`};
   }
   if(inputs.state !== 'a'){
     query.state = inputs.state;
@@ -66,17 +68,31 @@ module.exports = {
     if(!query){
       query={};
     }
-    var col = User.getDatastore().manager.collection('property');
-    col.find(query).sort({'lastPublishedDate' : -1}).toArray((err,props)=>{
-      if(err){
-        return exits.error({message:'server_error'});
-      }
+    Property.find(query).populate('owner').exec((err,props)=>{
+      console.log(err);
+      if(err) return exits.error({message:'server_error'});
       props=props.map((item)=>{
-        item.id=item._id.toHexString();
-        delete item._id;
+        if(item.publishedDates.length > 1){
+          item.state = 'r';
+        }
         return item;
       });
       return exits.success(props);
     });
+    // var col = User.getDatastore().manager.collection('property');
+    // col.find(query).sort({'lastPublishedDate' : -1}).toArray((err,props)=>{
+    //   if(err){
+    //     return exits.error({message:'server_error'});
+    //   }
+    //   props=props.map((item)=>{
+    //     item.id=item._id.toHexString();
+    //     delete item._id;
+    //     if(item.publishedDates.length > 1){
+    //       item.state = 'r';
+    //     }
+    //     return item;
+    //   });
+    //   return exits.success(props);
+    // });
   }
 };
