@@ -407,6 +407,7 @@
                         <span class="font-title p1">Filtros:</span>
                         <div class="horizontal p1">
                           <paper-input label="Email" value="{{emailsQuery.email}}"></paper-input>
+                          <paper-input label="Ciudad" value="{{emailsQuery.city}}" class="m1-x"></paper-input>
                           <vaadin-date-picker value="{{emailsQuery.from}}" label="Desde" class="m1-l"></vaadin-date-picker>
                           <vaadin-date-picker value="{{emailsQuery.to}}" label="Hasta" class="m1-l"></vaadin-date-picker>
                           <paper-button raised class="accent m1-l self-center" on-tap="searchEmails">Buscar</paper-button>
@@ -421,6 +422,7 @@
                                   <prism-tr>
                                       <prism-th>Email</prism-th>
                                       <prism-th>Nombre</prism-th>
+                                      <prism-th>Ciudad</prism-th>
                                       <prism-th>Teléfono</prism-th>
                                       <prism-th>Fecha</prism-th>
                                   </prism-tr>
@@ -430,6 +432,7 @@
                                   <prism-tr>
                                       <prism-td title="Email">[[item.email]]</prism-td>
                                       <prism-td title="Nombre">[[item.name]]</prism-td>
+                                      <prism-td title="Ciudad">[[item.city]]</prism-td>
                                       <prism-td title="Teléfono">[[item.phone]]</prism-td>
                                       <prism-td title="Fecha">[[item.date]]</prism-td>
                                   </prism-tr>
@@ -844,7 +847,8 @@
               return {
                 from: (new Date()).toFormat('MM/DD/YYYY'),
                 to: (new Date()).remove({weeks:1}).toFormat('MM/DD/YYYY'),
-                email:''
+                email:'',
+                city:''
               }
             }
           },
@@ -1089,6 +1093,9 @@
         }
         if(emailsQuery.email){
           result+='email='+emailsQuery.email;
+        }
+        if(emailsQuery.city){
+          result+='city='+emailsQuery.city;
         }
         window.open(result, '_blank');
       }
