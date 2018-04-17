@@ -13,8 +13,11 @@ function parseQuery(inputs){
   if(inputs.state !== 'a'){
     query.state = inputs.state;
   }
+  // if (inputs.from && inputs.to) {
+  //   query.lastPublishedDate = {'$gte' : inputs.from, '$lt' : inputs.to};
+  // }
   if (inputs.from && inputs.to) {
-    query.lastPublishedDate = {'$gte' : inputs.from, '$lt' : inputs.to};
+    query.lastPublishedDate = {'>' : inputs.from, '<' : inputs.to};
   }
   if(Object.keys(query).length<1){
     return null;
