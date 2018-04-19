@@ -63,8 +63,6 @@ module.exports = {
       statusCode:409
     }
   },
-
-
   fn: function (inputs, exits) {
     var query=parseQuery(inputs);
     if(!query){
@@ -88,8 +86,5 @@ module.exports = {
         exits.success(users);
       });
     }
-
   }
-
-
 };

@@ -323,6 +323,7 @@
                             <prism-th>Fecha</prism-th>
                             <prism-th>Titulo</prism-th>
                             <prism-th>Estado</prism-th>
+                            <prism-th>Usuario</prism-th>
                             <prism-th>Ciudad</prism-th>
                             <prism-th>Acción</prism-th>
                         </prism-tr>
@@ -339,6 +340,7 @@
                             </template>
                             <prism-td title="Nombre">[[item.title]]</prism-td>
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
+                            <prism-td title="Usuario"><a id="[[item.owner.id]]" href="/account/user/[[item.owner.id]]" on-click="loadUser">[[item.owner.email]]</a></prism-td>
                             <prism-td title="Ciudad">[[item.city]]</prism-td>
                             <prism-td title="Accion">
                               <template is="dom-if" if="[[!item.shared]]" restamp="true">
@@ -806,7 +808,7 @@
               return{
                 'en':{
                   'date' : '{value,date,medium}',
-                  'state' : '{value,select, p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
+                  'state' : '{value,select, p {pendiente} r {renovada} v {publicada} n {no puclicada} e {expirada}}',
                   'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
                   'date':'{value,date,medium}'
@@ -814,7 +816,7 @@
                 },
                 'es':{
                   'date' : '{value,date,medium}',
-                  'state' : '{value,select,p {pendiente} v {publicada} n {no puclicada} e {expirada}}',
+                  'state' : '{value,select,p {pendiente} r {renovada} v {publicada} n {no puclicada} e {expirada}}',
                   'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
                   'date':'{value,date,medium}'
