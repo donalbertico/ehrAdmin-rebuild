@@ -1,3 +1,4 @@
+require('date-utils');
 /*
 *Gets the query for this action and parses into a nodejs mongo driver query
 */
@@ -6,11 +7,11 @@ function parseQuery(query){
   var result={type:'userInfoRequest'};
 
   if(query.from){
-    var from = new Date(query.from);
+    var from = (new Date(query.from)).add({hours:4});
     result.createdAt=Object.assign({},result.createdAt,{'$gt':from.getTime()});
   }
   if(query.to){
-    var to = new Date(query.to);
+    var to = (new Date(query.to)).add({hours:4});
     result.createdAt=Object.assign({},result.createdAt,{'$lt':to.getTime()});
   }
   if(query.email){
