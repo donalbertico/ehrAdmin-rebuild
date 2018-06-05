@@ -1086,16 +1086,16 @@
         var emailsQuery = this.emailsQuery;
         var result = window.location.origin + '/stats/get-email-list?';
         if(emailsQuery.from){
-          result+='from='+emailsQuery.from;
+          result+='from='+emailsQuery.from+'&';
         }
         if(emailsQuery.to){
-          result+='to='+emailsQuery.to;
+          result+='to='+emailsQuery.to+'&';
         }
         if(emailsQuery.email){
-          result+='email='+emailsQuery.email;
+          result+='email='+emailsQuery.email+'&';
         }
         if(emailsQuery.city){
-          result+='city='+emailsQuery.city;
+          result+='city='+emailsQuery.city+'&';
         }
         window.open(result, '_blank');
       }
