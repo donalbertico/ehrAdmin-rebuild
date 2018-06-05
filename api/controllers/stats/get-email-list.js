@@ -11,7 +11,7 @@ function parseQuery(query){
     result.createdAt=Object.assign({},result.createdAt,{'$gt':from.getTime()});
   }
   if(query.to){
-    var to = (new Date(query.to)).add({hours:4});
+    var to = (new Date(query.to)).add({hours:24});
     result.createdAt=Object.assign({},result.createdAt,{'$lt':to.getTime()});
   }
   if(query.email){
@@ -91,8 +91,6 @@ module.exports = {
         env.res.setHeader('Content-Type', 'text/csv');
         return exits.success(json2csv({ data: results, fields: ['name','email','date','phone','city','locality'] }));
       }
-
-
     });
   }
 
