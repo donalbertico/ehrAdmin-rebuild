@@ -139,7 +139,8 @@ module.exports = {
     collaborateWith : {model : 'enterprise'},
 
     //misc
-    plusUntil : {type: 'number', defaultsTo:0},
+    plusUntil : {type: 'number', defaultsTo:0, allowNull:true},
+    plusAnnouncerUntil : {type: 'number', defaultsTo:0, allowNull:true},
     promoteTokens : {type: 'number', defaultsTo:0},
     mailChimpId: {type:'string',allowNull:true},
     qbId: {type:'string',unique:true},
@@ -260,11 +261,16 @@ module.exports = {
       if(err) return cb(err);
       details.forEach((detail)=>{
         var benefits = detailDic.benefitsFromCode(detail.code);
-        if (benefits.type == 'plan') {
-          var newDate = userBenefits.plusUntil || found.plusUntil || new Date();
+        if (benefits.type == 'plan'){
+          var newDate = userBenefits.plusUntil || found.plusUntil || new Date().getTime();
           newDate = new Date(newDate);
           newDate.add(benefits.add);
           userBenefits = {plusUntil : newDate.getTime()};
+        }else if (benefits.type == 'plusannouncer'){
+          var newDate = userBenefits.plusAnnouncerUntil || found.plusAnnouncerUntil || new Date().getTime();
+          newDate = new Date(newDate);
+          newDate.add(benefits.add);
+          userBenefits = {plusAnnouncerUntil : newDate.getTime()};
         }else{
           var tokens = userBenefits.promoteTokens|| found.promoteTokens || 0;
           tokens += benefits.add.tokens;

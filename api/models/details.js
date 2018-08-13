@@ -5,24 +5,27 @@
 *
 */
 var quick = require('node-quickbooks');
-var qb = new quick (sails.config.custom.qb_config.consumerKey,
-                         sails.config.custom.qb_config.consumerSecret,
+var request = require('request');
+var qb_key = sails.config.custom.qb_config.consumerKey;
+var qb_secret = sails.config.custom.qb_config.consumerSecret;
+var qb = new quick (qb_key,
+                         qb_secret,
                          sails.config.custom.qb_config.token,
                          sails.config.custom.qb_config.secret,
                          sails.config.custom.qb_config.realmId,
                          sails.config.custom.qb_config.qbTest, // use the sandbox (i.e. for testing)
                          false);
-
 const iva = {
   code : '2',
   rateCode : '3',
-  rate : 14
+  rate : 12
 }
 const detailDic = {};
 var customer = {}
     methods = {}
     accounts = {}
     taxes = {};
+
 qb.findItems([{field:'type',value:'Service'}], (err, response)=>{
   if(err) throw err;
   response.QueryResponse.Item.forEach((product)=>{
@@ -36,6 +39,7 @@ qb.findItems([{field:'type',value:'Service'}], (err, response)=>{
       rateCode : iva.rateCode
     }
     detailDic[product.Sku] = {
+      name : product.Name,
       description : product.Description,
       unitPrice : unitPrice,
       code : product.Sku,
@@ -44,6 +48,7 @@ qb.findItems([{field:'type',value:'Service'}], (err, response)=>{
     detailDic[product.Sku].taxes = [tax];
   });
 });
+
 
 module.exports = {
   /**
@@ -66,10 +71,13 @@ module.exports = {
     detail['discount'] = discount || 0;
     detail['subtotal'] = (detail.qty*detail.unitPrice) - detail.discount - taxTotal;
     detail['total'] = detail.unitPrice*detail.qty - detail.discount;
+    detail['taxTotal'] = taxTotal;
     if(code.substring(0,2)==='PL'){
       detail['type'] = 'plan';
-    }else{
+    }else if(code.substring(0,2)==='TO'){
       detail['type'] = 'token';
+    }else{
+      detail['type'] = 'plusannouncer';
     }
     return detail;
   },
@@ -97,11 +105,10 @@ module.exports = {
         case 10:
           benefits['add'] = {months:1}
           break;
-        default:
       }
-    }else{
+    }else if(code.substring(0,2)==='TO'){
       benefits['type'] = 'token';
-      switch (prod.code) {
+      switch (prod.code){
         case 'TO001':
           benefits['add'] = {tokens:1}
           break;
@@ -114,7 +121,19 @@ module.exports = {
         case 'TO004':
           benefits['add'] = {tokens:50}
           break;
-        default:
+      }
+    }else{
+      benefits['type'] = 'plusannouncer';
+      switch (prod.code) {
+        case 'AP001':
+          benefits['add'] = {days:7};
+          break;
+        case 'AP002':
+          benefits['add'] = {months:1};
+          break;
+        case 'AP003':
+          benefits['add'] = {days:365};
+          break;
       }
     }
     return benefits;
