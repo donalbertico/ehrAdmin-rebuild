@@ -175,7 +175,6 @@
               .then(handleReqError)
               .then((response)=>{
                 response.json().then((json)=>{
-                  console.log(json);
                   dispatch({type:'LOAD_PAYMENTS',status:'success',payments:json});
                 });
               })

@@ -51,6 +51,9 @@
     });
     return found;
   }
+  window.sh = new Headers({
+    'Content-Type': 'application/json'
+  });
   requestCRSF();
   const globalReducer = (state=GlobalState,action)=>{
     return{
