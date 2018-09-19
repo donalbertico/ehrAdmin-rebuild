@@ -64,13 +64,36 @@ const emailsSearch = (state,action)=>{
   }
 };
 
+const requestSearch = (state,action)=>{
+  switch (action.type) {
+    case 'LOAD_REQUESTS':
+      return Object.assign({},state,{records:[...action.emails]});
+      break;
+    case 'DELETE_REQUEST':
+      var newRecords = state.records.reduce((res,request)=>{
+        if(request.id!==action.id){
+          res.push(request);
+        }
+        return res;
+      },[]);
+      return Object.assign({},state,{records:newRecords});
+      break;
+    case 'SELECT_REQUEST':
+      return Object.assign({},state,{selectedRequest:action.id});
+      break;
+    default:
+      return state;
+  }
+}
+
 const search=(state,action)=>{
   return {
     users:userSearch(state.users,action),
     props:propSearch(state.props,action),
     payments:paymentsSearch(state.payments,action),
     audits:auditsSearch(state.audits,action),
-    emails:emailsSearch(state.emails,action)
+    emails:emailsSearch(state.emails,action),
+    requests:requestSearch(state.requests,action)
   }
 }
 

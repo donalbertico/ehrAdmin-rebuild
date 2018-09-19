@@ -88,6 +88,13 @@
       .emails prism-table{
         background-color: #fff;
       }
+      .requests{
+        height: calc(100vh - 180px);
+        overflow: auto;
+      }
+      .requests prism-table{
+        background-color: #fff;
+      }
       div.container{
         padding: 2rem;
       }
@@ -133,6 +140,7 @@
           <a name="users" href="/account/payments">Pagos por Verificar</a>
           <a name="users" href="/account/props">Propiedades</a>
           <a name="users" href="/account/emails">Correos</a>
+          <a name="users" href="/account/requests">Peticiones</a>
           <a name="users" href="/account/audit">Funciones realizadas</a>
         </iron-selector>
       </app-drawer>
@@ -472,6 +480,59 @@
               </div>
             </div>
           </section>
+          <section name="requests">
+            <div class="vertical h-100">
+              <div class="vertical dark-primary">
+                <div class="p1 horizontal">
+                  <span class="font-display1">Peticiones</span>
+                  <paper-spinner active="[[requestsLoading]]"></paper-spinner>
+                </div>
+              </div>
+              <div class="vertical p1 light-primary">
+                <span class="font-title p1">Filtros:</span>
+                <div class="horizontal p1">
+                  <paper-input label="Lugar" value="{{requestsQuery.place}}" class="m1-x"></paper-input>
+                  <vaadin-date-picker value="{{requestsQuery.from}}" label="Desde" class="m1-l"></vaadin-date-picker>
+                  <vaadin-date-picker value="{{requestsQuery.to}}" label="Hasta" class="m1-l"></vaadin-date-picker>
+                  <div class="flex"></div>
+                  <paper-button raised class="accent self-center" on-tap="searchRequests">Buscar</paper-button>
+                </div>
+              </div>
+              <div class="requests p1">
+                <prism-table shadow>
+                    <prism-thead>
+                        <prism-tr>
+                            <prism-th>Precio</prism-th>
+                            <prism-th>Tipo</prism-th>
+                            <prism-th>Lugar</prism-th>
+                            <prism-th>Nombre</prism-th>
+                            <prism-th>Teléfono</prism-th>
+                            <prism-th>Email</prism-th>
+                            <prism-th>Fecha</prism-th>
+                            <prism-th>Acciones</prism-th>
+                        </prism-tr>
+                    </prism-thead>
+                    <prism-tbody>
+                      <template is="dom-repeat" items="[[requests]]">
+                        <prism-tr>
+                            <prism-td title="Precio">[[item.priceReference]]</prism-td>
+                            <prism-td title="Tipo">[[item.propertyType]]</prism-td>
+                            <prism-td title="Lugar">[[item.place]]</prism-td>
+                            <prism-td title="Nombre">[[item.contactInfo.name]]</prism-td>
+                            <prism-td title="Teléfono">[[item.contactInfo.phone]]</prism-td>
+                            <prism-td title="Email">[[item.contactInfo.email]]</prism-td>
+                            <prism-td title="Fecha">[[item.date]]</prism-td>
+                            <prism-td title="Eliminar">
+                              <paper-icon-button icon="icons:close" on-tap="openDeleteRequestDialog"></paper-icon-button>
+                            </prism-td>
+                        </prism-tr>
+                      </template>
+                    </prism-tbody>
+                </prism-table>
+              </div>
+            </div>
+
+          </section>
           <section name="user">
             <div class="vertical h-100">
               <div class="vertical dark-primary">
@@ -705,6 +766,15 @@
           <paper-button on-tap="closeDialog">Cancelar</paper-button>
         </div>
       </paper-dialog>
+      <paper-dialog id="requestDelete" class="vertical">
+        <span class="font-display1">Eliminando Petición</span>
+        <span>Estas seguro que deseas eliminar esta petición?</span>
+        <div class="buttons">
+          <paper-spinner active="[[requestsLoading]]"></paper-spinner>
+          <paper-button disabled="[[requestsLoading]]" on-tap="deleteRequest">Eliminar</paper-button>
+          <paper-button dialog-dismiss>Cancelar</paper-button>
+        </div>
+      </paper-dialog>
       <paper-dialog id="paymentDelete" class="vertical">
         <span class="font-display1">Eliminando pago</span>
         <span>Estas seguro que deseas eliminar este pago</span>
@@ -900,6 +970,28 @@
             statePath:'search.emails.stats'
           },
           emailsLoading:{
+            type:Boolean,
+            value:false
+          },
+          requests:{
+            type:Array,
+            statePath:'search.requests.records'
+          },
+          requestsQuery:{
+            type:Object,
+            value:()=>{
+              return {
+                from: (new Date()).toFormat('MM/DD/YYYY'),
+                to: (new Date()).remove({weeks:1}).toFormat('MM/DD/YYYY'),
+                place:''
+              }
+            }
+          },
+          selectedRequest:{
+            type:String,
+            statePath:'search.requests.selectedRequest'
+          },
+          requestsLoading:{
             type:Boolean,
             value:false
           }
@@ -1108,8 +1200,28 @@
           this.emailsLoading=false;
         });
       }
+      searchRequests(){
+        this.requestsLoading=true;
+        this.dispatch('searchRequests',this.requestsQuery,(err)=>{
+          if(err)return showMessage('Hubo un error obteninedo la lista');
+          this.requestsLoading=false;
+        });
+      }
+      deleteRequest(){
+        this.requestsLoading=true;
+        this.dispatch('deleteRequest',this.selectedRequest,(err)=>{
+          this.requestsLoading=false;
+          console.log(err);
+          if(err)return showMessage('Hubo un error eliminando la petición');
+          this.$.requestDelete.close();
+        });
+      }
+      openDeleteRequestDialog(e){
+        let id = e.model.__data.item.id;
+        this.dispatch('selectRequest',id);
+        this.$.requestDelete.open();
+      }
       loadUser(e){
-        console.log(e.target.id);
         this.dispatch('loadSingleUser',e.target.id);
       }
       loadProp(e){

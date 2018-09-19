@@ -422,6 +422,50 @@
                 callback(e.message);
               });
             }
+          },
+          searchRequests:(query,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/request/search',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify(query),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((json)=>{
+                  dispatch({type:'LOAD_REQUESTS',emails:json})
+                  callback(null);
+                });
+              })
+              .catch((e)=>{
+                console.log(e.message);
+                callback(e.message);
+              });
+            }
+          },
+          deleteRequest:(id,callback)=>{
+            return (dispatch) =>{
+              let request = new Request('/request/delete',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                dispatch({type:'DELETE_REQUEST',id:id});
+                callback();
+              })
+              .catch((e)=>{
+                callback(e.message);
+              });
+            }
+          },
+          selectRequest:(id)=>{
+            return {type:'SELECT_REQUEST',id:id};
           }
         }
       }
