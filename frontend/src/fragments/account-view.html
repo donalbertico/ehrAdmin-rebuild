@@ -380,16 +380,17 @@
                         <paper-radio-button name="month">El último mes</paper-radio-button>
                       </paper-radio-group>
                     </div>
+                    <span class="font-display1 p1">Clientes/Inquilinos</span>
                     <div class="horizontal wrap w-100">
                         <paper-card class="stat">
                           <div class="card-content vertical">
-                            <span class="font-display2">[[emailStats.total]]</span>
+                            <span class="font-display2">[[emailStats.userInfoRequests]]</span>
                             <span>Contactos con propietarios</span>
                           </div>
                         </paper-card>
                         <paper-card class="stat">
                           <div class="card-content vertical">
-                            <span class="font-display2">[[emailStats.addresses]]</span>
+                            <span class="font-display2">[[emailStats.requestAddresses]]</span>
                             <span>Nuevos Correos</span>
                           </div>
                         </paper-card>
@@ -400,6 +401,21 @@
                           </div>
                         </paper-card>
                     </div>
+                    <span class="font-display1 p1">Anunciantes</span>
+                    <div class="horizontal wrap w-100">
+                        <paper-card class="stat">
+                          <div class="card-content vertical">
+                            <span class="font-display2">[[emailStats.requestMessages]]</span>
+                            <span>Contactos con requerimientos</span>
+                          </div>
+                        </paper-card>
+                        <paper-card class="stat">
+                          <div class="card-content vertical">
+                            <span class="font-display2">[[emailStats.requestAddresses]]</span>
+                            <span>Nuevos Correos</span>
+                          </div>
+                        </paper-card>
+                    </div>
                   </section>
                   <section>
                     <div class="vertical h-100">
@@ -407,7 +423,14 @@
                         <span class="font-title p1">Filtros:</span>
                         <div class="horizontal p1">
                           <paper-input label="Email" value="{{emailsQuery.email}}"></paper-input>
-                          <paper-input label="Ciudad" value="{{emailsQuery.city}}" class="m1-x"></paper-input>
+                          <paper-input label="Lugar" value="{{emailsQuery.city}}" class="m1-x"></paper-input>
+                          <paper-dropdown-menu label="Tipo">
+                            <paper-listbox slot="dropdown-content" attr-for-selected="state" selected="{{emailsQuery.type}}">
+                              <paper-item state="all">Todo</paper-item>
+                              <paper-item state="userRequestProvide">Anunciantes</paper-item>
+                              <paper-item state="userInfoRequest">Clientes/Inquilinos</paper-item>
+                            </paper-listbox>
+                          </paper-dropdown-menu>
                           <vaadin-date-picker value="{{emailsQuery.from}}" label="Desde" class="m1-l"></vaadin-date-picker>
                           <vaadin-date-picker value="{{emailsQuery.to}}" label="Hasta" class="m1-l"></vaadin-date-picker>
                           <paper-button raised class="accent m1-l self-center" on-tap="searchEmails">Buscar</paper-button>
@@ -420,9 +443,10 @@
                           <prism-table shadow>
                               <prism-thead>
                                   <prism-tr>
+                                      <prism-th>Tipo</prism-th>
                                       <prism-th>Email</prism-th>
                                       <prism-th>Nombre</prism-th>
-                                      <prism-th>Ciudad</prism-th>
+                                      <prism-th>Lugar</prism-th>
                                       <prism-th>Teléfono</prism-th>
                                       <prism-th>Fecha</prism-th>
                                   </prism-tr>
@@ -430,9 +454,10 @@
                               <prism-tbody>
                                 <template is="dom-repeat" items="[[emails]]">
                                   <prism-tr>
+                                      <prism-td title="Tipo">[[localize('email_record_type','value',item.type)]]</prism-td>
                                       <prism-td title="Email">[[item.email]]</prism-td>
                                       <prism-td title="Nombre">[[item.name]]</prism-td>
-                                      <prism-td title="Ciudad">[[item.city]]</prism-td>
+                                      <prism-td title="Lugar">[[item.place]]</prism-td>
                                       <prism-td title="Teléfono">[[item.phone]]</prism-td>
                                       <prism-td title="Fecha">[[item.date]]</prism-td>
                                   </prism-tr>
@@ -816,7 +841,8 @@
                   'state' : '{value,select, p {pendiente} r {renovada} v {publicada} n {no puclicada} e {expirada}}',
                   'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
-                  'date':'{value,date,medium}'
+                  'date':'{value,date,medium}',
+                  'email_record_type':'{value,select,userInfoRequest{Usuario} userRequestProvide{Anunciante} other{}}'
 
                 },
                 'es':{
@@ -824,7 +850,8 @@
                   'state' : '{value,select,p {pendiente} r {renovada} v {publicada} n {no puclicada} e {expirada}}',
                   'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
-                  'date':'{value,date,medium}'
+                  'date':'{value,date,medium}',
+                  'email_record_type':'{value,select, userInfoRequest {Usuario} userRequestProvide{Anunciante} other{}}'
                 }
               }
             }
@@ -853,7 +880,8 @@
                 from: (new Date()).toFormat('MM/DD/YYYY'),
                 to: (new Date()).remove({weeks:1}).toFormat('MM/DD/YYYY'),
                 email:'',
-                city:''
+                city:'',
+                type:''
               }
             }
           },
@@ -1101,6 +1129,9 @@
         }
         if(emailsQuery.city){
           result+='city='+emailsQuery.city+'&';
+        }
+        if(emailsQuery.type){
+          result+='type='+emailsQuery.type+'&';
         }
         window.open(result, '_blank');
       }

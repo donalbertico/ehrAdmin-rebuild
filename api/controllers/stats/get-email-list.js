@@ -4,7 +4,7 @@ require('date-utils');
 */
 
 function parseQuery(query){
-  var result={type:'userInfoRequest'};
+  var result={};
 
   if(query.from){
     var from = (new Date(query.from)).add({hours:4});
@@ -18,7 +18,27 @@ function parseQuery(query){
     result['data.email']={ '$regex': new RegExp(`^${query.email}`)}
   }
   if(query.city){
-    result['data.propInfo.city']=  { '$regex': new RegExp(`^${query.city}`)}
+    switch (query.type) {
+      case 'all':
+        result['$or']=  [
+          {'data.propInfo.city':{ '$regex': new RegExp(`^${query.city}`)}},
+          {'data.requestInfo.place':{ '$regex': new RegExp(`^${query.city}`)}}
+        ];
+        break;
+      case 'userInfoRequest':
+        result['data.propInfo.city']=  { '$regex': new RegExp(`^${query.city}`)}
+        break;
+      case 'userRequestProvide':
+        result['data.requestInfo.place']=  { '$regex': new RegExp(`^${query.city}`)}
+        break;
+    }
+  }
+  if(query.type){
+    if(query.type==='all'){
+      result.type= {'$in':['userInfoRequest','userRequestProvide']};
+    }else{
+      result.type=query.type;
+    }
   }
   console.log(query,result);
   return result;
@@ -47,6 +67,9 @@ module.exports = {
     },
     city:{
       type:'string'
+    },
+    type:{
+      type:'string'
     }
   },
 
@@ -68,20 +91,39 @@ module.exports = {
     var datastore = Stats.getDatastore().manager;
     datastore.collection('stats').find(parseQuery(inputs)).toArray((err,results)=>{
       if(err)return exits.error({message:'server_error'});
-      var emails={};
+      var userInfoEmails={},
+          requestEmails={};
       results=results.reduce((res,item)=>{
-        if(!emails[item.data.email]){
-          var record = {
-            name:item.data.name,
-            email:item.data.email,
-            date:(new Date(item.createdAt)).toFormat('DD-MM-YYYY'),
-            phone:item.data.phone
-          };
-          if(item.data.propInfo){
-            record = Object.assign(record,{city:item.data.propInfo.city,locality:item.data.propInfo.locality})
+        if(item.type==='userInfoRequest'){
+          if(!userInfoEmails[item.data.email]){
+            var record = {
+              name:item.data.name,
+              email:item.data.email,
+              date:(new Date(item.createdAt)).toFormat('DD-MM-YYYY'),
+              phone:item.data.phone,
+              type:'userInfoRequest'
+            };
+            if(item.data.propInfo){
+              record = Object.assign(record,{place:item.data.propInfo.city})
+            }
+            res.push(record);
+            userInfoEmails[item.data.email]=true;
           }
-          res.push(record);
-          emails[item.data.email]=true;
+        }else if (item.type==='userRequestProvide'){
+          if(!requestEmails[item.data.email]){
+            var record = {
+              name:item.data.name,
+              email:item.data.email,
+              date:(new Date(item.createdAt)).toFormat('DD-MM-YYYY'),
+              phone:item.data.phone,
+              type:'userRequestProvide'
+            };
+            if(item.data.requestInfo){
+              record = Object.assign(record,{place:item.data.requestInfo.place})
+            }
+            res.push(record);
+            requestEmails[item.data.email]=true;
+          }
         }
         return res;
       },[]);
@@ -89,7 +131,7 @@ module.exports = {
         return exits.success(results);
       }else{
         env.res.setHeader('Content-Type', 'text/csv');
-        return exits.success(json2csv({ data: results, fields: ['name','email','date','phone','city','locality'] }));
+        return exits.success(json2csv({ data: results, fields: ['name','email','date','phone','place'] }));
       }
     });
   }

@@ -26,7 +26,7 @@ module.exports = {
   friendlyName: 'Get Email Stats',
 
 
-  description: 'Gets the statistics about the emails that have been sent when contacting a property owner',
+  description: 'Gets the statistics about the emails that have been sent throug the platform',
 
 
   inputs: {
@@ -49,23 +49,35 @@ module.exports = {
 
   fn: function (inputs, exits,env) {
     var fromDate=getFromDate(inputs.time);
-    Stats.find({type:'userInfoRequest',createdAt:{'>':fromDate.getTime()}}).exec((err,results)=>{
+    Stats.find({type:['userInfoRequest','userRequestProvide'],createdAt:{'>':fromDate.getTime()}}).exec((err,results)=>{
       if(err)return exits.error('server_error');
       var stats={
-        total:results.length,
-        addresses:0,
+        userInfoRequests:0,
+        requestMessages:0,
+        userInfoAddresses:0,
+        requestAddresses:0,
         props:0
       };
-      var emails={},
+      var userInfoEmails={},
+          requestEmails={},
           props={};
       results.forEach((record)=>{
-        if(!emails[record.data.email]){
-          stats.addresses++;
-          emails[record.data.email]=true;
-        }
-        if(!props[record.data.email]){
-          stats.props++;
-          props[record.data.email]=true;
+        if(record.type==='userInfoRequest'){
+          stats.userInfoRequests++;
+          if(!props[record.data.email]){
+            stats.props++;
+            props[record.data.email]=true;
+          }
+          if(!userInfoEmails[record.data.email]){
+            stats.userInfoAddresses++;
+            userInfoEmails[record.data.email]=true;
+          }
+        }else if(record.type==='userRequestProvide'){
+          stats.requestMessages++;
+          if(!requestEmails[record.data.email]){
+            stats.requestAddresses++;
+            requestEmails[record.data.email]=true;
+          }
         }
       });
       return exits.success(stats);
