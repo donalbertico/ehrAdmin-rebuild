@@ -18,7 +18,7 @@ module.exports = {
   ],
   navigateFallback: 'index.html',
   navigateFallbackWhitelist: [
-    /(\/stats\/get-email-list)+/,
-    /(\logout)+/
+    /^\/(?:(?!stats\/get-email-list).)*?$/,
+    /^\/(?:(?!logout).)*?$/
   ]
 };
