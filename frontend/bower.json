@@ -1,5 +1,5 @@
 {
-  "name": "Ecuador House Rentals Frontend App",
+  "name": "EhrAdmin",
   "authors": [
     "@skullerj",
     "@donalbertico"
@@ -17,7 +17,7 @@
     "polymer": "^2.3.1",
     "webcomponentsjs": "^1.0.21",
     "iron-image": "^2.2.0",
-    "paper-button": "PolymerElements/paper-button",
+    "paper-button": "PolymerElements/paper-button#^2.0.0",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "paper-input": "PolymerElements/paper-input#^2.0.5",
     "paper-dropdown-menu": "^2.0.2",

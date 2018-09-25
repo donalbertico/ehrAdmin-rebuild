@@ -1,5 +1,5 @@
 {
-  "name": "ehr-2-0",
+  "name": "EhrAdmin",
   "private": true,
   "version": "0.0.1",
   "description": "Web app for administrators at EHR",
@@ -7,9 +7,7 @@
   "dependencies": {
     "async": "2.0.1",
     "aws-sdk": "^2.178.0",
-    "bcrypt": "^1.0.2",
     "bcryptjs": "^2.4.3",
-    "bower": "^1.8.0",
     "checkdigit": "^1.1.1",
     "cloudinary": "^1.10.0",
     "connect-redis": "^3.3.0",
@@ -25,8 +23,6 @@
     "passport-custom": "^1.0.5",
     "passport-local": "^1.0.0",
     "pem": "^1.12.3",
-    "polymer-cli": "^1.5.7",
-    "polymer-redux": "^1.0.1",
     "randomstring": "^1.1.5",
     "sails": "^1.0.0-36",
     "sails-hook-fixtures": "^1.0.0-beta",
@@ -37,7 +33,10 @@
     "webcomponentsjs": "^1.0.2",
     "xml2js": "^0.4.19"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "bower": "^1.8.4",
+    "polymer-cli": "^1.8.0"
+  },
   "scripts": {
     "postinstall": "bash ./post-install.sh",
     "start": "NODE_ENV=production node app.js",
@@ -46,8 +45,8 @@
   },
   "main": "app.js",
   "engines": {
-    "node": "6.4.0",
-    "npm": "3.10.3"
+    "node": "8.11.2",
+    "npm": "5.6.0"
   },
   "repository": {
     "type": "git",
