@@ -1,7 +1,7 @@
 module.exports = {
   models:{
     datastore:'testMongo',
-    migrate: 'safe'
+    migrate: 'drop'
   },
   session:{
     secret:'f99fc5594661102ab5055dc74a2f2ebd',
@@ -11,7 +11,11 @@ module.exports = {
   datastores:{
     testMongo:{
       adapter:require('sails-mongo'),
-      url:'mongodb://localhost:27017/ehr'
+      url:'mongodb://localhost:27017/ehrtest'
+    },
+    mongoAdmin: {
+      adapter: require('sails-mongo'),
+      url: 'mongodb://localhost:27017/ehradmintest'
     }
   },
   port:9000,

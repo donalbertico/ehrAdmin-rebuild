@@ -7,8 +7,6 @@ var rc = require('rc');
     this.timeout(145000);
     // Lift Sails with test database
     var sailsSettings = rc('sails');
-    console.log(sailsSettings);
-
 
     Sails.lift({
       fixtures:require('./fixtures.js'),
@@ -17,8 +15,7 @@ var rc = require('rc');
         fixtures:require('sails-hook-fixtures')
       }
     }, function(err) {
-      if (err)
-        return done(err);
+      if(err)return done(err);
       done();
     });
   });
