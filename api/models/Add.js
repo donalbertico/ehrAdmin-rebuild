@@ -10,6 +10,7 @@ module.exports = {
   attributes: {
     title:{type:'string',required:true},
     description:{type:'string',required:true},
+    contactEmail:{type:'string',required:true},
     url:{type:'string',allowNull:true},
     photoPublicId:{type:'string',allowNull:true},
     published:{type:'boolean',defaultsTo:false},

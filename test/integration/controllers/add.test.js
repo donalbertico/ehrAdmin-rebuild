@@ -25,6 +25,7 @@ describe('Add Controller',()=>{
             title:'Nuevo Anuncio',
             description:'Anuncio sobre alfombras en el norte de Quito',
             url:'https://www.facebook.com',
+            contactEmail:'test@test.com',
             location:{
               latitude:0.3123,
               longitude:-72.12312
