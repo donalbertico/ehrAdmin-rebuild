@@ -9,6 +9,8 @@ module.exports = {
 
   inputs: {
     title:{type:'string',required:true},
+    type:{type:'string',required:true},
+    contactEmail:{type:'string',required:true},
     description:{type:'string',required:true},
     url:{type:'string'},
     location:{type:'json',required:true}
