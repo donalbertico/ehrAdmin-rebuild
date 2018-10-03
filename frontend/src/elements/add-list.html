@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="add-list">
+  <template>
+    <style include="shared-styles">
+      :host{
+        display: block;
+      }
+    </style>
+    <div class="container">
+      <prism-table>
+        <prism-thead>
+            <prism-tr>
+                <prism-th>Título</prism-th>
+                <prism-th>Email</prism-th>
+                <prism-th>Lugar</prism-th>
+                <prism-th>Publicado</prism-th>
+            </prism-tr>
+        </prism-thead>
+        <prism-tbody>
+          <template is="dom-repeat" items="[[adds]]" index-as="index">
+            <prism-tr on-click="addClick">
+                <prism-td title="Nombre">[[item.title]]</prism-td>
+                <prism-td title="Email">[[item.contactEmail]]</prism-td>
+                <prism-td title="Lugar">[[item.place]]</prism-td>
+                <prism-td title="Publicado">
+                  <span hidden="[[item.published]]">Sin Publicar</span>
+                  <span hidden="[[!item.published]]">Publicado</span>
+                </prism-td>
+            </prism-tr>
+          </template>
+        </prism-tbody>
+      </prism-table>
+    </div>
+  </template>
+  <script>
+    class AddList extends Polymer.Element{
+      static get is() {return 'add-list';}
+      static get properties() {
+        return {
+          adds:{
+            type:Array,
+            value:()=>[]
+          }
+        };
+      }
+      addClick(e){
+        var id = e.model.__data.item.id;
+        this.dispatchEvent(new CustomEvent('add-click',{bubbles:false,detail:{id:id}}));
+      }
+    }
+    customElements.define(AddList.is, AddList);
+  </script>
+</dom-module>

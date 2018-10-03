@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>add-list</title>
+
+    <script src="../../src/js/date-utils.min.js"></script>
+    <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../bower_components/web-component-tester/browser.js"></script>
+
+    <!-- Import the element to test -->
+    <link rel="import" href="../../src/elements/add-list.html">
+  </head>
+  <body>
+    <test-fixture id="list">
+      <template>
+        <add-list></add-list>
+      </template>
+    </test-fixture>
+
+    <script>
+      var list,
+          clickStub=sinon.stub(),
+          fixtures=[
+            {
+              id:'123123',
+              title:'Anuncio 1',
+              type:'Tipo1',
+              description:'Anuncio numero 1 de toda la vida',
+              contactEmail:'hello@world.com',
+              url:'facebook.com',
+              photoPublicId:'maauhf61unuqfssjeid4',
+              published:false,
+              place:'Quito,Ecuador',
+              location:{
+                latitude:100,
+                longitude:100
+              }
+            },
+            {
+              id:'123124',
+              title:'Anuncio 2',
+              type:'Tipo2',
+              description:'Anuncio numero 2 de toda la vida',
+              contactEmail:'hello@world.com',
+              url:'twitter.com',
+              photoPublicId:'maauhf61unuqfssjeid4',
+              published:false,
+              place:'Riobamba,Ecuador',
+              location:{
+                latitude:100,
+                longitude:100
+              }
+            }
+          ];
+
+      describe('add-list tests',()=>{
+
+        before(()=>{
+          list = fixture('list');
+          list.addEventListener('add-click',clickStub);
+        });
+
+        it('should start with an empty adds array',()=>{
+          assert.equal(list.adds.length,0);
+        })
+
+        describe('dom rendering tests',()=>{
+
+          before((done)=>{
+            list.adds=fixtures;
+            flush(done);
+          });
+
+          it('should render a prism-tr for each add',()=>{
+            assert.equal(list.shadowRoot.querySelectorAll('prism-tr').length,fixtures.length+1);
+          });
+
+          it('should dispatch add-click when an add prism-tr is clicked and send it\'s id',()=>{
+            //select the first prism-tr on table body
+            let listItem = list.shadowRoot.querySelectorAll('prism-tr')[1];
+            listItem.click();
+            assert.equal(clickStub.callCount,1);
+            let sentId = clickStub.getCall(0).args[0].detail.id;
+            assert.equal(sentId,fixtures[0].id);
+          });
+        });
+
+
+      });
+    </script>
+  </body>
+</html>

@@ -2,6 +2,7 @@
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../elements/add-form.html">
+<link rel="import" href="../elements/add-list.html">
 
 <dom-module id="adds-section">
   <template>
@@ -13,8 +14,9 @@
       }
     </style>
     <h1>Anuncios</h1>
-    <div class="vertical">
-      <add-form></add-form>
+    <div class="horizontal">
+      <add-form class="flex"></add-form>
+      <add-list class="flex" adds="[[adds]]"></add-list>
     </div>
   </template>
   <script>
@@ -24,6 +26,43 @@
         return {
           loading:{
             type:Boolean
+          },
+          adds:{
+            type:Array,
+            value:()=>{
+              return [
+                {
+                  id:'123123',
+                  title:'Anuncio 1',
+                  type:'Tipo1',
+                  description:'Anuncio numero 1 de toda la vida',
+                  contactEmail:'hello@world.com',
+                  url:'facebook.com',
+                  photoPublicId:'maauhf61unuqfssjeid4',
+                  published:false,
+                  place:'Quito,Ecuador',
+                  location:{
+                    latitude:100,
+                    longitude:100
+                  }
+                },
+                {
+                  id:'123124',
+                  title:'Anuncio 2',
+                  type:'Tipo2',
+                  description:'Anuncio numero 2 de toda la vida',
+                  contactEmail:'hello@world.com',
+                  url:'twitter.com',
+                  photoPublicId:'maauhf61unuqfssjeid4',
+                  published:false,
+                  place:'Riobamba,Ecuador',
+                  location:{
+                    latitude:100,
+                    longitude:100
+                  }
+                }
+              ];
+            }
           }
         };
       }
