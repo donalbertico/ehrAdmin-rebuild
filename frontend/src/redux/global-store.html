@@ -4,6 +4,7 @@
 <link rel="import" href="global-state.html">
 <link rel="import" href="reducers/user-reducer.html">
 <link rel="import" href="reducers/search-reducer.html">
+<link rel="import" href="reducers/adds-reducer.html">
 
 <script type="text/javascript">
   function handleReqError(response) {
@@ -60,7 +61,8 @@
   const globalReducer = (state=GlobalState,action)=>{
     return{
       user:user(state.user,action),
-      search:search(state.search,action)
+      search:search(state.search,action),
+      adds:adds(state.adds,action)
     };
   };
   const globalStore = Redux.createStore(globalReducer,Redux.applyMiddleware(ReduxThunk.default));

@@ -1,0 +1,39 @@
+<script>
+
+  const adds = (state,action)=>{
+    switch (action.type) {
+      case 'LOAD_ADDS':
+        return Object.assign({},state,{records:[...state.records,...action.adds]});
+        break;
+      case 'ADD_ADD':
+        return Object.assign({},state,{records:[...state.records,action.add]});
+        break;
+      case 'DELETE_ADD':
+        var newRecords = state.records.reduce((res,add)=>{
+          if(add.id!==action.id){
+            res.push(add);
+          }
+          return res;
+        },[]);
+        return Object.assign({},state,{records:newRecords});
+        break;
+      case 'UPDATE_ADD':
+        var newRecords = state.records.reduce((res,add)=>{
+          if(add.id===action.add.id){
+            res.push(action.add);
+          }else{
+            res.push(add);
+          }
+          return res;
+        },[]);
+        return Object.assign({},state,{records:newRecords});
+        break;
+      case 'SELECT_ADD':
+        return Object.assign({},state,{selectedAdd:action.id});
+        break;
+      default:
+        return state;
+    }
+  }
+
+</script>

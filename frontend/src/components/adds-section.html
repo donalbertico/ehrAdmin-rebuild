@@ -1,8 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../redux/global-store.html">
+<link rel="import" href="../redux/actions/admin-actions.html">
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../elements/add-form.html">
 <link rel="import" href="../elements/add-list.html">
+<script src="//widget.cloudinary.com/global/all.js" type="text/javascript" async></script>
 
 <dom-module id="adds-section">
   <template>
@@ -11,60 +14,148 @@
         display: block;
         height: 100%;
         min-height: 100vh;
+        @apply --layout-vertical;
+      }
+      .list{
+        @apply --layout-flex;
+        background-color: #fff;
+      }
+      .form{
+        @apply --layout-vertical;
+        width: 320px;
+        padding: 8px;
+        @apply --shadow-elevation-3dp;
+        background-color: #fff;
+      }
+      .overlay{
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 100;
+        @apply --layout-vertical;
+        @apply --layout-center-center;
+
       }
     </style>
-    <h1>Anuncios</h1>
-    <div class="horizontal">
-      <add-form class="flex"></add-form>
-      <add-list class="flex" adds="[[adds]]"></add-list>
+    <div class="overlay" hidden="[[!loading]]">
+      <paper-spinner active></paper-spinner>
+    </div>
+    <div class="vertical dark-primary">
+      <div class="p1 horizontal">
+        <span class="font-display1">Anuncios</span>
+        <div class="flex"></div>
+        <paper-button raised class="self-center accent" on-tap="refreshAdds">Recargar</paper-button>
+      </div>
+    </div>
+    <div class="horizontal p1">
+      <div class="list">
+        <add-list class="flex" adds="[[adds]]" on-add-click="selectAdd"></add-list>
+      </div>
+      <div class="form">
+        <paper-button class="accent self-end" on-tap="resetAdd">Nuevo Anuncio</paper-button>
+        <add-form add="[[selectedAdd]]" class="flex" on-upload-click="_uploadClick" on-save-click="_saveClick" id="form"></add-form>
+      </div>
     </div>
   </template>
   <script>
-    class AddsSection extends GlobalStoreMixin(Polymer.Element){
+    const emptyAdd = {
+      id:null,
+      title:'',
+      description:'',
+      type:'',
+      contactEmail:'',
+      url:'',
+      photoPublicId:'',
+      published:false,
+      location:{
+        latitude:null,
+        longitude:null
+      }
+    };
+    class AddsSection extends AdminMixin(GlobalStoreMixin(Polymer.Element)){
       static get is() {return 'adds-section';}
       static get properties() {
         return {
           loading:{
-            type:Boolean
+            type:Boolean,
+            value:false
           },
           adds:{
             type:Array,
-            value:()=>{
-              return [
-                {
-                  id:'123123',
-                  title:'Anuncio 1',
-                  type:'Tipo1',
-                  description:'Anuncio numero 1 de toda la vida',
-                  contactEmail:'hello@world.com',
-                  url:'facebook.com',
-                  photoPublicId:'maauhf61unuqfssjeid4',
-                  published:false,
-                  place:'Quito,Ecuador',
-                  location:{
-                    latitude:100,
-                    longitude:100
-                  }
-                },
-                {
-                  id:'123124',
-                  title:'Anuncio 2',
-                  type:'Tipo2',
-                  description:'Anuncio numero 2 de toda la vida',
-                  contactEmail:'hello@world.com',
-                  url:'twitter.com',
-                  photoPublicId:'maauhf61unuqfssjeid4',
-                  published:false,
-                  place:'Riobamba,Ecuador',
-                  location:{
-                    latitude:100,
-                    longitude:100
-                  }
+            statePath:'adds.records'
+          },
+          selectedAdd:{
+            type:Object,
+            statePath:(state)=>{
+              let records=state.adds.records,
+                  selectedAdd=state.adds.selectedAdd;
+              if(!selectedAdd||records.length===0)return Object.assign({},emptyAdd);
+              for (var i = 0; i < records.length; i++) {
+                if(selectedAdd===records[i].id){
+                  return Object.assign({},records[i]);
                 }
-              ];
+              }
             }
           }
         };
+      }
+      _saveClick(e){
+        let add = e.detail;
+        if(add.id){
+          this.loading=true;
+          this.dispatch('updateAdd',add,(err)=>{
+            this.loading=false;
+            if(err)return showMessage('Hubo un error actualizando el anuncio');
+            showMessage('Anuncio guardado');
+          });
+        }else{
+          this.loading=true;
+          this.dispatch('createAdd',add,(err)=>{
+            this.loading=false;
+            if(err)return showMessage('Hubo un error creando el anuncio');
+            showMessage('Anuncio guardado');
+          });
+        }
+      }
+      _uploadClick(e){
+        let id = e.detail.id;
+        this.loading=true;
+        cloudinary.openUploadWidget(
+          {cloud_name: 'hmeefwd4l',
+           upload_preset: 'eazvkkt2',
+           multiple : 'false' ,
+           client_allowed_formats : ['png','jpeg'],
+           min_image_height : '150',
+           max_image_height : '1400',
+           max_image_width : '1400'},
+          (error, result)=>{
+            if(error){
+              this.loading=false;
+              return showMessage('No has subido ninguna imagen');
+            }else{
+              console.log(result);
+              let publicId = result[0].public_id;
+              this.dispatch('updateAddPhoto',id,publicId,(err)=>{
+                this.loading=false;
+                if(err)return showMessage('Hubo un error actualizando la foto');
+              });
+            }
+          }
+        );
+      }
+      refreshAdds(){
+        this.loading=true;
+        this.dispatch('loadAdds',(err)=>{
+          this.loading=false;
+          if(err)return showMessage('Hubo un error obteinendo los anuncios');
+        });
+      }
+      resetAdd(){
+        this.dispatch('selectAdd',null);
+      }
+      selectAdd(e){
+        this.dispatch('selectAdd',e.detail.id);
       }
     }
     customElements.define(AddsSection.is, AddsSection);

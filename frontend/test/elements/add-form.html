@@ -171,7 +171,7 @@
               form.set('add.location.longitude',100);
               assert.equal(form.validate(),false);
               form.set('add.place','Quito');
-              assert.equal(form.validate(),true);
+              assert.deepEqual(form.validate(),form.add);
             });
           });
         });
@@ -197,7 +197,7 @@
             saveButton.click();
             assert.equal(saveStub.callCount,0);
           });
-          it('should dispatch save-click when form is valid',()=>{
+          it('should dispatch save-click when form is valid and send add as detail',()=>{
             //set add to a valid value
             form.add={
               title:'Clean house',
@@ -213,19 +213,22 @@
             let saveButton = form.shadowRoot.querySelector('#saveButton');
             saveButton.click();
             assert.equal(saveStub.callCount,1);
+            assert.deepEqual(saveStub.getCall(0).args[0].detail,form.add);
           });
 
           it('should not dispatch upload-click if there is no id for the add',()=>{
             let uploadPhotoButton = form.shadowRoot.querySelector('#uploadButton');
             uploadPhotoButton.click();
             assert.equal(uploadStub.callCount,0);
+
           });
 
-          it('should dispatch upload-click if there is an id for the add',()=>{
+          it('should dispatch upload-click if there is an id for the add and send id on event detail',()=>{
             form.set('add.id','123123');
             let uploadPhotoButton = form.shadowRoot.querySelector('#uploadButton');
             uploadPhotoButton.click();
             assert.equal(uploadStub.callCount,1);
+            assert.deepEqual(uploadStub.getCall(0).args[0].detail.id,form.add.id);
           });
         });
 

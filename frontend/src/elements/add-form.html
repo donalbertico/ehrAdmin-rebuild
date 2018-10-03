@@ -15,9 +15,12 @@
         min-height: 100vh;
       }
       .photo-container{
+        border: 1px solid var(--divider-color);
         @apply --layout-vertical;
-        height: 300px;
+        @apply --layout-center;
+        height: 200px;
         width: 100%;
+        margin: 8px 0 ;
       }
       iron-image{
         width: 100%;
@@ -46,20 +49,6 @@
     </div>
   </template>
   <script>
-    const emptyAdd = {
-      id:null,
-      title:'',
-      description:'',
-      type:'',
-      contactEmail:'',
-      url:'',
-      photoPublicId:'',
-      published:false,
-      location:{
-        latitude:null,
-        longitude:null
-      }
-    };
     class AddForm extends Polymer.Element{
       static get is() {return 'add-form';}
       static get properties() {
@@ -67,7 +56,20 @@
           add:{
             type:Object,
             value:()=>{
-              return emptyAdd;
+              return {
+                id:null,
+                title:'',
+                description:'',
+                type:'',
+                contactEmail:'',
+                url:'',
+                photoPublicId:'',
+                published:false,
+                location:{
+                  latitude:null,
+                  longitude:null
+                }
+              };
             }
           },
           photoUrl:{
@@ -99,7 +101,7 @@
           this.$.placeInput.invalid=true;
           return false;
         }
-        return true;
+        return this.add;
       }
       resetAdd(){
         this.set('add',emptyAdd);
@@ -131,11 +133,12 @@
       uploadClick(){
         if(!this.validate())return;
         if(!this.add.id)return;
-        this.dispatchEvent(new CustomEvent('upload-click', {bubbles:false}));
+        this.dispatchEvent(new CustomEvent('upload-click', {bubbles:false,detail:{id:this.add.id}}));
       }
       saveClick(){
-        if(!this.validate())return;
-        this.dispatchEvent(new CustomEvent('save-click', {bubbles:false}));
+        let add = this.validate();
+        if(!add)return;
+        this.dispatchEvent(new CustomEvent('save-click', {bubbles:false,detail:add}));
       }
     }
     customElements.define(AddForm.is, AddForm);

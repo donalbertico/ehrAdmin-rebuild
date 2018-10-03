@@ -1,7 +1,7 @@
 <script>
   AdminMixin = (superclass) => {
     return class extends superclass{
-      cosntructor(){
+      constructor(){
         super();
       }
       static get actions(){
@@ -31,9 +31,113 @@
                 callback(e.message);
               });
             }
+          },
+          createAdd:(add,cb)=>{
+            return (dispatch) =>{
+              let request = new Request('/add/create',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify(add),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((add)=>{
+                  dispatch({type:'ADD_ADD',add:add});
+                  cb(null);
+                });
+              })
+              .catch((e)=>{
+                cb(e.message);
+              });
+            }
+          },
+          deleteAdd:(id,cb)=>{
+            return (dispatch) =>{
+              let request = new Request('/add/delete',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                dispatch({type:'DELETE_ADD',id:id});
+                cb(null);
+              })
+              .catch((e)=>{
+                cb(e.message);
+              });
+            }
+          },
+          updateAdd:(updates,cb)=>{
+            return (dispatch) =>{
+              let request = new Request('/add/update',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify(updates),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((add)=>{
+                  dispatch({type:'UPDATE_ADD',add:add});
+                  cb(null);
+                });
+              })
+              .catch((e)=>{
+                cb(e.message);
+              });
+            }
+          },
+          updateAddPhoto:(id,publicId,cb)=>{
+            return (dispatch) =>{
+              let request = new Request('/add/update-image',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id,publicId:publicId}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((add)=>{
+                  dispatch({type:'UPDATE_ADD',add:add});
+                  cb(null);
+                });
+              })
+              .catch((e)=>{
+                cb(e.message);
+              });
+            }
+          },
+          loadAdds:(cb)=>{
+            return (dispatch) =>{
+              let request = new Request('/add/search',{
+                method:'GET',
+                headers: sh,
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((adds)=>{
+                  dispatch({type:'LOAD_ADDS',adds:adds});
+                  cb(null);
+                });
+              })
+              .catch((e)=>{
+                cb(e.message);
+              });
+            }
+          },
+          selectAdd:(id)=>{
+            return {type:'SELECT_ADD',id:id};
           }
         }
-      }
       }
     }
   }
