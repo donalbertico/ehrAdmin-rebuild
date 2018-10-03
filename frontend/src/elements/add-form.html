@@ -96,6 +96,7 @@
         },true);
         if(!valid)return false;
         if(!this.add.location.latitude||!this.add.location.longitude)return false;
+        if(!this.add.place)return false;
         return true;
       }
       resetAdd(){
@@ -105,12 +106,16 @@
 
       }
       _computePhotoUrl(id){
+        if(!id)return '';
         return 'https://res.cloudinary.com/hmeefwd4l/image/upload/'+id+'.jpg';
       }
       uploadClick(){
+        if(!this.validate())return;
+        if(!this.add.id)return;
         this.dispatchEvent(new CustomEvent('upload-click', {bubbles:false}));
       }
       saveClick(){
+        if(!this.validate())return;
         this.dispatchEvent(new CustomEvent('save-click', {bubbles:false}));
       }
     }
