@@ -31,7 +31,7 @@
       <paper-textarea name="description" label="Descripción" rows="3" required char-counter value="{{add.description}}" error-message="Descripción inválida" maxlength="500"></paper-textarea>
       <paper-input name="contactEmail" label="Email de contacto" pattern="^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$" required value="{{add.contactEmail}}" error-message="Email inválido"></paper-input>
       <paper-input name="url" label="URL" pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$" value="{{add.url}}"></paper-input>
-      <paper-input label="Lugar" id="placeInput"></paper-input>
+      <paper-input label="Lugar" id="placeInput" error-message="Debes seleccionar un lugar"></paper-input>
       <div class="photo-container">
         <iron-image src="[[photoUrl]]" hidden="[[!add.photoPublicId]]"></iron-image>
         <div class="vertical center" hidden="[[add.photoPublicId]]">
@@ -95,15 +95,34 @@
           return result&&ele.validate();
         },true);
         if(!valid)return false;
-        if(!this.add.location.latitude||!this.add.location.longitude)return false;
-        if(!this.add.place)return false;
+        if(!this.add.location.latitude||!this.add.location.longitude||!this.add.place){
+          this.$.placeInput.invalid=true;
+          return false;
+        }
         return true;
       }
       resetAdd(){
         this.set('add',emptyAdd);
       }
       _googleApiLoaded(){
-
+        //Introduce async since sometimes the api is ready before the paper-input
+        //element is ready
+        setTimeout(()=>{
+          var placeInput=this.$.placeInput.inputElement.inputElement;
+          var placeSearch = new google.maps.places.Autocomplete(placeInput,{componentRestrictions:{country:'ec'}});
+          google.maps.event.addListener(placeSearch,'place_changed',() => {
+            var city = placeSearch.getPlace();
+            if(!city.geometry){
+              showMessage('No podemos reconocer ese lugar');
+            }else{
+              this.set('add.location',{
+                latitude:city.geometry.location.lat(),
+                longitude:city.geometry.location.lng()
+              });
+              this.set('add.place',city.formatted_address);
+            }
+          });
+        },100);
       }
       _computePhotoUrl(id){
         if(!id)return '';

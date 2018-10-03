@@ -154,17 +154,23 @@
                 title:'Clean house',
                 description:'Clean house es un servicio de limpieza de alformbras a domicilio',
                 type:'Limpieza de hogares',
-                contactEmail:'contacto@cleanhouse.com',
-                place:'Quito'
+                contactEmail:'contacto@cleanhouse.com'
               }
               form.add=Object.assign(form.add,valid);
             });
-            it('should return false until the latitude and longitude are set propperly',()=>{
+            it('should return false and set placeInput invalid when there is no place',()=>{
+              assert.equal(form.validate(),false);
+              let input = form.shadowRoot.querySelector('#placeInput');
+              assert.equal(input.invalid,true);
+            });
+            it('should return false until the latitude,longitude and place are set propperly',()=>{
               //this fields are set by cloudinary
               assert.equal(form.validate(),false);
               form.set('add.location.latitude',100);
               assert.equal(form.validate(),false);
               form.set('add.location.longitude',100);
+              assert.equal(form.validate(),false);
+              form.set('add.place','Quito');
               assert.equal(form.validate(),true);
             });
           });
