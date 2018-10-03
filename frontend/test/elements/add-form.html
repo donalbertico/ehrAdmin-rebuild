@@ -176,20 +176,17 @@
           });
         });
 
-        it('should reset its add to an initial state',()=>{
-          form.resetAdd();
-          assert.deepEqual(form.add,initialState);
-        });
-
         describe('Event dispatching',()=>{
 
           var uploadStub=sinon.stub(),
-              saveStub=sinon.stub();
+              saveStub=sinon.stub(),
+              deleteStub=sinon.stub();
 
           before(()=>{
             form.set('add',initialState);
             form.addEventListener('upload-click',uploadStub);
             form.addEventListener('save-click',saveStub);
+            form.addEventListener('delete-click',deleteStub);
           });
 
           it('should not dispatch save-click if form is not valid',()=>{
@@ -230,12 +227,37 @@
             assert.equal(uploadStub.callCount,1);
             assert.deepEqual(uploadStub.getCall(0).args[0].detail.id,form.add.id);
           });
-        });
 
+          it('should not dispatch delete-click if add has no id',()=>{
+            form.set('add.id',null);
+            let deleteButton = form.shadowRoot.querySelector('#deleteButton');
+            deleteButton.click();
+            assert.equal(deleteStub.callCount,0);
+          });
+
+          it('should dispatch delete-click if add has id and send id as detail',()=>{
+            form.set('add.id','123123');
+            let deleteButton = form.shadowRoot.querySelector('#deleteButton');
+            deleteButton.click();
+            assert.equal(deleteStub.callCount,1);
+            assert.equal(deleteStub.getCall(0).args[0].detail.id,form.add.id);
+          });
+
+        });
 
         it('should hide the photo when there is no photoPublicId',()=>{
           form.set('add.photoPublicId','');
           assert.equal(form.shadowRoot.querySelector('iron-image').hasAttribute('hidden'),true);
+        });
+
+        it('should hide the delete button when there is no add id',()=>{
+          form.set('add.id',null);
+          assert.equal(form.shadowRoot.querySelector('#deleteButton').hasAttribute('hidden'),true);
+        });
+
+        it('should show the delete button when there add id exists',()=>{
+          form.set('add.id','123123');
+          assert.equal(form.shadowRoot.querySelector('#deleteButton').hasAttribute('hidden'),false);
         });
 
         it('should show the photo when there is photoPublicId and compute photoUrl',()=>{

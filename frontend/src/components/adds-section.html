@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/admin-actions.html">
 <link rel="import" href="../shared-styles.html">
@@ -12,8 +13,6 @@
     <style include="shared-styles">
       :host{
         display: block;
-        height: 100%;
-        min-height: 100vh;
         @apply --layout-vertical;
       }
       .list{
@@ -54,9 +53,17 @@
       </div>
       <div class="form">
         <paper-button class="accent self-end" on-tap="resetAdd">Nuevo Anuncio</paper-button>
-        <add-form add="[[selectedAdd]]" class="flex" on-upload-click="_uploadClick" on-save-click="_saveClick" id="form"></add-form>
+        <add-form add="[[selectedAdd]]" class="flex" on-upload-click="_uploadClick" on-save-click="_saveClick" on-delete-click="_deleteClick" id="form"></add-form>
       </div>
     </div>
+    <paper-dialog id="deleteDialog">
+      <h2>Eliminar Anuncio</h2>
+      <span>¿Estas seguro de eliminar este anuncio?</span>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancelar</paper-button>
+        <paper-button dialog-confirm on-tap="deleteAdd">Eliminar</paper-button>
+      </div>
+    </paper-dialog>
   </template>
   <script>
     const emptyAdd = {
@@ -144,6 +151,19 @@
           }
         );
       }
+      _deleteClick(e){
+        let id = e.detail.id;
+        this.dispatch('selectAdd',id);
+        this.$.deleteDialog.open();
+      }
+      deleteAdd(){
+        this.loading=true;
+        this.dispatch('deleteAdd',id,(e)=>{
+          this.loading=false;
+          if(e)return showMessage('Hubo un error al eliminar el anuncio');
+          showMessage('Anuncio eliminado');
+        });
+      };
       refreshAdds(){
         this.loading=true;
         this.dispatch('loadAdds',(err)=>{

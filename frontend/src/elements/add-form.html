@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
@@ -11,8 +12,6 @@
     <style include="shared-styles">
       :host{
         display: block;
-        height: 100%;
-        min-height: 100vh;
       }
       .photo-container{
         border: 1px solid var(--divider-color);
@@ -26,9 +25,13 @@
         width: 100%;
         height: 100%;
       }
+      paper-button#deleteButton{
+        color: var(--error-color);
+      }
     </style>
     <google-maps-api api-key="AIzaSyBlD1kUDWG_VEeipSylrAMucm-xhX-cDbQ" version="3.exp" on-api-load="_googleApiLoaded"></google-maps-api>
     <div class="vertical p1">
+      <paper-toggle-button checked="{{add.published}}">Publicado</paper-toggle-button>
       <paper-input name="title" label="Título" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.title}}" error-message="Título inválido"></paper-input>
       <paper-input name="type" label="Tipo" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.type}}" error-message="Tipo inválido"></paper-input>
       <paper-textarea name="description" label="Descripción" rows="3" required char-counter value="{{add.description}}" error-message="Descripción inválida" maxlength="500"></paper-textarea>
@@ -37,13 +40,14 @@
       <paper-input label="Lugar" id="placeInput" error-message="Debes seleccionar un lugar"></paper-input>
       <div class="photo-container">
         <iron-image src="[[photoUrl]]" hidden="[[!add.photoPublicId]]"></iron-image>
-        <div class="vertical center" hidden="[[add.photoPublicId]]">
+        <div class="vertical center h-100" hidden="[[add.photoPublicId]]">
           <span class="font-subtitle s-text">No hay ninguna foto</span>
           <paper-button id="uploadButton"  on-tap="uploadClick" class="accent">Subir una foto</paper-button>
         </div>
       </div>
-      <div class="horizontal">
+      <div class="horizontal p1">
         <div class="flex"></div>
+        <paper-button id="deleteButton" on-tap="deleteClick" hidden="[[!add.id]]">Eliminar</paper-button>
         <paper-button id="saveButton" on-tap="saveClick" class="accent" raised>Guardar</paper-button>
       </div>
     </div>
@@ -103,9 +107,6 @@
         }
         return this.add;
       }
-      resetAdd(){
-        this.set('add',emptyAdd);
-      }
       _googleApiLoaded(){
         //Introduce async since sometimes the api is ready before the paper-input
         //element is ready
@@ -139,6 +140,10 @@
         let add = this.validate();
         if(!add)return;
         this.dispatchEvent(new CustomEvent('save-click', {bubbles:false,detail:add}));
+      }
+      deleteClick(){
+        if(!this.add.id)return;
+        this.dispatchEvent(new CustomEvent('delete-click', {bubbles:false,detail:{id:this.add.id}}));
       }
     }
     customElements.define(AddForm.is, AddForm);
