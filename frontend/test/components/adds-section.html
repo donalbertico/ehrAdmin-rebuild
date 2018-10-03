@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>adds-section</title>
+
+    <script src="../../src/js/date-utils.min.js"></script>
+    <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../bower_components/web-component-tester/browser.js"></script>
+
+    <!-- Import the element to test -->
+    <link rel="import" href="../../src/components/adds-section.html">
+  </head>
+  <body>
+    <test-fixture id="testSection">
+      <template>
+        <adds-section></adds-section>
+      </template>
+    </test-fixture>
+
+    <script>
+      var section;
+
+      describe('adds-section tests',()=>{
+
+        before(()=>{
+          section = fixture('testSection');
+        });
+
+        it('should show a title',()=>{
+          var title = section.shadowRoot.querySelector('h1');
+          assert.equal(title.innerHTML,'Anuncios');
+        });
+
+      });
+    </script>
+  </body>
+</html>

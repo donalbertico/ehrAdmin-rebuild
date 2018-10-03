@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>add-form</title>
+
+    <script src="../../src/js/date-utils.min.js"></script>
+    <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../bower_components/web-component-tester/browser.js"></script>
+
+    <!-- Import the element to test -->
+    <link rel="import" href="../../src/elements/add-form.html">
+  </head>
+  <body>
+    <test-fixture id="form">
+      <template>
+        <add-form></add-form>
+      </template>
+    </test-fixture>
+
+    <script>
+      var form;
+      var uploadStub=sinon.stub();
+      var saveStub=sinon.stub();
+      var initialState={
+        id:null,
+        title:'',
+        description:'',
+        type:'',
+        contactEmail:'',
+        url:'',
+        photoPublicId:'',
+        published:false,
+        location:{
+          latitude:null,
+          longitude:null
+        }
+      };
+
+      describe('add-form tests',()=>{
+
+        before(()=>{
+          form = fixture('form');
+
+          form.addEventListener('upload-click',uploadStub);
+          form.addEventListener('save-click',saveStub);
+        });
+
+        it('should set it\'s initial state propperly',()=>{
+          assert.deepEqual(form.add,initialState);
+        });
+
+        it('should save the inputs that need to be validated on _formElements',()=>{
+          let names=['name','title','description','type','contactEmail','url'];
+          let types=['paper-input','paper-textarea'];
+          form._formElements.forEach((item)=>{
+            assert.include(types,item.localName);
+            assert.include(names,item.getAttribute('name'));
+          });
+        });
+
+        describe('Form validation',()=>{
+
+          describe('title field',()=>{
+
+            it('should be invalid',()=>{
+              let title = form.shadowRoot.querySelector('[name=title]');
+              title.value=' ';
+              assert.equal(title.validate(),false);
+            });
+            it('should be valid',()=>{
+              let title = form.shadowRoot.querySelector('[name=title]');
+              title.value='Nuevo título';
+              assert.equal(title.validate(),true);
+            });
+
+          });
+          describe('description field',()=>{
+
+            it('should be invalid',()=>{
+              //This being a paper-textarea has only required validation enabled
+              let description = form.shadowRoot.querySelector('[name=description]');
+              description.value='';
+              assert.equal(description.validate(),false);
+            });
+            it('should be valid',()=>{
+              let description = form.shadowRoot.querySelector('[name=description]');
+              description.value='Nueva descripción';
+              assert.equal(description.validate(),true);
+            });
+
+          });
+          describe('type field',()=>{
+
+            it('should be invalid',()=>{
+              let type = form.shadowRoot.querySelector('[name=type]');
+              type.value=' ';
+              assert.equal(type.validate(),false);
+            });
+            it('should be valid',()=>{
+              let type = form.shadowRoot.querySelector('[name=type]');
+              type.value='Limpieza a domicilio';
+              assert.equal(type.validate(),true);
+            });
+
+          });
+          describe('contactEmail field',()=>{
+
+            it('should be invalid',()=>{
+              let contactEmail = form.shadowRoot.querySelector('[name=contactEmail]');
+              contactEmail.value=' ';
+              assert.equal(contactEmail.validate(),false);
+              contactEmail.value='Nombreapellido';
+              assert.equal(contactEmail.validate(),false);
+              contactEmail.value='@hotmail.com';
+              assert.equal(contactEmail.validate(),false);
+              contactEmail.value='1@3.c';
+              assert.equal(contactEmail.validate(),false);
+            });
+
+            it('should be valid',()=>{
+              let contactEmail = form.shadowRoot.querySelector('[name=contactEmail]');
+              contactEmail.value='username@hotmail.com';
+              assert.equal(contactEmail.validate(),true);
+            });
+
+          });
+          describe('url field',()=>{
+            //url field is not mandatory
+            it('should be invalid',()=>{
+              let url = form.shadowRoot.querySelector('[name=url]');
+              url.value=' ';
+              assert.equal(url.validate(),false);
+              url.value='123123';
+              assert.equal(url.validate(),false);
+              url.value='hellowrold';
+              assert.equal(url.validate(),false);
+              url.value='.com';
+              assert.equal(url.validate(),false);
+            });
+            it('should be valid',()=>{
+              let url = form.shadowRoot.querySelector('[name=url]');
+              url.value='';
+              assert.equal(url.validate(),true);
+              url.value='helloworld.com';
+              assert.equal(url.validate(),true);
+              url.value='helloworld.inner.ec';
+              assert.equal(url.validate(),true);
+              url.value='https://helloworld.com';
+              assert.equal(url.validate(),true);
+            });
+          });
+          describe('validation function',()=>{
+            before(()=>{
+              let valid = {
+                title:'Clean house',
+                description:'Clean house es un servicio de limpieza de alformbras a domicilio',
+                type:'Limpieza de hogares',
+                contactEmail:'contacto@cleanhouse.com'
+              }
+              form.add=Object.assign(form.add,valid);
+            });
+            it('should return false until the latitude and longitude are set propperly',()=>{
+              //this fields are set by cloudinary
+              assert.equal(form.validate(),false);
+              form.set('add.location.latitude',100);
+              assert.equal(form.validate(),false);
+              form.set('add.location.longitude',100);
+              assert.equal(form.validate(),true);
+            });
+          });
+
+        });
+
+        it('should reset its add to an initial state',()=>{
+          form.resetAdd();
+          assert.deepEqual(form.add,initialState);
+        });
+
+        it('should send the fire appropiate events',()=>{
+          var uploadPhotoButton = form.shadowRoot.querySelector('#uploadButton');
+          var saveButton = form.shadowRoot.querySelector('#saveButton');
+          uploadPhotoButton.click();
+          assert.equal(uploadStub.callCount,1);
+          saveButton.click();
+          assert.equal(saveStub.callCount,1);
+        });
+
+        it('should hide the photo when there is no photoPublicId',()=>{
+          form.set('add.photoPublicId','');
+          assert.equal(form.shadowRoot.querySelector('iron-image').hasAttribute('hidden'),true);
+        });
+
+        it('should show the photo when there is photoPublicId and compute photoUrl',()=>{
+          form.set('add.photoPublicId','123123');
+          assert.equal(form.shadowRoot.querySelector('iron-image').hasAttribute('hidden'),false);
+          assert.equal(form.photoUrl,'https://res.cloudinary.com/hmeefwd4l/image/upload/123123.jpg');
+        });
+
+      });
+    </script>
+  </body>
+</html>

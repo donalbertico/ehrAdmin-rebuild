@@ -43,7 +43,8 @@
     "paper-styles": "^2.0.0",
     "prism-table": "Prhythm/prism-table#^2.0.0",
     "vaadin-date-picker": "^2.0.7",
-    "paper-tabs": "^2.0.0"
+    "paper-tabs": "^2.0.0",
+    "google-apis": "GoogleWebComponents/google-apis#^2.0.1"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"

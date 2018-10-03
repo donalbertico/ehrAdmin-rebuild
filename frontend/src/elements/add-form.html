@@ -1,0 +1,119 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/google-apis/google-maps-api.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="add-form">
+  <template>
+    <style include="shared-styles">
+      :host{
+        display: block;
+        height: 100%;
+        min-height: 100vh;
+      }
+      .photo-container{
+        @apply --layout-vertical;
+        height: 300px;
+        width: 100%;
+      }
+      iron-image{
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <google-maps-api api-key="AIzaSyBlD1kUDWG_VEeipSylrAMucm-xhX-cDbQ" version="3.exp" on-api-load="_googleApiLoaded"></google-maps-api>
+    <div class="vertical p1">
+      <paper-input name="title" label="Título" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.title}}" error-message="Título inválido"></paper-input>
+      <paper-input name="type" label="Tipo" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.type}}" error-message="Tipo inválido"></paper-input>
+      <paper-textarea name="description" label="Descripción" rows="3" required char-counter value="{{add.description}}" error-message="Descripción inválida" maxlength="500"></paper-textarea>
+      <paper-input name="contactEmail" label="Email de contacto" pattern="^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$" required value="{{add.contactEmail}}" error-message="Email inválido"></paper-input>
+      <paper-input name="url" label="URL" pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$" value="{{add.url}}"></paper-input>
+      <paper-input label="Lugar" id="placeInput"></paper-input>
+      <div class="photo-container">
+        <iron-image src="[[photoUrl]]" hidden="[[!add.photoPublicId]]"></iron-image>
+        <div class="vertical center" hidden="[[add.photoPublicId]]">
+          <span class="font-subtitle s-text">No hay ninguna foto</span>
+          <paper-button id="uploadButton"  on-tap="uploadClick" class="accent">Subir una foto</paper-button>
+        </div>
+      </div>
+      <div class="horizontal">
+        <div class="flex"></div>
+        <paper-button id="saveButton" on-tap="saveClick" class="accent" raised>Guardar</paper-button>
+      </div>
+    </div>
+  </template>
+  <script>
+    const emptyAdd = {
+      id:null,
+      title:'',
+      description:'',
+      type:'',
+      contactEmail:'',
+      url:'',
+      photoPublicId:'',
+      published:false,
+      location:{
+        latitude:null,
+        longitude:null
+      }
+    };
+    class AddForm extends Polymer.Element{
+      static get is() {return 'add-form';}
+      static get properties() {
+        return {
+          add:{
+            type:Object,
+            value:()=>{
+              return emptyAdd;
+            }
+          },
+          photoUrl:{
+            type:String,
+            computed:'_computePhotoUrl(add.photoPublicId)'
+          },
+          //Contains all the paper-inputs and paper-textareas that need to be validated
+          _formElements:{
+            type:Array,
+            value:()=>[]
+          }
+        };
+      }
+      ready(){
+        super.ready();
+        this.shadowRoot.querySelectorAll('paper-input').forEach((input)=>{
+          if(input.id!=='placeInput'){
+            this._formElements.push(input);
+          }
+        });
+        this._formElements.push(this.shadowRoot.querySelector('paper-textarea'));
+      }
+      validate(){
+        let valid = this._formElements.reduce((result,ele)=>{
+          return result&&ele.validate();
+        },true);
+        if(!valid)return false;
+        if(!this.add.location.latitude||!this.add.location.longitude)return false;
+        return true;
+      }
+      resetAdd(){
+        this.set('add',emptyAdd);
+      }
+      _googleApiLoaded(){
+
+      }
+      _computePhotoUrl(id){
+        return 'https://res.cloudinary.com/hmeefwd4l/image/upload/'+id+'.jpg';
+      }
+      uploadClick(){
+        this.dispatchEvent(new CustomEvent('upload-click', {bubbles:false}));
+      }
+      saveClick(){
+        this.dispatchEvent(new CustomEvent('save-click', {bubbles:false}));
+      }
+    }
+    customElements.define(AddForm.is, AddForm);
+  </script>
+</dom-module>

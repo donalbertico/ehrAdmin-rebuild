@@ -23,6 +23,9 @@
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/search-actions.html">
 
+<link rel="import" href="../components/adds-section.html">
+
+
 <dom-module id="account-view">
   <template>
     <style include="shared-styles app-grid-style">
@@ -137,11 +140,12 @@
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="start" href="/account/start">Inicio</a>
           <a name="users" href="/account/users">Usuarios</a>
-          <a name="users" href="/account/payments">Pagos por Verificar</a>
-          <a name="users" href="/account/props">Propiedades</a>
-          <a name="users" href="/account/emails">Correos</a>
-          <a name="users" href="/account/requests">Peticiones</a>
-          <a name="users" href="/account/audit">Funciones realizadas</a>
+          <a name="payments" href="/account/payments">Pagos por Verificar</a>
+          <a name="props" href="/account/props">Propiedades</a>
+          <a name="emails" href="/account/emails">Correos</a>
+          <a name="requests" href="/account/requests">Peticiones</a>
+          <a name="audit" href="/account/audit">Funciones realizadas</a>
+          <a name="adds" href="/account/adds">Anuncios</a>
         </iron-selector>
       </app-drawer>
       <div>
@@ -688,6 +692,9 @@
                   </template>
                 </prism-tbody>
             </prism-table>
+          </section>
+          <section name="adds">
+            <adds-section></adds-section>
           </section>
         </iron-pages>
       </div>

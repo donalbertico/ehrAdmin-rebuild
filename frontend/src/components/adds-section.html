@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux/global-store.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../elements/add-form.html">
+
+<dom-module id="adds-section">
+  <template>
+    <style include="shared-styles">
+      :host{
+        display: block;
+        height: 100%;
+        min-height: 100vh;
+      }
+    </style>
+    <h1>Anuncios</h1>
+    <div class="vertical">
+      <add-form></add-form>
+    </div>
+  </template>
+  <script>
+    class AddsSection extends GlobalStoreMixin(Polymer.Element){
+      static get is() {return 'adds-section';}
+      static get properties() {
+        return {
+          loading:{
+            type:Boolean
+          }
+        };
+      }
+    }
+    customElements.define(AddsSection.is, AddsSection);
+  </script>
+</dom-module>
