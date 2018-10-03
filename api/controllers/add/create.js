@@ -13,6 +13,7 @@ module.exports = {
     contactEmail:{type:'string',required:true},
     description:{type:'string',required:true},
     url:{type:'string'},
+    place:{type:'string',required:true},
     location:{type:'json',required:true}
   },
 

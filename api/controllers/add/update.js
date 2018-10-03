@@ -10,8 +10,12 @@ module.exports = {
   inputs: {
     id:{type:'string',required:true},
     title:{type:'string'},
+    type:{type:'string'},
+    contactEmail:{type:'string'},
     description:{type:'string'},
     published:{type:'boolean'},
+    url:{type:'string'},
+    place:{type:'string'},
     location:{type:'json'}
   },
 

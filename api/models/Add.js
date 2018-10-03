@@ -15,6 +15,7 @@ module.exports = {
     url:{type:'string',allowNull:true},
     photoPublicId:{type:'string',allowNull:true},
     published:{type:'boolean',defaultsTo:false},
+    place:{type:'string',required:true},
     location:{type:'json',defaultsTo:{latitude:0,longitude:0}}
   },
 

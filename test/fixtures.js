@@ -11,6 +11,7 @@ module.exports= {
       type:'Tipo de prueba',
       url:'https://www.facebook.com',
       photoPublicId:null,
+      place:'Quito',
       location:{
         latitude:0.123123,
         longitude:0.123123

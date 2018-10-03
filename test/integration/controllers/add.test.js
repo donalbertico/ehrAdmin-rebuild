@@ -27,6 +27,7 @@ describe('Add Controller',()=>{
             url:'https://www.facebook.com',
             contactEmail:'test@test.com',
             type:'Tipo de prueba',
+            place:'Quito',
             location:{
               latitude:0.3123,
               longitude:-72.12312
@@ -61,34 +62,45 @@ describe('Add Controller',()=>{
 
   describe('Update',()=>{
 
-    it('Should update an add normally',(done)=>{
+    it('Should ignore photoPublicId if sent',(done)=>{
       user.post('/add/update')
           .send({
             id:addId,
-            description:'Descripción actualizada'
+            description:'Descripción actualizada',
+            photoPublicId:'123123'
           })
           .expect(200)
           .expect((res)=>{
             let add = res.body;
             add.description.should.equal('Descripción actualizada');
+            should.equal(add.photoPublicId, null);
           })
           .end((err,res)=>{
             if(err) return done(err);
             done()
           });
     });
-    it('Should ignore photoPublicId if sent',(done)=>{
+    it('Should update an add normally',(done)=>{
+      let updatedAdd={
+        id:addId,
+        title:'Titulo actualizado',
+        type:'Nuevo tipo',
+        description:'Descripción actualizada 2',
+        contactEmail:'updated@contact.com',
+        url:'newurl.com',
+        published:true,
+        place:'Nuevo Quito',
+        location:{
+          latitude:100,
+          longitude:100
+        }
+      };
       user.post('/add/update')
-          .send({
-            id:addId,
-            description:'Descripción actualizada 2',
-            photoPublicId:'123123'
-          })
+          .send(updatedAdd)
           .expect(200)
           .expect((res)=>{
             let add = res.body;
-            add.description.should.equal('Descripción actualizada 2');
-            should.not.exist(add.photoPublicId);
+            add.should.deep.equal({...updatedAdd,photoPublicId:null,createdAt:add.createdAt,updatedAt:add.updatedAt});
           })
           .end((err,res)=>{
             if(err) return done(err);
