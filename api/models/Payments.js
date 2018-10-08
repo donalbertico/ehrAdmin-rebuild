@@ -70,10 +70,10 @@ module.exports = {
           if(err) return cb(err);
           var bill = {
             payment:payment.id,
-            name:payment.payer.paymentInfo.name,
-            identifier:payment.payer.paymentInfo.identifier,
+            name:payment.payer.paymentInfo.name||'Consumidor Final',
+            identifier:payment.payer.paymentInfo.identifier||'9999999999999',
             address:payment.payer.paymentInfo.address,
-            idType:payment.payer.paymentInfo.idType,
+            idType:payment.payer.paymentInfo.idType||'07',
             email:payment.payer.email,
             details : payment.details
           };
