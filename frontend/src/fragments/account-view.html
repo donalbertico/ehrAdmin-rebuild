@@ -24,6 +24,7 @@
 <link rel="import" href="../redux/actions/search-actions.html">
 
 <link rel="import" href="../components/adds-section.html">
+<link rel="import" href="../components/users-section.html">
 
 
 <dom-module id="account-view">
@@ -72,9 +73,6 @@
       span.link{
         color: var(--accent-color);
         cursor: pointer;
-      }
-      div.benefits{
-        width: 25rem;
       }
       span.stat{
         width: 10rem;
@@ -155,79 +153,8 @@
               Administrador
             </div>
           </section>
-          <section name="users" class="p2 vertical">
-            <span class="font-display1 self-start m1-b">Usuarios</span>
-            <div class="horizontal">
-              <div class="vertical flex">
-                <span class="font-headline s m1-b">Filtros</span>
-                <div class="card vertical">
-                  <div class="horizontal">
-                    <paper-input class="m1-r" label="Email" value="{{userQuery.email}}"></paper-input>
-                    <paper-input class="m1-r" label="Nombre" value="{{userQuery.firstName}}"></paper-input>
-                    <paper-input class="m1-r" label="Apellido" value="{{userQuery.lastName}}"></paper-input>
-                  </div>
-                  <div class="">
-                    <vaadin-date-picker id="propFrom" value="{{userQuery.from}}" label="Desde"></vaadin-date-picker>
-                    <vaadin-date-picker id="propTo" value="{{userQuery.to}}" label="Hasta"></vaadin-date-picker>
-                    <paper-dropdown-menu label="Tipo">
-                      <paper-listbox   slot="dropdown-content" attr-for-selected="users" selected="{{userQuery.type}}">
-                        <paper-item users="a">Todos</paper-item>
-                        <paper-item users="r">Corredor</paper-item>
-                        <paper-item users="n">Normal</paper-item>
-                        <paper-item users="h">Hotel</paper-item>
-                        <paper-item users="e">Empresa de bienes Raices</paper-item>
-                      </paper-listbox>
-                    </paper-dropdown-menu>
-                    <paper-button raised class="accent self-center" on-tap="searchUsers">Buscar</paper-button>
-                  </div>
-                </div>
-                <div class="card horizontal">
-                  <paper-dropdown-menu label="Propiedades">
-                    <paper-listbox   slot="dropdown-content" attr-for-selected="users" selected="{{filters.props}}">
-                      <paper-item users="a">Ascendente</paper-item>
-                      <paper-item users="d">Descendente</paper-item>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                  <!-- <paper-dropdown-menu id="Dropdown" label="Propiedades">
-                    <paper-listbox slot="dropdown-content" attr-for-selected="state" selected="{{propsQuery.state}}">
-                      <paper-item state="a">Ascendente</paper-item>
-                      <paper-item state="v">Descendente</paper-item>
-                    </paper-listbox>
-                  </paper-dropdown-menu> -->
-                  <paper-button raised class="accent self-center" on-tap="sortByProps">Filtrar</paper-button>
-                </div>
-                <span>[[users.length]] Resultados</span>
-                <prism-table>
-                    <prism-thead>
-                        <prism-tr>
-                            <prism-th>Nombre</prism-th>
-                            <prism-th>Email</prism-th>
-                            <prism-th>Fecha</prism-th>
-                            <prism-th>Propiedades</prism-th>
-                            <prism-th>log in</prism-th>
-                            <prism-th>Acción</prism-th>
-                        </prism-tr>
-                    </prism-thead>
-                    <prism-tbody>
-                      <template is="dom-repeat" items="[[users]]" index-as="index">
-                        <prism-tr>
-                            <prism-td title="Nombre"><a id="[[item.id]]" href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
-                            <prism-td title="Email">[[item.email]]</prism-td>
-                            <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
-                            <prism-td title="Propiedades">[[item.properties.length]]</prism-td>
-                            <prism-td title="login">[[item.passports.0.protocol]]</prism-td>
-                            <prism-td title="Accion">
-                              <paper-button id="[[item.id]]" raised on-tap="setBenefeciary">Beneficiar</paper-button>
-                              <paper-button id="[[item.id]]" raised on-tap="setLucky">Donar</paper-button>
-                              <paper-button id="[[item.id]]" raised on-tap="verifyEmail" hidden$="[[item.mailVerified]]">Verificar correo</paper-button>
-                              <paper-button id="[[item.id]]" raised on-tap="setUserDelete">Eliminar</paper-button>
-                            </prism-td>
-                        </prism-tr>
-                      </template>
-                    </prism-tbody>
-                </prism-table>
-              </div>
-            </div>
+          <section name="users">
+            <users-section users="[[users]]" on-search="searchUsers" on-donate="donate" on-benefit="benefit" on-delete-user="deleteUser" on-verify-email="verifyEmail"></users-section>
           </section>
           <section name="payments">
             <span class="font-headline s m1-b">Pagos</span>
@@ -535,7 +462,6 @@
                 </prism-table>
               </div>
             </div>
-
           </section>
           <section name="user">
             <div class="vertical h-100">
@@ -698,30 +624,11 @@
           </section>
         </iron-pages>
       </div>
-      <paper-dialog id="benefitsDialog" class="vertical">
-        <span class="font-display1">Beneficios</span>
-        <span>Selecciona el beneficio</span>
-        <div class="benefits">
-          <paper-radio-group id="group" selected="{{benefit}}">
-            <paper-radio-button name="PL001">1 dia,$3</paper-radio-button>
-            <paper-radio-button name="PL002">1 semana,$5</paper-radio-button>
-            <paper-radio-button name="PL003">1 mes,$10</paper-radio-button>
-            <paper-radio-button name="TO001">1 propiedad,$3</paper-radio-button>
-            <paper-radio-button name="TO002">10 propeidades,$20</paper-radio-button>
-            <paper-radio-button name="TO003">25 propiedades,$37.50</paper-radio-button>
-            <paper-radio-button name="TO004">50 propiedades$50</paper-radio-button>
-          </paper-radio-group>
-        </div>
-        <div class="horizontl self-end">
-          <paper-button on-tap="benefy">Beneficiar</paper-button>
-        </div>
-      </paper-dialog>
       <paper-dialog id="benefitsPDialog" class="vertical">
         <span class="font-display1">Beneficios</span>
         <span>Selecciona el beneficio</span>
         <span>(UP) Usuario Plus (TO) Token (AP) Anunciante Plus</span>
         <div class="benefits">
-
           <paper-radio-group id="benf" selected="{{benefit}}">
             <paper-radio-button name="PL001">(UP) 1 dia - $3</paper-radio-button>
             <paper-radio-button name="PL002">(UP) 1 semana - $5</paper-radio-button>
@@ -737,32 +644,6 @@
         </div>
         <div class="horizontl self-end">
           <paper-button on-tap="verify">Verificar</paper-button>
-        </div>
-      </paper-dialog>
-      <paper-dialog id="luckyDialog" class="vertical">
-        <span class="font-display1">Beneficios</span>
-        <span>Selecciona el beneficio</span>
-        <div class="benefits">
-          <paper-radio-group id="benf" selected="{{benefit}}">
-            <paper-radio-button name="PL001">1 dia,$3</paper-radio-button>
-            <paper-radio-button name="PL002">1 semana,$5</paper-radio-button>
-            <paper-radio-button name="PL003">1 mes,$10</paper-radio-button>
-            <paper-radio-button name="TO001">1 propiedad,$3</paper-radio-button>
-            <paper-radio-button name="TO002">10 propeidades,$20</paper-radio-button>
-            <paper-radio-button name="TO003">25 propiedades,$37.50</paper-radio-button>
-            <paper-radio-button name="TO004">50 propiedades$50</paper-radio-button>
-          </paper-radio-group>
-        </div>
-        <div class="horizontl self-end">
-          <paper-button on-tap="donate">Donar</paper-button>
-        </div>
-      </paper-dialog>
-      <paper-dialog id="userDelete" class="vertical">
-        <span class="font-display1">Eliminando usuario</span>
-        <span>Estas seguro que deseas eliminar este usuario</span>
-        <div class="horizontl self-end">
-          <paper-button on-tap="deleteUser">Eliminar</paper-button>
-          <paper-button on-tap="closeDialog">Cancelar</paper-button>
         </div>
       </paper-dialog>
       <paper-dialog id="propDelete" class="vertical">
@@ -866,16 +747,6 @@
             type:Array,
             statePath: 'search.props.entities'
           },
-          userQuery:{
-            type:Object,
-            value:()=>{
-              return {
-                email:null,
-                firstName:null,
-                lastName:null
-              }
-            }
-          },
           propsQuery:{
             type:Object,
             value:()=>{
@@ -935,7 +806,6 @@
           },
           route:String,
           page:String,
-          beneficiary: String,
           payment:String,
           benefit : {
             type : String,
@@ -1014,13 +884,8 @@
           if(e)return showMessage('No pudimos obtener las estadísticas');
         })
       }
-      searchUsers(){
-        var userQuery={};
-        Object.keys(this.userQuery).forEach((key)=>{
-          if(this.userQuery[key]){
-            userQuery[key]=this.userQuery[key];
-          }
-        });
+      searchUsers(e){
+        var userQuery=e.detail;
         if(userQuery.from && userQuery.to){
           userQuery.from = new Date(userQuery.from).getTime();
           userQuery.to = new Date(userQuery.to).getTime();
@@ -1055,13 +920,6 @@
           if(e)return showMessage('Error obteniendo la información del usuario');
         });
       }
-      updateUserMr(){
-        var newMr = parseInt(this.$.maxRecoSelector.value);
-        this.dispatch('updateUserMr',this.su.id,newMr,(e)=>{
-          if(e)return showMessage('Error actualizando el MR');
-          return showMessage('Usuario actualizado.');
-        });
-      }
       _routePageChanged(page){
         if(page===undefined){
           return;
@@ -1081,18 +939,6 @@
           }
         }
       }
-      setBenefeciary(e){
-        this.set('beneficiary',e.target.id);
-        this.$.benefitsDialog.open();
-      }
-      setLucky(e){
-        this.set('beneficiary',e.target.id);
-        this.$.luckyDialog.open();
-      }
-      setUserDelete(e){
-        this.set('userToDelete',e.target.id);
-        this.$.userDelete.open();
-      }
       setDeleteProp(e){
         this.set('propToDelete',e.target.id);
         this.$.propDelete.open();
@@ -1106,11 +952,11 @@
         this.$.benefitsPDialog.open();
       }
       deleteUser(e){
-        this.dispatch('deleteUser',this.userToDelete,(err)=>{
-          if (err) return showMessage(err);
+        this.dispatch('deleteUser',e.detail.id,(err)=>{
+          if(err)return showMessage('Hubo un error');
           showMessage('Usuario eliminado');
-          this.searchUsers();
-          this.$.userDelete.close();
+          e.cb();
+          this.searchUsers({detail:this.$.usersSection.query});
         })
       }
       deleteProp(e){
@@ -1140,12 +986,13 @@
           return null;
         }
       }
-      benefy(e){
+      benefit(e){
+        let d = e.detail;
         this.$.wait.open();
-        this.$.benefitsDialog.close();
-        this.dispatch('promoteToPlus',this.beneficiary,this.benefit,(err)=>{
+        this.dispatch('promoteToPlus',d.id,d.code,(err)=>{
+          if(err)return showMessage('Hubo un error');
           showMessage('Beneficio agregado');
-          this.$.benefitsDialog.close();
+          d.cb();
           this.$.wait.close();
         });
       }
@@ -1159,8 +1006,11 @@
         });
       }
       verifyEmail(e){
-        this.dispatch('verifyEmail',e.target.id,(err)=>{
+        let d = e.detail;
+        this.dispatch('verifyEmail',d.id,(err)=>{
+          if(err)return showMessage('Error verificando el email');
           showMessage('Mail verificado');
+          d.cb();
         });
       }
       loadPayments(){
@@ -1181,10 +1031,12 @@
         });
       }
       donate(e){
-        this.$.luckyDialog.close();
+        let d = e.detail;
         this.$.wait.open();
-        this.dispatch('donateBenefit',this.beneficiary,this.benefit,(err)=>{
+        this.dispatch('donateBenefit',d.id,d.code,(err)=>{
+          if(err)return showMessage('Hubo un error');
           showMessage('Beneficio donado');
+          d.cb();
           this.$.wait.close();
         });
       }

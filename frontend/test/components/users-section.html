@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>users-section</title>
+
+    <script src="../../src/js/date-utils.min.js"></script>
+    <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../bower_components/web-component-tester/browser.js"></script>
+
+    <!-- Import the element to test -->
+    <link rel="import" href="../../src/components/users-section.html">
+  </head>
+  <body>
+    <test-fixture id="testSection">
+      <template>
+        <users-section></users-section>
+      </template>
+    </test-fixture>
+
+    <script>
+      var section,searchStub=sinon.stub();
+      var querySample={
+        email:'hello@world.com',
+        firstName:'John',
+        lastName:'Green',
+        type:'n',
+        from:'2018-10-09',
+        to:'2018-12-09',
+      };
+      var userFixtures = [
+        {
+          id:'123',
+          email:'user1@email.com',
+          firstName:'John',
+          lastName:'Doe',
+          passports:[
+            {protocol:'Facebook'}
+          ],
+          properties:['a','b'],
+          mailVerified:true,
+          createdAt:1539051349890
+        },
+        {
+          id:'124',
+          email:'user2@email.com',
+          firstName:'John',
+          lastName:'Doe',
+          passports:[
+            {protocol:'Facebook'}
+          ],
+          properties:['a','b'],
+          mailVerified:false,
+          createdAt:1539051349890
+        },
+        {
+          id:'142',
+          email:'user3@email.com',
+          firstName:'John',
+          lastName:'Doe',
+          passports:[
+            {protocol:'Facebook'}
+          ],
+          properties:['a','b'],
+          mailVerified:false,
+          createdAt:1539051349890
+        }
+      ]
+      describe('users-section tests',()=>{
+
+        before(()=>{
+          section = fixture('testSection');
+          section.addEventListener('search',searchStub);
+          section.set('query',querySample);
+        });
+
+        it('should render correctly and show a title',()=>{
+          var title = section.shadowRoot.querySelector('span');
+          assert.equal(title.innerHTML,'Usuarios');
+        });
+
+        it('should dispatch search event on click sending query object on detail',()=>{
+          section.shadowRoot.querySelector('#searchButton').click();
+          assert.equal(searchStub.callCount,1);
+          assert.deepEqual(searchStub.getCall(0).args[0].detail,querySample);
+        });
+
+        it('should avoid sending unfilled fields on with search event',()=>{
+          section.set('query.email',"");
+          section.shadowRoot.querySelector('#searchButton').click();        
+          assert.equal(searchStub.callCount,2);
+          assert.isUndefined(searchStub.getCall(1).args[0].detail.email);
+        });
+
+        it('should render a list for the users',(done)=>{
+          section.set('users',userFixtures);
+          flush(()=>{
+            assert.equal(section.shadowRoot.querySelectorAll('prism-tr').length,userFixtures.length+1);
+            done();
+          })
+        });
+
+        describe('users list actions',()=>{
+          let buttons={},userId=userFixtures[0].id;
+
+          before((done)=>{
+            flush(()=>{
+              let but = section.shadowRoot.querySelector('prism-td[title=Acciones]').querySelectorAll('paper-button');
+              //have to skip 0 because it's shadow root text
+              buttons.donate=but[0];
+              buttons.benefit=but[1];
+              buttons.verifyEmail=but[2];
+              buttons.deleteUser=but[3];
+              done();
+            });
+          });
+
+          beforeEach(()=>{
+            section.selectedUser=null;
+          });
+
+          describe('donate button',()=>{
+
+            it('should select the user id and open donate dialog',()=>{
+              buttons.donate.click();
+              assert.equal(section.$.donateDialog.opened,true);
+              assert.equal(section.selectedUser,userId);
+            });
+
+          });
+          describe('benefit button',()=>{
+
+            it('should select the user id and open benefit dialog',()=>{
+              buttons.benefit.click();
+              assert.equal(section.$.benefitDialog.opened,true);
+              assert.equal(section.selectedUser,userId);
+            });
+
+          });
+          describe('verifyEmail button',()=>{
+
+            it('should have a hidden attribute when user has emailVerified=true',()=>{
+              //this user has emailVerified=true
+              assert.equal(buttons.verifyEmail.hasAttribute('hidden'),true);
+            });
+
+            it('should select the user id and open verifyEmail dialog',()=>{
+              //Even though button is hidden we can still call it's click method
+              buttons.verifyEmail.click();
+              assert.equal(section.$.verifyEmailDialog.opened,true);
+              assert.equal(section.selectedUser,userId);
+            });
+
+          });
+          describe('deleteUser button',()=>{
+
+            it('should select the user id and open deleteUser dialog',()=>{
+              buttons.deleteUser.click();
+              assert.equal(section.$.deleteUserDialog.opened,true);
+              assert.equal(section.selectedUser,userId);
+            });
+
+          });
+
+        });
+
+        describe('donate dialog',()=>{
+
+          let donateStub=sinon.stub()
+              userId=userFixtures[0].id,
+              sampleCode="TO001";
+
+          before(()=>{
+            section.addEventListener('donate',donateStub);
+            section.selectedCode=sampleCode;
+            section.selectedUser=userId;
+          });
+
+          describe('close button',()=>{
+
+            it('should close dialog',()=>{
+              section.$.donateDialog.open();
+              section.$.donateDialog.querySelector('paper-button[dialog-dismiss]').click();
+              assert.equal(section.$.donateDialog.opened,false);
+            });
+
+          });
+
+          describe('submit button',()=>{
+
+            it('should dispatch the donate event with id,selectedCode and a completion callback as details. When callback is called close dialog and reset selectedCode.',()=>{
+              section.$.donateDialog.open();
+              section.$.donateDialog.querySelector('paper-button.primary').click();
+              let detail = donateStub.getCall(0).args[0].detail;
+              assert.equal(donateStub.callCount,1);
+              assert.equal(detail.id,section.selectedUser);
+              assert.equal(detail.code,section.selectedCode);
+              detail.cb();
+              assert.equal(section.$.donateDialog.opened,false);
+              assert.equal(section.selectedCode,'PL001');
+            });
+
+
+          });
+
+        });
+
+        describe('benefit dialog',()=>{
+
+          let benefitStub=sinon.stub()
+              userId=userFixtures[0].id,
+              sampleCode="TO001";
+
+          before(()=>{
+            section.addEventListener('benefit',benefitStub);
+            section.selectedUser=userId;
+            section.selectedCode=sampleCode;
+          });
+
+          describe('close button',()=>{
+
+            it('should close dialog',()=>{
+              section.$.benefitDialog.open();
+              section.$.benefitDialog.querySelector('paper-button[dialog-dismiss]').click();
+              assert.equal(section.$.benefitDialog.opened,false);
+            });
+
+          });
+
+          describe('submit button',()=>{
+
+            it('should dispatch the benefit event with id,selectedCode and a completion callback as details. When callback is called close dialog and reset selectedCode.',()=>{
+              section.$.benefitDialog.open();
+              section.$.benefitDialog.querySelector('paper-button.primary').click();
+              let detail = benefitStub.getCall(0).args[0].detail;
+              assert.equal(benefitStub.callCount,1);
+              assert.equal(detail.id,section.selectedUser);
+              assert.equal(detail.code,section.selectedCode);
+              detail.cb();
+              assert.equal(section.$.benefitDialog.opened,false);
+              assert.equal(section.selectedCode,'PL001');
+            });
+
+
+          });
+
+        });
+
+        describe('verifyEmail dialog',()=>{
+
+          let verifyEmailStub=sinon.stub()
+              userId=userFixtures[0].id;
+
+          before(()=>{
+            section.addEventListener('verify-email',verifyEmailStub);
+            section.selectedUser=userId;
+          });
+
+          describe('close button',()=>{
+
+            it('should close dialog',()=>{
+              section.$.verifyEmailDialog.open();
+              section.$.verifyEmailDialog.querySelector('paper-button[dialog-dismiss]').click();
+              assert.equal(section.$.verifyEmailDialog.opened,false);
+            });
+
+          });
+
+          describe('submit button',()=>{
+
+            it('should dispatch the verify-email event with id and a completion callback as details. When callback is called close dialog.',()=>{
+              section.$.verifyEmailDialog.open();
+              section.$.verifyEmailDialog.querySelector('paper-button.primary').click();
+              let detail = verifyEmailStub.getCall(0).args[0].detail;
+              assert.equal(verifyEmailStub.callCount,1);
+              assert.equal(detail.id,section.selectedUser);
+              detail.cb();
+              assert.equal(section.$.verifyEmailDialog.opened,false);
+            });
+
+
+          });
+
+        });
+        describe('deleteUser dialog',()=>{
+
+          let deleteUserStub=sinon.stub()
+              userId=userFixtures[0].id;
+
+          before(()=>{
+            section.addEventListener('delete-user',deleteUserStub);
+            section.selectedUser=userId;
+          });
+
+          describe('close button',()=>{
+
+            it('should close dialog',()=>{
+              section.$.deleteUserDialog.open();
+              section.$.deleteUserDialog.querySelector('paper-button[dialog-dismiss]').click();
+              assert.equal(section.$.deleteUserDialog.opened,false);
+            });
+
+          });
+
+          describe('submit button',()=>{
+
+            it('should dispatch the delete-user event with id and a completion callback as details. When callback is called close dialog.',()=>{
+              section.$.deleteUserDialog.open();
+              section.$.deleteUserDialog.querySelector('paper-button.primary').click();
+              let detail = deleteUserStub.getCall(0).args[0].detail;
+              assert.equal(deleteUserStub.callCount,1);
+              assert.equal(detail.id,section.selectedUser);
+              detail.cb();
+              assert.equal(section.$.deleteUserDialog.opened,false);
+            });
+
+
+          });
+
+        });
+
+
+
+      });
+    </script>
+  </body>
+</html>

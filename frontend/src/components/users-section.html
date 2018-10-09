@@ -1,0 +1,267 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+
+
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="users-section">
+  <template>
+    <style include="shared-styles">
+      :host{
+        @apply --layout-vertical;
+        height: 100vh;
+      }
+      .filters{
+        background-color: var(--light-primary-color);
+      }
+      div.benefits{
+        width: 25rem;
+      }
+    </style>
+    <div class="vertical">
+      <div class="p1 dark-primary">
+        <span class="font-display1">Usuarios</span>
+      </div>
+      <div class="filters vertical p1">
+        <span class="font-title">Filtros</span>
+        <div class="horizontal">
+          <paper-input name="email" class="m1-r" label="Email" value="{{query.email}}"></paper-input>
+          <paper-input name="firstName" class="m1-r" label="Nombre" value="{{query.firstName}}"></paper-input>
+          <paper-input name="lastName" class="m1-r" label="Apellido" value="{{query.lastName}}"></paper-input>
+          <paper-dropdown-menu class="m1-r" label="Tipo">
+            <paper-listbox name="type" slot="dropdown-content" attr-for-selected="users" selected="{{query.type}}">
+              <paper-item users="a">Todos</paper-item>
+              <paper-item users="r">Corredor</paper-item>
+              <paper-item users="n">Normal</paper-item>
+              <paper-item users="h">Hotel</paper-item>
+              <paper-item users="e">Empresa de bienes Raices</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+        <div class="horizontal">
+          <vaadin-date-picker name="from" class="m1-r" label="Desde" value="{{query.from}}"></vaadin-date-picker>
+          <vaadin-date-picker name="to" class="m1-r" label="Hasta" value="{{query.to}}"></vaadin-date-picker>
+          <div class="flex"></div>
+          <paper-button raised class="accent self-center" on-click="_onSearch" id="searchButton">Buscar</paper-button>
+        </div>
+        <div class="horizontal" hidden>
+          <paper-dropdown-menu label="Propiedades">
+            <paper-listbox slot="dropdown-content" attr-for-selected="users" selected="{{filters.props}}">
+              <paper-item users="a">Ascendente</paper-item>
+              <paper-item users="d">Descendente</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-button raised class="accent self-center" on-tap="sortByProps">Filtrar</paper-button>
+        </div>
+      </div>
+    </div>
+    <span class="m1 font-title">[[users.length]] Resultados</span>
+    <prism-table>
+      <prism-thead>
+          <prism-tr>
+              <prism-th>Nombre</prism-th>
+              <prism-th>Email</prism-th>
+              <prism-th>Fecha</prism-th>
+              <prism-th>Propiedades</prism-th>
+              <prism-th>log in</prism-th>
+              <prism-th>Acciones</prism-th>
+          </prism-tr>
+      </prism-thead>
+      <prism-tbody>
+        <template is="dom-repeat" items="[[users]]" index-as="index">
+          <prism-tr>
+              <prism-td title="Nombre"><a href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
+              <prism-td title="Email">[[item.email]]</prism-td>
+              <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+              <prism-td title="Propiedades">[[item.properties.length]]</prism-td>
+              <prism-td title="login">[[item.passports.0.protocol]]</prism-td>
+              <prism-td title="Acciones">
+                <paper-button raised on-tap="openDonate">Donar</paper-button>
+                <paper-button raised on-tap="openBenefit">Beneficiar</paper-button>
+                <paper-button raised on-tap="openVerifyEmail" hidden$="[[item.mailVerified]]">Verificar correo</paper-button>
+                <paper-button raised on-tap="openDeleteUser">Eliminar</paper-button>
+              </prism-td>
+          </prism-tr>
+        </template>
+      </prism-tbody>
+    </prism-table>
+    <paper-dialog id="donateDialog" class="vertical">
+      <span class="font-display1">Beneficios</span>
+      <span>Selecciona el beneficio</span>
+      <span>(UP) Usuario Plus (TO) Token (AP) Anunciante Plus</span>
+      <div class="benefits">
+        <paper-radio-group selected="{{selectedCode}}">
+          <paper-radio-button name="PL001">(UP) 1 dia - $3</paper-radio-button>
+          <paper-radio-button name="PL002">(UP) 1 semana - $5</paper-radio-button>
+          <paper-radio-button name="PL003">(UP) 1 mes - $10</paper-radio-button>
+          <paper-radio-button name="TO001">(TO) 1 propiedad - $3</paper-radio-button>
+          <paper-radio-button name="TO002">(TO) 10 propeidades - $20</paper-radio-button>
+          <paper-radio-button name="TO003">(TO) 25 propiedades - $37.50</paper-radio-button>
+          <paper-radio-button name="TO004">(TO) 50 propiedades - $50</paper-radio-button>
+          <paper-radio-button name="AP001">(AP) 1 semana - $6</paper-radio-button>
+          <paper-radio-button name="AP002">(AP) 1 mes - $18</paper-radio-button>
+          <paper-radio-button name="AP003">(AP) 1 año - $180</paper-radio-button>
+        </paper-radio-group>
+      </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancelar</paper-button>
+        <paper-button class="primary" on-tap="_onDonate">Donar</paper-button>
+      </div>
+    </paper-dialog>
+    <paper-dialog id="benefitDialog" class="vertical">
+      <span class="font-display1">Beneficios</span>
+      <span>Selecciona el beneficio</span>
+      <span>(UP) Usuario Plus (TO) Token (AP) Anunciante Plus</span>
+      <div class="benefits">
+        <paper-radio-group selected="{{selectedCode}}">
+          <paper-radio-button name="PL001">(UP) 1 dia - $3</paper-radio-button>
+          <paper-radio-button name="PL002">(UP) 1 semana - $5</paper-radio-button>
+          <paper-radio-button name="PL003">(UP) 1 mes - $10</paper-radio-button>
+          <paper-radio-button name="TO001">(TO) 1 propiedad - $3</paper-radio-button>
+          <paper-radio-button name="TO002">(TO) 10 propeidades - $20</paper-radio-button>
+          <paper-radio-button name="TO003">(TO) 25 propiedades - $37.50</paper-radio-button>
+          <paper-radio-button name="TO004">(TO) 50 propiedades - $50</paper-radio-button>
+          <paper-radio-button name="AP001">(AP) 1 semana - $6</paper-radio-button>
+          <paper-radio-button name="AP002">(AP) 1 mes - $18</paper-radio-button>
+          <paper-radio-button name="AP003">(AP) 1 año - $180</paper-radio-button>
+        </paper-radio-group>
+      </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss >Cancelar</paper-button>
+        <paper-button class="primary" on-tap="_onBenefit">Beneficiar</paper-button>
+      </div>
+    </paper-dialog>
+    <paper-dialog id="verifyEmailDialog" class="vertical">
+      <span class="font-display1">Confirmando correo</span>
+      <span>Estas seguro que deseas confirmar este correo?</span>
+      <div class="buttons">
+        <paper-button dialog-dismiss >Cancelar</paper-button>
+        <paper-button class="primary" on-tap="_onVerify">Eliminar</paper-button>
+      </div>
+    </paper-dialog>
+    <paper-dialog id="deleteUserDialog" class="vertical">
+      <span class="font-display1">Eliminando usuario</span>
+      <span>Estas seguro que deseas eliminar este usuario?</span>
+      <div class="buttons">
+        <paper-button dialog-dismiss >Cancelar</paper-button>
+        <paper-button class="primary" on-tap="_onDelete">Eliminar</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+    class UsersSection extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior],Polymer.Element) {
+      static get is(){
+        return 'users-section';
+      }
+      static get properties(){
+        return {
+          users:{
+            type:Array,
+            value:()=>{return [];}
+          },
+          query:{
+            type:Object,
+            value:()=>{
+              return {
+                email:'',
+                firstName:'',
+                lastName:'',
+                from:'',
+                to:'',
+                type:'a'
+              }
+            }
+          },
+          selectedUser:{
+            type:String,
+            value:''
+          },
+          selectedCode:{
+            type:String,
+            value:'PL001'
+          },
+          resources:{
+            value:()=>{
+              return {
+                'en':{
+                  'date' : '{value,date,medium}'
+                },
+                'es':{
+                  'date' : '{value,date,medium}'
+                }
+              }
+            }
+          },
+          language:{
+            type:String,
+            value:'es'
+          }
+        }
+      }
+      _onSearch(){
+        let purgedQuery = Object.keys(this.query).reduce((res,key)=>{
+          //check if the value exists
+          if(this.query[key]){
+            res[key]=this.query[key];
+          }
+          return res;
+        },{});
+        this.dispatchEvent(new CustomEvent('search',{bubbles:false,detail:purgedQuery}));
+      }
+      openDonate(e){
+        let id = e.model.__data.item.id;
+        this.selectedUser=id;
+        this.$.donateDialog.open();
+      }
+      openBenefit(e){
+        let id = e.model.__data.item.id;
+        this.selectedUser=id;
+        this.$.benefitDialog.open();
+      }
+      openVerifyEmail(e){
+        let id = e.model.__data.item.id;
+        this.selectedUser=id;
+        this.$.verifyEmailDialog.open();
+      }
+      openDeleteUser(e){
+        let id = e.model.__data.item.id;
+        this.selectedUser=id;
+        this.$.deleteUserDialog.open();
+      }
+      _onDonate(){
+        let cb = ()=>{
+          this.$.donateDialog.close();
+          this.selectedCode='PL001';
+        }
+        this.dispatchEvent(new CustomEvent('donate',{bubbles:false,detail:{id:this.selectedUser,code:this.selectedCode,cb:cb}}));
+      }
+      _onBenefit(){
+        let cb = ()=>{
+          this.$.benefitDialog.close();
+          this.selectedCode='PL001';
+        }
+        this.dispatchEvent(new CustomEvent('benefit',{bubbles:false,detail:{id:this.selectedUser,code:this.selectedCode,cb:cb}}));
+      }
+      _onDelete(){
+        let cb = ()=>{
+          this.$.deleteUserDialog.close();
+        }
+        this.dispatchEvent(new CustomEvent('delete-user',{bubbles:false,detail:{id:this.selectedUser,cb:cb}}));
+      }
+      _onVerify(){
+        let cb = ()=>{
+          this.$.verifyEmailDialog.close();
+        }
+        this.dispatchEvent(new CustomEvent('verify-email',{bubbles:false,detail:{id:this.selectedUser,cb:cb}}));
+      }
+    }
+    customElements.define(UsersSection.is,UsersSection);
+  </script>
+</dom-module>
