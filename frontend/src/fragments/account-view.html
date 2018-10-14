@@ -157,13 +157,18 @@
             <users-section users="[[users]]" on-search="searchUsers" on-donate="donate" on-benefit="benefit" on-delete-user="deleteUser" on-verify-email="verifyEmail"></users-section>
           </section>
           <section name="payments">
-            <span class="font-headline s m1-b">Pagos</span>
+            <div class="vertical dark-primary">
+              <div class="p1 horizontal">
+                <span class="font-display1">Pagos</span>
+              </div>
+            </div>
             <prism-table>
                 <prism-thead>
                     <prism-tr>
                         <prism-th>Fecha</prism-th>
                         <prism-th>Numero</prism-th>
                         <prism-th>Usuario</prism-th>
+                        <prism-th>Código</prism-th>
                         <prism-th>Acción</prism-th>
                     </prism-tr>
                 </prism-thead>
@@ -173,6 +178,7 @@
                         <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
                         <prism-td title="Numero">[[item.transferNumber]]</prism-td>
                         <prism-td title="Usuario">[[item.payer.email]]</prism-td>
+                        <prism-td title="Código">[[localize('product_code','code',item.productCode)]]</prism-td>
                         <prism-td title="Accion">
                           <paper-button id="[[item.id]]" raised class="primary" on-click="setPayment">Aprobar</paper-button>
                           <paper-button id="[[item.id]]" raised class="primary" on-click="setDeletePayment">Eliminar</paper-button>
@@ -789,6 +795,7 @@
                   'state' : '{value,select, p {pendiente} r {renovada} v {publicada} n {no puclicada} e {expirada}}',
                   'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                  'product_code':'{code,select, PL001{Usuario Plus (1 día)} PL002 {Usuario Plus (1 semana)}  PL003 {Usuario Plus (1 mes)}  TO001{1 Token}  TO002 {10 Tokens} TO003 {25 Tokens} TO004{50 Tokens} AP001 {Anunciante Plus (1 semana)} AP002 {Anunciante Plus (1 mes)} AP003 {Anunciante Plus (1 año)} other{}}',
                   'date':'{value,date,medium}',
                   'email_record_type':'{value,select,userInfoRequest{Usuario} userRequestProvide{Anunciante} other{}}'
 
@@ -798,6 +805,7 @@
                   'state' : '{value,select,p {pendiente} r {renovada} v {publicada} n {no puclicada} e {expirada}}',
                   'enterprise' : '{value,select, e {Bienes Raíces} h {Hotel} r{Corredor}}',
                   'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                  'product_code':'{code,select, PL001{Usuario Plus (1 día)} PL002 {Usuario Plus (1 semana)}  PL003 {Usuario Plus (1 mes)}  TO001{1 Token}  TO002 {10 Tokens} TO003 {25 Tokens} TO004{50 Tokens} AP001 {Anunciante Plus (1 semana)} AP002 {Anunciante Plus (1 mes)} AP003 {Anunciante Plus (1 año)} other{}}',
                   'date':'{value,date,medium}',
                   'email_record_type':'{value,select, userInfoRequest {Usuario} userRequestProvide{Anunciante} other{}}'
                 }
