@@ -6,7 +6,7 @@
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../elements/add-form.html">
 <link rel="import" href="../elements/add-list.html">
-<script src="//widget.cloudinary.com/global/all.js" type="text/javascript" async></script>
+<script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript" async></script>
 
 <dom-module id="adds-section">
   <template>
@@ -128,7 +128,8 @@
       _uploadClick(e){
         let id = e.detail.id;
         this.loading=true;
-        cloudinary.openUploadWidget(
+
+        let uploadWidget = cloudinary.openUploadWidget(
           {cloud_name: 'hmeefwd4l',
            upload_preset: 'eazvkkt2',
            multiple : 'false' ,
@@ -137,19 +138,25 @@
            max_image_height : '1400',
            max_image_width : '1400'},
           (error, result)=>{
+            console.log(result);
             if(error){
               this.loading=false;
               return showMessage('No has subido ninguna imagen');
             }else{
-              console.log(result);
-              let publicId = result[0].public_id;
-              this.dispatch('updateAddPhoto',id,publicId,(err)=>{
+              if(result.event==='success'){
+                uploadWidget.close();
+                let publicId = result.info.public_id;
+                this.dispatch('updateAddPhoto',id,publicId,(err)=>{
+                  this.loading=false;
+                  if(err)return showMessage('Hubo un error actualizando la foto');
+                });
+              }else if(result.event==='close'){
                 this.loading=false;
-                if(err)return showMessage('Hubo un error actualizando la foto');
-              });
+              }
             }
           }
         );
+        uploadWidget.open();
       }
       _deleteClick(e){
         let id = e.detail.id;
