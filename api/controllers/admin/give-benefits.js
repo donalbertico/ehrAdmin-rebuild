@@ -18,6 +18,7 @@ module.exports = {
   },
 
   fn: function (inputs, exits,env) {
+    console.log(inputs);
     var  details = [{code:inputs.code}];
     var employee = env.req.session.user;
     User.findOne(inputs.user,(err,found)=>{

@@ -68,6 +68,11 @@ var verificarRuc=function(ruc){
       return verificarCedula(ruc.slice(0,-3)) &&(ruc[10]+ruc[11]+ruc[12])==1;
     }
 };
+
+const isInThePast = (date) => {
+  return date.getTime() <= (new Date()).getTime();
+};
+
 module.exports = {
   attributes: {
     email:{type:'string',required:true,unique:true},
@@ -260,19 +265,19 @@ module.exports = {
     User.findOne(payer,(err,found)=>{
       if(err) return cb(err);
       details.forEach((detail)=>{
-        var benefits = detailDic.benefitsFromCode(detail.code);
-        if (benefits.type == 'plan'){
-          var newDate = userBenefits.plusUntil || found.plusUntil || new Date().getTime();
-          newDate = new Date(newDate);
+        var benefits = detailDic.benefitsFromCode(detail.code);      
+        if (benefits.type === 'plan'){
+          var lastDate = new Date(found.plusUntil || new Date().getTime());
+          var newDate = isInThePast(lastDate) ? (new Date()) : lastDate;
           newDate.add(benefits.add);
           userBenefits = {plusUntil : newDate.getTime()};
-        }else if (benefits.type == 'plusannouncer'){
-          var newDate = userBenefits.plusAnnouncerUntil || found.plusAnnouncerUntil || new Date().getTime();
-          newDate = new Date(newDate);
+        }else if (benefits.type === 'plusannouncer'){
+          var lastDate = new Date(found.plusAnnouncerUntil || new Date().getTime());
+          var newDate = isInThePast(lastDate) ? (new Date()) : lastDate;
           newDate.add(benefits.add);
           userBenefits = {plusAnnouncerUntil : newDate.getTime()};
         }else{
-          var tokens = userBenefits.promoteTokens|| found.promoteTokens || 0;
+          var tokens = found.promoteTokens || 0;
           tokens += benefits.add.tokens;
           userBenefits = {promoteTokens : tokens};
         }
