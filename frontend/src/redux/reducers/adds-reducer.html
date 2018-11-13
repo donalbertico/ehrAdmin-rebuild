@@ -3,7 +3,7 @@
   const adds = (state,action)=>{
     switch (action.type) {
       case 'LOAD_ADDS':
-        return Object.assign({},state,{records:[...state.records,...action.adds]});
+        return Object.assign({},state,{records:[...action.adds]});
         break;
       case 'ADD_ADD':
         return Object.assign({},state,{records:[...state.records,action.add]});
