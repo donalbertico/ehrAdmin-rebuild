@@ -26,7 +26,7 @@
         id:null,
         title:'',
         description:'',
-        type:'',
+        type:'cleaning',
         contactEmail:'',
         url:'',
         photoPublicId:'',
@@ -73,6 +73,12 @@
             });
 
           });
+          describe('type field', ()=>{
+            it('should be cleaning by default',()=>{
+              let type = form.shadowRoot.querySelector('[name=type]');
+              assert.equal(type.selected,'cleaning');
+            });
+          });
           describe('description field',()=>{
 
             it('should be invalid',()=>{
@@ -88,20 +94,7 @@
             });
 
           });
-          describe('type field',()=>{
-
-            it('should be invalid',()=>{
-              let type = form.shadowRoot.querySelector('[name=type]');
-              type.value=' ';
-              assert.equal(type.validate(),false);
-            });
-            it('should be valid',()=>{
-              let type = form.shadowRoot.querySelector('[name=type]');
-              type.value='Limpieza a domicilio';
-              assert.equal(type.validate(),true);
-            });
-
-          });
+          
           describe('contactEmail field',()=>{
 
             it('should be invalid',()=>{
@@ -153,7 +146,6 @@
               let valid = {
                 title:'Clean house',
                 description:'Clean house es un servicio de limpieza de alformbras a domicilio',
-                type:'Limpieza de hogares',
                 contactEmail:'contacto@cleanhouse.com'
               }
               form.add=Object.assign(form.add,valid);
@@ -162,7 +154,7 @@
               assert.equal(form.validate(),false);
               let input = form.shadowRoot.querySelector('#placeInput');
               assert.equal(input.invalid,true);
-            });
+            });          
             it('should return false until the latitude,longitude and place are set propperly',()=>{
               //this fields are set by cloudinary
               assert.equal(form.validate(),false);

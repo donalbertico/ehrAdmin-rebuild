@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/google-apis/google-maps-api.html">
 <link rel="import" href="../shared-styles.html">
 
@@ -33,7 +34,12 @@
     <div class="vertical p1">
       <paper-toggle-button checked="{{add.published}}">Publicado</paper-toggle-button>
       <paper-input name="title" label="Título" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.title}}" error-message="Título inválido"></paper-input>
-      <paper-input name="type" label="Tipo" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.type}}" error-message="Tipo inválido"></paper-input>
+      <paper-dropdown-menu label="Tipo" error-message="Tipo inválido">
+        <paper-listbox slot="dropdown-content" selected="{{add.type}}" name="type">
+          <paper-item value="cleaning">Limpieza</paper-item>
+          <paper-item value="moving">Mudanza</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu>
       <paper-textarea name="description" label="Descripción" rows="3" required char-counter value="{{add.description}}" error-message="Descripción inválida" maxlength="500"></paper-textarea>
       <paper-input name="contactEmail" label="Email de contacto" pattern="^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$" required value="{{add.contactEmail}}" error-message="Email inválido"></paper-input>
       <paper-input name="url" label="URL" pattern="^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$" value="{{add.url}}"></paper-input>
@@ -64,7 +70,7 @@
                 id:null,
                 title:'',
                 description:'',
-                type:'',
+                type:'cleaning',
                 contactEmail:'',
                 url:'',
                 photoPublicId:'',
