@@ -36,8 +36,19 @@
       <paper-input name="title" label="Título" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.title}}" error-message="Título inválido"></paper-input>
       <paper-dropdown-menu label="Tipo" error-message="Tipo inválido">
         <paper-listbox slot="dropdown-content" selected="{{add.type}}" name="type" attr-for-selected="value">
-          <paper-item value="cleaning">Limpieza</paper-item>
-          <paper-item value="moving">Mudanza</paper-item>
+          <paper-item value="moving">Mudanza y transporte</paper-item>
+          <paper-item value="realstate">Inmobiliarias</paper-item>
+          <paper-item value="touring">Turismo</paper-item>
+          <paper-item value="airlines">Aerolineas</paper-item>
+          <paper-item value="banks">Bancos</paper-item>
+          <paper-item value="legal">Servicios legales</paper-item>
+          <paper-item value="photo ">Fotografía</paper-item>
+          <paper-item value="fixing">Reparaciones</paper-item>
+          <paper-item value="renewing">Remodelaciones</paper-item>
+          <paper-item value="appraisal">Avalúos</paper-item>
+          <paper-item value="notary">Notarías</paper-item>
+          <paper-item value="condo-admin">Administración de condominios</paper-item>
+          <paper-item value="rent-admin">Administración de arriendos</paper-item>
         </paper-listbox>
       </paper-dropdown-menu>
       <paper-textarea name="description" label="Descripción" rows="3" required char-counter value="{{add.description}}" error-message="Descripción inválida" maxlength="500"></paper-textarea>
