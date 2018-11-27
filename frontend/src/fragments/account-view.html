@@ -133,6 +133,11 @@
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
+    <app-route
+        route="{{route}}"
+        pattern="/user/:id"
+        data="{{userRouteData}}"
+        active="{{userRouteActive}}"></app-route>
     <app-route route="{{route}}" pattern="/account/payments" on-active-changed="loadPayments"></app-route>
     <app-route route="{{route}}" pattern="/account/props/:id" on-active-changed="loadPropsStats" data="{{propData}}" tail="{{tail}}"></app-route>
     <app-drawer-layout>
@@ -288,7 +293,9 @@
                             </template>
                             <prism-td title="Nombre">[[item.title]]</prism-td>
                             <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
-                            <prism-td title="Usuario"><a id="[[item.owner.id]]" href="/account/user/[[item.owner.id]]" on-click="loadUser">[[item.owner.email]]</a></prism-td>
+                            <prism-td title="Usuario">
+                              <a id="[[item.owner.id]]" href="/account/user/[[item.owner.id]]" on-click="loadUser">[[item.owner.email]]</a>
+                            </prism-td>
                             <prism-td title="Ciudad">[[item.city]]</prism-td>
                             <prism-td title="Accion">
                               <template is="dom-if" if="[[!item.shared]]" restamp="true">
@@ -883,12 +890,14 @@
           requestsLoading:{
             type:Boolean,
             value:false
-          }
+          },
+          userRouteData:Object,
+          userRouteActive: Boolean
         }
       }
       static get observers() {
         return [
-          '_routePageChanged(routeData.page)',
+          '_routePageChanged(routeData.page)','_selectedUserChange(userRouteData.id)',
         ];
       }
       searchStats(){
@@ -950,6 +959,11 @@
             this.loadEmailStats();
           }
         }
+      }
+      _selectedUserChange(id){
+        if(!id) return ;
+        if(!this.userRouteActive) return;
+        this.dispatch('loadSingleUser', id);
       }
       setDeleteProp(e){
         this.set('propToDelete',e.target.id);
