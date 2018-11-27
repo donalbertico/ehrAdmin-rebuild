@@ -29,6 +29,7 @@
     "sails-hook-orm": "^2.0.0-16",
     "sails-mongo": "^1.0.0-9",
     "soap": "^0.23.0",
+    "standard": "^12.0.1",
     "ursa": "^0.9.4",
     "webcomponentsjs": "^1.0.2",
     "xml2js": "^0.4.19"
