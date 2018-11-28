@@ -162,7 +162,7 @@
             </div>
           </section>
           <section name="users">
-            <users-section users="[[users]]" on-search="searchUsers" on-donate="donate" on-benefit="benefit" on-delete-user="deleteUser" on-verify-email="verifyEmail"></users-section>
+            <users-section users="[[users]]" on-search="searchUsers" on-donate="donate" on-benefit="applyBenefit" on-delete-user="deleteUser" on-verify-email="verifyEmail"></users-section>
           </section>
           <section name="payments">
             <div class="vertical dark-primary">
@@ -1012,7 +1012,7 @@
           return null;
         }
       }
-      benefit(e){
+      applyBenefit(e){
         let d = e.detail;
         this.$.wait.open();
         this.dispatch('promoteToPlus',d.id,d.code,(err)=>{
