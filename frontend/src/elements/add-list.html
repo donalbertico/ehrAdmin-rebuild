@@ -14,20 +14,26 @@
         <prism-thead>
             <prism-tr>
                 <prism-th>Título</prism-th>
-                <prism-th>Email</prism-th>
-                <prism-th>Lugar</prism-th>
                 <prism-th>Publicado</prism-th>
+                <prism-th>Visitas</prism-th>
             </prism-tr>
         </prism-thead>
         <prism-tbody>
           <template is="dom-repeat" items="[[adds]]" index-as="index">
             <prism-tr on-click="addClick">
                 <prism-td title="Nombre">[[item.title]]</prism-td>
-                <prism-td title="Email">[[item.contactEmail]]</prism-td>
-                <prism-td title="Lugar">[[item.place]]</prism-td>
                 <prism-td title="Publicado">
                   <span hidden="[[item.published]]">Sin Publicar</span>
                   <span hidden="[[!item.published]]">Publicado</span>
+                </prism-td>
+                <prism-td title="Visitas">
+                  <div hidden="[[!item.stats]]">
+                    <span>Este mes: [[item.stats.thisMonth]]</span>
+                    <span>El mes pasado: [[item.stats.lastMonth]]</span>
+                  </div>
+                  <div hidden="[[item.stats]]">
+                    <span>Seleciona el anuncio.</span>
+                  </div>
                 </prism-td>
             </prism-tr>
           </template>

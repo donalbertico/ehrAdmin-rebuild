@@ -134,6 +134,27 @@
               });
             }
           },
+          getAddStats: (id) => {
+            return (dispatch, getState) => {
+              let request = new Request('/add/count-views',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify({id:id}),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((stats)=>{
+                  dispatch({type:'SET_ADD_STATS',stats:stats, id: id});
+                });
+                return true;
+              })
+              .catch((e)=>{
+                return false;
+              });
+            }
+          },
           selectAdd:(id)=>{
             return {type:'SELECT_ADD',id:id};
           }
