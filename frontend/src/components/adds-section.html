@@ -163,9 +163,9 @@
         this.dispatch('selectAdd',id);
         this.$.deleteDialog.open();
       }
-      deleteAdd(){
+      deleteAdd(e){
         this.loading=true;
-        this.dispatch('deleteAdd',id,(e)=>{
+        this.dispatch('deleteAdd',this.selectedAdd.id,(e)=>{
           this.loading=false;
           if(e)return showMessage('Hubo un error al eliminar el anuncio');
           showMessage('Anuncio eliminado');
