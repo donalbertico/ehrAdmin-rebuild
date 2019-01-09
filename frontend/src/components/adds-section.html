@@ -183,9 +183,9 @@
       }
       selectAdd(e){
         this.dispatch('selectAdd',e.detail.id);
-        if(!this.dispatch('getAddStats', e.detail.id)){
-          showMessage('Hubo un error obteninendo las estadísiticas');
-        }
+        this.dispatch('getAddStats', e.detail.id, (error)=>{
+          if(error) return showMessage('Hubo un error obteninendo las estadísiticas');
+        });
       }
     }
     customElements.define(AddsSection.is, AddsSection);

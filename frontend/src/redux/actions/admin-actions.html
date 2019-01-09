@@ -134,7 +134,7 @@
               });
             }
           },
-          getAddStats: (id) => {
+          getAddStats: (id, cb) => {
             return (dispatch, getState) => {
               let request = new Request('/add/count-views',{
                 method:'POST',
@@ -147,11 +147,11 @@
               .then((response)=>{
                 response.json().then((stats)=>{
                   dispatch({type:'SET_ADD_STATS',stats:stats, id: id});
+                  cb(null);
                 });
-                return true;
               })
               .catch((e)=>{
-                return false;
+                cb(e)
               });
             }
           },

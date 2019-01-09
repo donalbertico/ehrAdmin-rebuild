@@ -22,6 +22,7 @@
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/search-actions.html">
+<link rel="import" href="../redux/actions/admin-actions.html">
 
 <link rel="import" href="../components/adds-section.html">
 <link rel="import" href="../components/users-section.html">
@@ -694,7 +695,7 @@
     </app-drawer-layout>
   </template>
   <script>
-    class AccountView extends SearchMixin(GlobalStoreMixin(Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior],Polymer.Element))) {
+    class AccountView extends AdminMixin(SearchMixin(GlobalStoreMixin(Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior],Polymer.Element)))) {
       static get is() {return 'account-view';}
       static get properties(){
         return {
@@ -957,6 +958,9 @@
           }
           if(page ==='emails'){
             this.loadEmailStats();
+          }
+          if(page === 'adds'){
+            this.dispatch('loadAdds',()=>{});
           }
         }
       }
