@@ -33,7 +33,7 @@
     <google-maps-api api-key="AIzaSyBlD1kUDWG_VEeipSylrAMucm-xhX-cDbQ" version="3.exp" on-api-load="_googleApiLoaded"></google-maps-api>
     <div class="vertical p1">
       <paper-toggle-button checked="{{add.published}}">Publicado</paper-toggle-button>
-      <paper-input name="title" label="Título" pattern="^[a-zA-Z á-úÁ-Ú]{5,50}$" required value="{{add.title}}" error-message="Título inválido"></paper-input>
+      <paper-input name="title" label="Título" pattern="^[a-zA-Z á-úÁ-Ú&/0-9]{5,50}$" required value="{{add.title}}" error-message="Título inválido"></paper-input>
       <paper-dropdown-menu label="Tipo" error-message="Tipo inválido">
         <paper-listbox slot="dropdown-content" selected="{{add.type}}" name="type" attr-for-selected="value">
           <paper-item value="moving">Mudanza y transporte</paper-item>
@@ -86,6 +86,7 @@
                 url:'',
                 photoPublicId:'',
                 published:false,
+                place:'',
                 location:{
                   latitude:null,
                   longitude:null
@@ -103,6 +104,9 @@
             value:()=>[]
           }
         };
+      }
+      static get observers() {
+        return ['updatePlace(add.place)']
       }
       ready(){
         super.ready();
@@ -143,6 +147,9 @@
             }
           });
         },100);
+      }
+      updatePlace(place) {
+        this.$.placeInput.inputElement.inputElement.value=place;
       }
       _computePhotoUrl(id){
         if(!id)return '';
