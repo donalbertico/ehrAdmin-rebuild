@@ -149,7 +149,9 @@
         },100);
       }
       updatePlace(place) {
-        this.$.placeInput.inputElement.inputElement.value=place;
+        if(this.$.placeInput.inputElement.inputElement){
+          this.$.placeInput.inputElement.inputElement.value=place;
+        }
       }
       _computePhotoUrl(id){
         if(!id)return '';

@@ -8,6 +8,12 @@
       :host{
         display: block;
       }
+      .table-actions{
+        min-width: 240px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
     </style>
     <div class="container">
       <prism-table>
@@ -15,25 +21,31 @@
             <prism-tr>
                 <prism-th>Título</prism-th>
                 <prism-th>Publicado</prism-th>
-                <prism-th>Visitas</prism-th>
+                <prism-th>Creado el</prism-th>
+                <prism-th>Acciones</prism-th>
             </prism-tr>
         </prism-thead>
         <prism-tbody>
           <template is="dom-repeat" items="[[adds]]" index-as="index">
-            <prism-tr on-click="addClick">
+            <prism-tr>
                 <prism-td title="Nombre">[[item.title]]</prism-td>
                 <prism-td title="Publicado">
                   <span hidden="[[item.published]]">Sin Publicar</span>
                   <span hidden="[[!item.published]]">Publicado</span>
                 </prism-td>
-                <prism-td title="Visitas">
+                <prism-td title="Fecha de creación">
+                  <span>[[parseCreatedAt(item.createdAt)]]</span>
+                </prism-td>
+                <prism-td title="Acciones">              
+                  <div class="horizontal justified table-actions">
+                    <a href="javascript:;" on-click="checkAdd">Detalles</a>
+                    <a href="javascript:;" on-click="checkViews" hidden="[[item.stats]]" >Ver visitas.</a>
+                    <a href="javascript:;" on-click="checkContacts">Ver contactos</a>
+                  </div>
                   <div hidden="[[!item.stats]]">
-                    <span>Este mes: [[item.stats.thisMonth]]</span>
-                    <span>El mes pasado: [[item.stats.lastMonth]]</span>
-                  </div>
-                  <div hidden="[[item.stats]]">
-                    <span>Seleciona el anuncio.</span>
-                  </div>
+                      <span>Este mes: [[item.stats.thisMonth]]</span>
+                      <span>El mes pasado: [[item.stats.lastMonth]]</span>
+                    </div>
                 </prism-td>
             </prism-tr>
           </template>
@@ -52,10 +64,21 @@
           }
         };
       }
-      addClick(e){
+      checkViews(e){
         var id = e.model.__data.item.id;
-        this.dispatchEvent(new CustomEvent('add-click',{bubbles:false,detail:{id:id}}));
+        this.dispatchEvent(new CustomEvent('add-check-views',{bubbles:false,detail:{id:id}}));
       }
+      checkContacts(e){
+        var id = e.model.__data.item.id;
+        this.dispatchEvent(new CustomEvent('add-check-contacts',{bubbles:false,detail:{id:id}}));
+      }
+      checkAdd(e){
+        var id = e.model.__data.item.id;
+        this.dispatchEvent(new CustomEvent('add-check',{bubbles:false,detail:{id:id}}));
+      }
+      parseCreatedAt(date){
+        return (new Date(date)).toFormat('DD-MM-YYYY')
+      } 
     }
     customElements.define(AddList.is, AddList);
   </script>

@@ -155,6 +155,27 @@
               });
             }
           },
+          getAddContacts: (query, cb) => {
+            return (dispatch, getState) => {
+              let request = new Request('/add/search-contacts',{
+                method:'POST',
+                headers: sh,
+                body:JSON.stringify(query),
+                credentials: 'include'
+              });
+              window.fetch(request)
+              .then(handleReqError)
+              .then((response)=>{
+                response.json().then((contacts)=>{
+                  dispatch({type:'SET_ADD_CONTACTS', contacts: contacts, id: query.id});
+                  cb(null);
+                });
+              })
+              .catch((e)=>{
+                cb(e)
+              });
+            }
+          },
           selectAdd:(id)=>{
             return {type:'SELECT_ADD',id:id};
           }

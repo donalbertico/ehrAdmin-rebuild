@@ -1,11 +1,13 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../redux/global-store.html">
 <link rel="import" href="../redux/actions/admin-actions.html">
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="../elements/add-form.html">
 <link rel="import" href="../elements/add-list.html">
+<link rel="import" href="../elements/add-view.html">
 <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript" async></script>
 
 <dom-module id="adds-section">
@@ -47,14 +49,21 @@
         <paper-button raised class="self-center accent" on-tap="refreshAdds">Recargar</paper-button>
       </div>
     </div>
-    <div class="horizontal p1">
-      <div class="list">
-        <add-list class="flex" adds="[[adds]]" on-add-click="selectAdd"></add-list>
-      </div>
-      <div class="form">
-        <paper-button class="accent self-end" on-tap="resetAdd">Nuevo Anuncio</paper-button>
-        <add-form add="[[selectedAdd]]" class="flex" on-upload-click="_uploadClick" on-save-click="_saveClick" on-delete-click="_deleteClick" id="form"></add-form>
-      </div>
+    <div class="horizontal">
+      <iron-pages selected="[[page]]" attr-for-selected="name" class="w-100">
+        <section name="main" class="horizontal p1">
+          <div class="list">
+            <add-list class="flex" adds="[[adds]]" on-add-check-views="getAddStats" on-add-check-contacts="goToAddContacts" on-add-check="selectAdd"></add-list>
+          </div>
+          <div class="form">
+            <paper-button class="accent self-end" on-tap="resetAdd">Nuevo Anuncio</paper-button>
+            <add-form add="[[selectedAdd]]" class="flex" on-upload-click="_uploadClick" on-save-click="_saveClick" on-delete-click="_deleteClick" id="form"></add-form>
+          </div>
+        </section>
+        <section name="details">
+          <add-view add="[[selectedAdd]]" on-back-to-adds="goToMain" on-search-add-contacts="searchContacts"></add-view>
+        </section>
+      </iron-pages>
     </div>
     <paper-dialog id="deleteDialog">
       <h2>Eliminar Anuncio</h2>
@@ -91,6 +100,10 @@
           adds:{
             type:Array,
             statePath:'adds.records'
+          },
+          page: {
+            type: String,
+            value: 'main'
           },
           selectedAdd:{
             type:Object,
@@ -183,8 +196,29 @@
       }
       selectAdd(e){
         this.dispatch('selectAdd',e.detail.id);
+      }
+      getAddStats(e){
+        this.dispatch('selectAdd',e.detail.id);
         this.dispatch('getAddStats', e.detail.id, (error)=>{
           if(error) return showMessage('Hubo un error obteninendo las estadísiticas');
+        });
+      }
+      goToAddContacts(e){
+        this.dispatch('selectAdd',e.detail.id);
+        this.page = 'details';
+      }
+      goToMain(){
+        this.page = 'main';
+      }
+      searchContacts(e){
+        this.loading = true;
+        const query = e.detail.query;
+        const id = e.detail.id;
+        this.dispatch('getAddContacts',{...query,id: id}, (err)=> {
+          this.loading = false;
+          if(err) {
+            return showMessage('Hubo un error obteniendo los contactos');
+          }
         });
       }
     }

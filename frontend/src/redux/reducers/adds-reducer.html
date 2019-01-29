@@ -39,6 +39,17 @@
         },[]);
         return Object.assign({},state,{records:newRecords});
         break;
+      case 'SET_ADD_CONTACTS': 
+        var newRecords = state.records.reduce((res,add)=>{
+          if(add.id===action.id){
+            res.push({ ...add, contacts: action.contacts});
+          }else{
+            res.push(add);
+          }
+          return res;
+        },[]);
+        return Object.assign({},state,{records:newRecords});
+        break;
       case 'SELECT_ADD':
         return Object.assign({},state,{selectedAdd:action.id});
         break;

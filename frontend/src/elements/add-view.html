@@ -1,0 +1,104 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
+<dom-module id="add-view">
+  <template>
+    <style include="shared-styles">
+      .top-nav{
+        height: 80px;
+        display: flex;
+        flex-direction: row;
+        padding: 0px 1rem;
+      }
+      .contacts{
+        margin: 1rem;
+        background-color: #fff;
+      }
+    </style>
+    <div class="main">
+      <div class="top-nav white-primary">
+        <paper-icon-button icon="arrow-back" on-click="getBack" class="self-center"></paper-icon-button>
+        <span class="self-center flex font-headline">[[add.title]]</span>
+        <vaadin-date-picker value="{{query.from}}" label="Desde"></vaadin-date-picker>
+        <vaadin-date-picker value="{{query.to}}" label="Hasta"></vaadin-date-picker>
+        <paper-button raised class="accent self-center" on-tap="search">Buscar</paper-button>
+      </div>
+      <div class="contacts">
+        <prism-table>
+          <prism-thead>
+            <prism-tr>
+              <prism-th>Nombre</prism-th>
+              <prism-th>Teléfono</prism-th>
+              <prism-th>Enviado el</prism-th>
+            </prism-tr>
+          </prism-thead>
+          <prism-tbody>
+            <template is="dom-repeat" items="[[add.contacts]]" index-as="index">
+              <prism-tr>
+                <prism-td title="Nombre">[[item.name]]</prism-td>
+                <prism-td title="Teléfono">[[item.phone]]</prism-td>
+                <prism-td title="Enviado el">[[parseCreatedAt(item.createdAt)]]</prism-td>
+              </prism-tr>
+            </template>
+          </prism-tbody>
+        </prism-table>
+        <div hidden=[[add.contacts.0]] class="horizontal center">
+          <span class="self-center font-headline s-text">
+            Nadie se ha contactado por este anuncio.
+          </span>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    const emptyQuery = {
+      from: undefined,
+      to: undefined,
+    };
+    class AddView extends Polymer.Element {
+      static get is() {
+        return 'add-view';
+      }
+      static get properties(){
+        return {
+          query: {
+            type: Object,
+            value: () => ({...emptyQuery })
+          },
+          add: {
+            type: Object,
+            observer: '_watchAdd'
+          },
+        }
+      }
+      _watchAdd(add, lastAdd){
+        if(!lastAdd){
+          if(add.id){
+            return this.search();
+          }
+          return ;
+        }
+        if(add.id !== lastAdd.id && add.id){
+          this.resetQuery();
+          this.search();
+        }
+      }
+      resetQuery(){
+        this.set('query', { ...emptyQuery });
+      }
+      search() {
+        console.log(this.query, this.add)
+        this.dispatchEvent(new CustomEvent('search-add-contacts',{bubbles:false,detail:{ query: this.query, id: this.add.id }}));
+      }
+      getBack() {
+        this.dispatchEvent(new CustomEvent('back-to-adds',{bubbles:false}));
+      }
+      parseCreatedAt(date){
+        return (new Date(date)).toFormat('DD-MM-YYYY')
+      } 
+    }
+    customElements.define(AddView.is, AddView);
+  </script>
+</dom-module>
