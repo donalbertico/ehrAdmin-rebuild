@@ -11,6 +11,10 @@
         display: flex;
         flex-direction: row;
         padding: 0px 1rem;
+        background-color: var(--primary-color);
+      }
+      .top-nav span, .top-nav paper-icon-button {
+        color: var(--white-primary-text-color);
       }
       .contacts{
         margin: 1rem;
@@ -18,11 +22,11 @@
       }
     </style>
     <div class="main">
-      <div class="top-nav white-primary">
+      <div class="top-nav">
         <paper-icon-button icon="arrow-back" on-click="getBack" class="self-center"></paper-icon-button>
         <span class="self-center flex font-headline">[[add.title]]</span>
-        <vaadin-date-picker value="{{query.from}}" label="Desde"></vaadin-date-picker>
-        <vaadin-date-picker value="{{query.to}}" label="Hasta"></vaadin-date-picker>
+        <vaadin-date-picker value="{{query.from}}" label="Desde" class="m1-x"></vaadin-date-picker>
+        <vaadin-date-picker value="{{query.to}}" label="Hasta" class="m1-x"></vaadin-date-picker>
         <paper-button raised class="accent self-center" on-tap="search">Buscar</paper-button>
       </div>
       <div class="contacts">
@@ -45,8 +49,8 @@
           </prism-tbody>
         </prism-table>
         <div hidden=[[add.contacts.0]] class="horizontal center">
-          <span class="self-center font-headline s-text">
-            Nadie se ha contactado por este anuncio.
+          <span class="self-center font-subhead s-text m1-b">
+            No se han encontrado resultados.
           </span>
         </div>
       </div>
