@@ -56,6 +56,7 @@ module.exports = {
           id: s.id,
           name: s.data.name,
           phone: s.data.phone,
+          email: s.data.email,
           createdAt: s.createdAt
         }
       })
