@@ -13,9 +13,8 @@
                 method:'POST',
                 headers: sh,
                 body:JSON.stringify({
-                  username:username,
-                  password:password,
-                  _csrf:sh.get('X-CSRF-Token')
+                  user:id,
+                  code:code
                 }),
                 credentials: 'include'
               });
