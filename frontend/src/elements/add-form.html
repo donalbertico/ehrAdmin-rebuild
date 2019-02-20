@@ -148,7 +148,7 @@
           });
         },100);
       }
-      updatePlace(place) {
+      updatePlace(place = '') {
         if(this.$.placeInput.inputElement.inputElement){
           this.$.placeInput.inputElement.inputElement.value=place;
         }
