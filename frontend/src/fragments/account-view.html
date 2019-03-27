@@ -163,7 +163,7 @@
             </div>
           </section>
           <section name="users">
-            <users-section users="[[users]]" on-search="searchUsers" on-donate="donate" on-benefit="applyBenefit" on-delete-user="deleteUser" on-verify-email="verifyEmail"></users-section>
+            <users-section total="[[totalUsers]]" users="[[users]]" on-search="searchUsers" on-donate="donate" on-benefit="applyBenefit" on-delete-user="deleteUser" on-verify-email="verifyEmail"></users-section>
           </section>
           <section name="payments">
             <div class="vertical dark-primary">
@@ -492,6 +492,9 @@
                     <template is="dom-if" if="[[selectedUser.isPlus]]" restamp="true">
                       <span>Cliente Plus : [[localize('date','value',selectedUser.plusUntil)]]</span>
                     </template>
+                    <template is="dom-if" if="[[selectedUser.isPlusAnnouncer]]" restamp="true">
+                      <span>Anunciante Plus : [[localize('date','value',selectedUser.plusAnnouncerUntil)]]</span>
+                    </template>
                     <span>Tokens : [[selectedUser.promoteTokens]]</span>
                   </div>
                   <iron-image src="[[photoUrl]]" preload sizing="cover" class="photo self-end" placeholder="/images/user_no_photo.jpg"></iron-image>
@@ -513,8 +516,8 @@
                       [[item]]
                     </template>
                     <span class="font-title">Información</span>
-                    <span>id : [[selectedUser.extraInfo.id]]</span>
-                    <span>nacimiento : [[selectedUser.extraInfo.birthDate]]</span>
+                    <span>Id : [[selectedUser.extraInfo.id]]</span>
+                    <span>Fecha de Nacimiento : [[selectedUser.extraInfo.birthDate]]</span>
                     <span>[[selectedUser.extraInfo.location.address]] - [[selectedUser.extraInfo.location.city]]</span>
                   </div>
                 </paper-card>
@@ -756,6 +759,10 @@
           users:{
             type:Array,
             statePath:'search.users.entities'
+          },
+          totalUsers: {
+            tyep: Number,
+            statePath: 'search.users.total',
           },
           props:{
             type:Array,

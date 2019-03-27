@@ -32,6 +32,7 @@ module.exports = {
     User.findOne(inputs.id).populate('properties').populate('enterprise').populate('payments').exec((err,found)=>{
       if(err) exits.error(err);
       found.isPlus = User.isPlus(found);
+      found.isPlusAnnouncer = User.isPlusAnnouncer(found);
       if(found.collaborateWith){
         Enterprise.findOne(found.collaborateWith,(err,enterprise)=>{
           if(err) exits.error(err);

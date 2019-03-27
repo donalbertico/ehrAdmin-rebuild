@@ -40,8 +40,8 @@
               .then(handleReqError)
               .then((response)=>{
                 response.json().then((json)=>{
-                  dispatch({type:'LOAD_USERS',users:json});
-                  callback(null,json);
+                  dispatch({type:'LOAD_USERS',users:json.users, total: json.total});
+                  callback(null,json.users);
                 });
               })
               .catch((e)=>{

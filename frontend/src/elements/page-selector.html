@@ -1,0 +1,129 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="page-selector">
+  <template>
+    <style include="shared-styles">
+      .wrapper{
+        @apply --layout-horizontal;
+      }
+      .container{
+        @apply --layout-horizontal;
+      }
+      .first-page{
+        margin: 0 8px;
+        text-align: center;
+        cursor: pointer;
+        color: var(--accent-color);
+      }
+      .page{
+        margin: 0 8px;
+        padding-top: 1px;
+        border-radius: 50%;
+        width: 1.5rem;
+        height: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        color: var(--accent-color);
+      }
+      .page.selected{
+        background-color: var(--secondary-color);
+        color: var(--secondary-text-color);
+      }
+    </style>
+    <div class="wrapper">
+      <span class="first-page" on-tap="firstPage" hidden="[[showFirstPage]]">Primera  ...</span>
+      <div class="container" id="container">
+
+      </div>
+      <iron-icon icon="chevron-right" on-tap="nextPage" hidden="[[lastPage]]" class="font-accent"></iron-icon>
+    </div>
+  </template>
+  <script>
+    class PageSelector extends Polymer.Element{
+      static get is(){
+        return 'page-selector'
+      }
+      static get properties(){
+        return{
+          page:{
+            type:Number,
+            notify:true
+          },
+          total:{
+            type:Number,
+            notify:true
+          },
+          limit:{
+            type:Number
+          },
+          showFirstPage:{
+            type:Boolean,
+            computed:'_computShowFirstPage(page)'
+          },
+          lastPage:{
+            type:Boolean,
+            computed:'_isLastPage(page,total,limit)'
+          }
+
+        }
+      }
+      static get observers(){
+        return ['_insertPages(page,total,limit)'];
+      }
+      _computShowFirstPage(page){
+        return page-6<0;
+      }
+      _isLastPage(page,total,limit){
+        if(!page||!total||!limit){
+          return;
+        }
+        return Math.ceil(total/limit)==page;
+      }
+      _insertPages(page,total,limit){
+        //check if the values are not undefined
+        if(!page||!total||!limit){
+          return;
+        }
+        //first delete all pages
+        while(this.$.container.firstChild){
+          this.$.container.removeChild(this.$.container.firstChild);
+        }
+        var totalPages = Math.ceil(total/limit);
+        if(totalPages==0){
+          return;
+        }
+        var startAt = page-3 <= 0 ? 1 : page-3 ;
+        var finishAt = page+3 > totalPages ? totalPages : page+3;
+        for(var i=startAt;i<=finishAt;i++){
+          var sp = document.createElement('span');
+          sp.className='page';
+          if(i==page){
+            sp.className='page selected'
+          }
+          sp.innerHTML=''+i;
+          sp.setAttribute('page',i);
+          sp.onclick=this.selectPage.bind(this);
+          this.$.container.appendChild(sp);
+        }
+      }
+      selectPage(e){
+        var element = e.path[0];
+        this.set('page',parseInt(element.getAttribute('page')))
+        this.dispatchEvent(new CustomEvent('page-changed',{bubbles:false}));
+      }
+      firstPage(){
+        this.set('page',1);
+        this.dispatchEvent(new CustomEvent('page-changed',{},{bubbles:false}));
+      }
+      nextPage(){
+        console.log('nextPage', e);
+        this.set('page',this.page+1);
+        this.dispatchEvent(new CustomEvent('page-changed',{},{bubbles:false}));
+      }
+    }
+    window.customElements.define(PageSelector.is,PageSelector);
+  </script>
+</dom-module>

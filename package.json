@@ -5,6 +5,7 @@
   "description": "Web app for administrators at EHR",
   "keywords": [],
   "dependencies": {
+    "@google/maps": "^0.5.5",
     "async": "2.0.1",
     "aws-sdk": "^2.178.0",
     "bcryptjs": "^2.4.3",
@@ -28,6 +29,7 @@
     "sails-hook-fixtures": "^1.0.0-beta",
     "sails-hook-orm": "^2.0.0-16",
     "sails-mongo": "^1.0.0-9",
+    "shortid": "^2.2.14",
     "soap": "^0.23.0",
     "standard": "^12.0.1",
     "ursa": "^0.9.4",

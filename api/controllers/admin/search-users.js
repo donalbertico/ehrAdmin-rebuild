@@ -1,91 +1,117 @@
-function parseQuery(inputs){
-  var query={};
-  if(inputs.email){
-    query.email=inputs.email;
+function parseQuery (inputs) {
+  var query = {}
+  if (inputs.email) {
+    query.email = { contains: inputs.email }
   }
-  if(inputs.firstName){
-    query.firstName=inputs.firstName;
+  if (inputs.firstName) {
+    query.firstName = { contains: inputs.firstName }
   }
-  if(inputs.lastName){
-    query.lastName=inputs.lastName;
+  if (inputs.lastName) {
+    query.lastName = { contains: inputs.lastName }
   }
   if (inputs.from && inputs.to) {
-    query.createdAt = {'>' : inputs.from, '<' : inputs.to};
+    query.createdAt = { '>': inputs.from, '<': inputs.to }
   }
-  if(inputs.type == 'n'){
-    query.collaborateWith = null;
+  if (inputs.plusState) {
+    switch (inputs.plusState) {
+      case 'plususer':
+        query.plusUntil = { '>': (new Date()).getTime() }
+        break
+      case 'plusannouncer':
+        query.plusAnnouncerUntil = { '>': (new Date()).getTime() }
+        break
+      case 'tokens':
+        query.promoteTokens = { '>': 0 }
+        break
+    }
   }
-  if(Object.keys(query).length<1){
-    return null;
+  if (inputs.type === 'n') {
+    query.collaborateWith = null
   }
-  return query;
+  if (Object.keys(query).length < 1) {
+    return null
+  }
+  return query
 }
 
 module.exports = {
 
-
   friendlyName: 'Search users',
-
 
   description: 'Search users that have filelds like the inputs',
 
-
   inputs: {
-    email:{
-      type:'string'
+    email: {
+      type: 'string'
     },
-    firstName:{
-      type:'string'
+    firstName: {
+      type: 'string'
     },
-    lastName:{
-      type:'string'
+    lastName: {
+      type: 'string'
     },
-    from :{
-      type :'number'
+    from: {
+      type: 'number'
     },
-    to :{
-      type :'number'
+    to: {
+      type: 'number'
     },
-    type:{
-      type:'string'
+    type: {
+      type: 'string'
+    },
+    plusState: {
+      type: 'string'
+    },
+    page: {
+      type: 'number'
+    },
+    limit: {
+      type: 'number'
     }
   },
 
-
   exits: {
-    error:{
-      statusCode:500
+    error: {
+      statusCode: 500
     },
-    success:{
-      statusCode:200
+    success: {
+      statusCode: 200
     },
-    conflict:{
-      statusCode:409
+    conflict: {
+      statusCode: 409
     }
   },
   fn: function (inputs, exits) {
-    var query=parseQuery(inputs);
-    if(!query){
-      query={};
+    var query = parseQuery(inputs)
+    if (!query) {
+      query = {}
     }
-
-    if(inputs.type == 'h' || inputs.type =='r' || inputs.type =='e'){
-      var users = [];
-      Enterprise.find({type : inputs.type}).populate('collaborators').populate('deputy').exec((err,enterprises)=>{
-        if(err)return exits.error(err);
-        enterprises.forEach((item)=>{
-          users.push(item.deputy);
-          item.collaborators.forEach((collaborator)=>{
-            users.push(collaborator);
-          });
-        });
-        exits.success(users);
-      });
-    }else{
-      User.find(query).populate('properties').populate('passports').sort('createdAt DESC').exec((err,users)=>{
-        if(err)return exits.error(err);
-        exits.success(users);
-      });
+    const limit = inputs.limit || 20
+    const skip = (inputs.page - 1) * limit
+    if (inputs.type == 'h' || inputs.type == 'r' || inputs.type == 'e') {
+      const users = []
+      Enterprise.count({ type: inputs.type }).exec((err, userCount) => {
+        if (err) return exits.error(err)
+        Enterprise.find({ type: inputs.type }).limit(limit).skip(skip).populate('collaborators').populate('deputy').exec((err, enterprises) => {
+          if (err) return exits.error(err)
+          enterprises.forEach((item) => {
+            users.push(item.deputy)
+            item.collaborators.forEach((collaborator) => {
+              users.push(collaborator)
+              userCount += 1
+            })
+          })
+          exits.success({ users, total: userCount })
+        })
+      })
+    } else {
+      User.count(query).exec((err, userCount) => {
+        if (err) return exits.error(err)
+        User.find(query).limit(limit).skip(skip).populate('properties').populate('passports').sort('createdAt DESC').exec((err, users) => {
+          if (err) return exits.error(err)
+          exits.success({ users, total: userCount })
+        })
+      })
     }
   }
-};
+}

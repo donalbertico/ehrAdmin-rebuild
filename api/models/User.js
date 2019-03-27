@@ -155,6 +155,9 @@ module.exports = {
   isPlus:function(user){
     return user.plusUntil==null ? false :  Date.compare(user.plusUntil, Date.today()) >= 0;
   },
+  isPlusAnnouncer:function(user){
+    return user.plusAnnouncerUntil==null ? false :  Date.compare(new Date(user.plusAnnouncerUntil), Date.today()) >= 0;
+  },
   getContactInfo:function(user){
     var info={};
     if(user.contactInfo.used){

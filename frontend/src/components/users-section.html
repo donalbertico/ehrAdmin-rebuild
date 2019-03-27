@@ -8,6 +8,8 @@
 <link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 
+<link rel="import" href="../elements/page-selector.html">
+
 
 <link rel="import" href="../shared-styles.html">
 
@@ -24,8 +26,11 @@
       div.benefits{
         width: 25rem;
       }
+      div.no-shrink {
+        flex-shrink: 0;
+      }
     </style>
-    <div class="vertical">
+    <div class="vertical no-shrink">
       <div class="p1 dark-primary">
         <span class="font-display1">Usuarios</span>
       </div>
@@ -42,6 +47,14 @@
               <paper-item users="n">Normal</paper-item>
               <paper-item users="h">Hotel</paper-item>
               <paper-item users="e">Empresa de bienes Raices</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu class="m1-r" label="Estado Plus">
+            <paper-listbox name="plusState" slot="dropdown-content" attr-for-selected="value" selected="{{query.plusState}}">
+              <paper-item value="a">Todos</paper-item>
+              <paper-item value="plususer">Usuarios Plus</paper-item>
+              <paper-item value="plusannouncer">Anuncianes Plus</paper-item>
+              <paper-item value="tokens">Tiene Tokens</paper-item>
             </paper-listbox>
           </paper-dropdown-menu>
         </div>
@@ -61,37 +74,40 @@
           <paper-button raised class="accent self-center" on-tap="sortByProps">Filtrar</paper-button>
         </div>
       </div>
+      <div class="horizontal">
+        <span class="m1 font-title flex">[[total]] Resultados</span>
+        <page-selector page="{{query.page}}" limit="{{query.limit}}" total="[[total]]"></page-selector>
+      </div>
+      <prism-table>
+        <prism-thead>
+            <prism-tr>
+                <prism-th>Nombre</prism-th>
+                <prism-th>Email</prism-th>
+                <prism-th>Fecha</prism-th>
+                <prism-th>Propiedades</prism-th>
+                <prism-th>log in</prism-th>
+                <prism-th>Acciones</prism-th>
+            </prism-tr>
+        </prism-thead>
+        <prism-tbody>
+          <template is="dom-repeat" items="[[users]]" index-as="index">
+            <prism-tr>
+                <prism-td title="Nombre"><a href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
+                <prism-td title="Email">[[item.email]]</prism-td>
+                <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                <prism-td title="Propiedades">[[item.properties.length]]</prism-td>
+                <prism-td title="login">[[item.passports.0.protocol]]</prism-td>
+                <prism-td title="Acciones">
+                  <paper-button raised on-tap="openDonate">Donar</paper-button>
+                  <paper-button raised on-tap="openBenefit">Beneficiar</paper-button>
+                  <paper-button raised on-tap="openVerifyEmail" hidden$="[[item.mailVerified]]">Verificar correo</paper-button>
+                  <paper-button raised on-tap="openDeleteUser">Eliminar</paper-button>
+                </prism-td>
+            </prism-tr>
+          </template>
+        </prism-tbody>
+      </prism-table>
     </div>
-    <span class="m1 font-title">[[users.length]] Resultados</span>
-    <prism-table>
-      <prism-thead>
-          <prism-tr>
-              <prism-th>Nombre</prism-th>
-              <prism-th>Email</prism-th>
-              <prism-th>Fecha</prism-th>
-              <prism-th>Propiedades</prism-th>
-              <prism-th>log in</prism-th>
-              <prism-th>Acciones</prism-th>
-          </prism-tr>
-      </prism-thead>
-      <prism-tbody>
-        <template is="dom-repeat" items="[[users]]" index-as="index">
-          <prism-tr>
-              <prism-td title="Nombre"><a href="/account/user/[[item.id]]" on-click="loadUser">[[item.firstName]] [[item.lastName]]</a></prism-td>
-              <prism-td title="Email">[[item.email]]</prism-td>
-              <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
-              <prism-td title="Propiedades">[[item.properties.length]]</prism-td>
-              <prism-td title="login">[[item.passports.0.protocol]]</prism-td>
-              <prism-td title="Acciones">
-                <paper-button raised on-tap="openDonate">Donar</paper-button>
-                <paper-button raised on-tap="openBenefit">Beneficiar</paper-button>
-                <paper-button raised on-tap="openVerifyEmail" hidden$="[[item.mailVerified]]">Verificar correo</paper-button>
-                <paper-button raised on-tap="openDeleteUser">Eliminar</paper-button>
-              </prism-td>
-          </prism-tr>
-        </template>
-      </prism-tbody>
-    </prism-table>
     <paper-dialog id="donateDialog" class="vertical">
       <span class="font-display1">Beneficios</span>
       <span>Selecciona el beneficio</span>
@@ -170,14 +186,20 @@
             type:Object,
             value:()=>{
               return {
+                page: '1',
+                limit: '20',
                 email:'',
                 firstName:'',
                 lastName:'',
                 from:'',
                 to:'',
+                plusState:'a',
                 type:'a'
               }
             }
+          },
+          total: {
+            type: Number,
           },
           selectedUser:{
             type:String,
@@ -205,7 +227,8 @@
           }
         }
       }
-      _onSearch(){
+      _onSearch(e){
+
         let purgedQuery = Object.keys(this.query).reduce((res,key)=>{
           //check if the value exists
           if(this.query[key]){
@@ -213,7 +236,10 @@
           }
           return res;
         },{});
-        this.dispatchEvent(new CustomEvent('search',{bubbles:false,detail:purgedQuery}));
+        if(JSON.stringify(this.lastQuery || {}) !== JSON.stringify(purgedQuery)){
+          this.dispatchEvent(new CustomEvent('search',{bubbles:false,detail:purgedQuery}));
+          this.lastQuery = purgedQuery;
+        }
       }
       openDonate(e){
         let id = e.model.__data.item.id;

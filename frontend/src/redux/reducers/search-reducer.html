@@ -18,7 +18,7 @@ const auditsSearch = (state,action)=>{
 const userSearch = (state,action)=>{
   switch (action.type) {
     case 'LOAD_USERS':
-      return Object.assign({},state,{entities:action.users});
+      return Object.assign({},state,{entities:action.users, total: action.total});
       break;
     case 'UPDATE_USER':
       var newSelectedUser=Object.assign({},state.selectedUser,action.updates);
