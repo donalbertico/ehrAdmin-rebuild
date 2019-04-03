@@ -1,101 +1,93 @@
-var ObjectID = require('mongodb').ObjectID;
-
-function parseQuery(inputs){
-  var query={};
-  if(inputs.id){
-    query.shortId = inputs.id;
-    // query.shortId = {'$regex':`.*${inputs.id}.*`};
+function parseQuery (inputs) {
+  var query = {}
+  if (inputs.id) {
+    query.shortId = inputs.id
   }
-  if(inputs.title){
-    query.title=inputs.title;
-    // query.title={'$regex':`.*${inputs.title}.*`};
+  if (inputs.title) {
+    query.title = { contains: inputs.title }
   }
-  if(inputs.state !== 'a'){
-    query.state = inputs.state;
+  if (inputs.state !== 'a') {
+    query.state = inputs.state
   }
-  // if (inputs.from && inputs.to) {
-  //   query.lastPublishedDate = {'$gte' : inputs.from, '$lt' : inputs.to};
-  // }
+  if (inputs.propType) {
+    query.type = inputs.propType
+  }
   if (inputs.from && inputs.to) {
-    query.lastPublishedDate = {'>' : inputs.from, '<' : inputs.to};
+    query.lastPublishedDate = { '>': inputs.from, '<': inputs.to }
   }
-  if(Object.keys(query).length<1){
-    return null;
+  if (Object.keys(query).length < 1) {
+    return null
   }
-  return query;
+  return query
 }
 
 module.exports = {
 
-
   friendlyName: 'Search users',
-
 
   description: 'Search users that have filelds like the inputs',
 
-
   inputs: {
-    id:{
-      type:'string'
+    id: {
+      type: 'string'
     },
-    title:{
-      type:'string'
+    title: {
+      type: 'string'
     },
-    state:{
-      type:'string'
+    state: {
+      type: 'string'
     },
-    from:{
-      type:'number'
+    from: {
+      type: 'number'
     },
-    to:{
-      type:'number'
+    to: {
+      type: 'number'
     },
+    propType: {
+      type: 'string'
+    },
+    page: {
+      type: 'number'
+    },
+    limit: {
+      type: 'number'
+    }
   },
-
 
   exits: {
-    error:{
-      statusCode:500
+    error: {
+      statusCode: 500
     },
-    success:{
-      statusCode:200
+    success: {
+      statusCode: 200
     },
-    conflict:{
-      statusCode:409
+    conflict: {
+      statusCode: 409
     }
   },
 
-
   fn: function (inputs, exits) {
-    var query=parseQuery(inputs);
-    if(!query){
-      query={};
+    var query = parseQuery(inputs)
+    if (!query) {
+      query = {}
     }
-    Property.find(query).populate('owner').exec((err,props)=>{
-      console.log(err);
-      if(err) return exits.error({message:'server_error'});
-      props=props.map((item)=>{
-        if(item.publishedDates.length > 1){
-          item.state = 'r';
-        }
-        return item;
-      });
-      return exits.success(props);
-    });
-    // var col = User.getDatastore().manager.collection('property');
-    // col.find(query).sort({'lastPublishedDate' : -1}).toArray((err,props)=>{
-    //   if(err){
-    //     return exits.error({message:'server_error'});
-    //   }
-    //   props=props.map((item)=>{
-    //     item.id=item._id.toHexString();
-    //     delete item._id;
-    //     if(item.publishedDates.length > 1){
-    //       item.state = 'r';
-    //     }
-    //     return item;
-    //   });
-    //   return exits.success(props);
-    // });
+    const limit = inputs.limit || 20
+    const skip = (inputs.page - 1) * limit
+    Property.count(query).exec((err, count) => {
+      if (err) return exits.error({ message: 'server_error' })
+      Property.find(query).limit(limit).skip(skip).populate('owner').exec((err, props) => {
+        if (err) return exits.error({ message: 'server_error' })
+        props = props.map((item) => {
+          if (item.state === 'v') {
+            item.isPublished = true
+          }
+          if (item.publishedDates.length > 1) {
+            item.state = 'r'
+          }
+          return item
+        })
+        return exits.success({ props, total: count })
+      })
+    })
   }
-};
+}

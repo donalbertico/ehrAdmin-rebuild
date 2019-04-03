@@ -1,0 +1,301 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/prism-table/prism-data-table.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+
+<link rel="import" href="../elements/page-selector.html">
+
+
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="props-section">
+  <template>
+    <style include="shared-styles">
+      :host{
+        @apply --layout-vertical;
+        height: 100vh;
+      }
+      .filters{
+        background-color: var(--light-primary-color);
+      }
+      div.benefits{
+        width: 25rem;
+      }
+      div.no-shrink {
+        flex-shrink: 0;
+      }
+      div.loading-overlay{
+        position: absolute;
+        background-color: rgba(0,0,0,0.55);
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+      }
+    </style>
+    <div class="vertical no-shrink">
+      <div class="loading-overlay" hidden="[[!loading]]">
+        <paper-spinner active></paper-spinner>
+      </div>
+      <div class="p1 dark-primary horizontal">
+        <span class="font-display1">Propiedades</span>
+        <div class="flex"></div>
+        <div class="vertical">
+          <b>
+            Total : [[propStats.total]]
+          </b>
+          <span class="stat">
+            Pendientes : [[propStats.pendent]]
+          </span>
+          <span class="stat">
+            No publicadas : [[propStats.noPublish]]
+          </span>
+          <span class="stat">
+            Publicadas : [[propStats.published]]
+          </span>
+        </div>
+      </div>
+      <div class="filters vertical p1">
+        <span class="font-title">Filtros</span>
+        <div class="horizontal">
+          <paper-input class="m1-r" label="Id" value="{{query.id}}"></paper-input>
+          <paper-input class="m1-r" label="Título" value="{{query.title}}"></paper-input>
+          <paper-dropdown-menu label="Estado" class="m1-r">
+            <paper-listbox slot="dropdown-content" attr-for-selected="state" selected="{{query.state}}">
+              <paper-item state="a">Todo</paper-item>
+              <paper-item state="v">Publicada</paper-item>
+              <paper-item state="n">No publicada</paper-item>
+              <paper-item state="p">Pendiente</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu label="Tipo">
+            <paper-listbox slot="dropdown-content" attr-for-selected="type" selected="{{query.propType}}">
+              <paper-item type="all">Todos</paper-item>
+              <paper-item type="rro">[[localize('type','type','rro')]]</paper-item>
+              <paper-item type="rsr">[[localize('type','type','rsr')]]</paper-item>
+              <paper-item type="hih">[[localize('type','type','hih')]]</paper-item>
+              <paper-item type="hth">[[localize('type','type','hth')]]</paper-item>
+              <paper-item type="dde">[[localize('type','type','dde')]]</paper-item>
+              <paper-item type="ddu">[[localize('type','type','ddu')]]</paper-item>
+              <paper-item type="dpe">[[localize('type','type','dpe')]]</paper-item>
+              <paper-item type="dsu">[[localize('type','type','dsu')]]</paper-item>
+              <paper-item type="dlo">[[localize('type','type','dlo')]]</paper-item>
+              <paper-item type="lfa">[[localize('type','type','lfa')]]</paper-item>
+              <paper-item type="lla">[[localize('type','type','lla')]]</paper-item>
+              <paper-item type="cof">[[localize('type','type','cof')]]</paper-item>
+              <paper-item type="cse">[[localize('type','type','cse')]]</paper-item>
+              <paper-item type="cst">[[localize('type','type','cst')]]</paper-item>
+              <paper-item type="cga">[[localize('type','type','cga')]]</paper-item>
+              <paper-item type="cba">[[localize('type','type','cba')]]</paper-item>
+              <paper-item type="tsm">[[localize('type','type','tsm')]]</paper-item>
+              <paper-item type="tdb">[[localize('type','type','tdb')]]</paper-item>
+              <paper-item type="ths">[[localize('type','type','ths')]]</paper-item>
+              <paper-item type="tma">[[localize('type','type','tma')]]</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+        <div class="horizontal">
+          <vaadin-date-picker name="from" class="m1-r" label="Desde" value="{{query.from}}"></vaadin-date-picker>
+          <vaadin-date-picker name="to" class="m1-r" label="Hasta" value="{{query.to}}"></vaadin-date-picker>
+          <div class="flex"></div>
+          <paper-button raised class="accent self-center" on-click="searchProps" id="searchButton">Buscar</paper-button>
+        </div>
+      </div>
+      <div class="horizontal">
+        <span class="m1 font-title flex">[[total]] Resultados</span>
+        <page-selector page="{{query.page}}" limit="{{query.limit}}" total="[[total]]"></page-selector>
+      </div>
+      <div class="vertical">
+        <prism-table>
+            <prism-thead>
+                <prism-tr>
+                    <prism-th>Id</prism-th>
+                    <prism-th>Fecha</prism-th>
+                    <prism-th>Titulo</prism-th>
+                    <prism-th>Estado</prism-th>
+                    <prism-th>Usuario</prism-th>
+                    <prism-th>Ciudad</prism-th>
+                    <prism-th>Acción</prism-th>
+                </prism-tr>
+            </prism-thead>
+            <prism-tbody>
+              <template is="dom-repeat" items="[[props]]" index-as="index">
+                <prism-tr>
+                    <prism-td title="Id"><a id="[[item.id]]" href="/account/prop/[[item.id]]" on-click="loadProp">[[item.shortId]]</a></prism-td>
+                    <template is="dom-if" if="[[item.lastPublishedDate]]" restamp="true">
+                      <prism-td title="Fecha">[[localize('date','value',item.lastPublishedDate)]]</prism-td>
+                    </template>
+                    <template is="dom-if" if="[[!item.lastPublishedDate]]" restamp="true">
+                      <prism-td title="Fecha">[[localize('date','value',item.createdAt)]]</prism-td>
+                    </template>
+                    <prism-td title="Nombre">[[item.title]]</prism-td>
+                    <prism-td title="Estado">[[localize('state','value',item.state)]]</prism-td>
+                    <prism-td title="Usuario">
+                      <a id="[[item.owner.id]]" href="/account/user/[[item.owner.id]]" on-click="loadUser">[[item.owner.email]]</a>
+                    </prism-td>
+                    <prism-td title="Ciudad">[[item.city]]</prism-td>
+                    <prism-td title="Accion">
+                      <template is="dom-if" if="[[!item.shared]]" restamp="true">
+                        <paper-button id="[[item.id]]" class="accent" raised on-tap="shareFacebook">Compartir</paper-button>
+                      </template>
+                      <template is="dom-if" if="[[item.isPublished]]" restamp>
+                        <paper-button id="[[item.id]]" raised on-tap="setUnpublishProp">Dejar de publicar</paper-button>
+                      </template>           
+                      <paper-button id="[[item.id]]" raised on-tap="setDeleteProp">Eliminar</paper-button>
+                    </prism-td>
+                </prism-tr>
+              </template>
+            </prism-tbody>
+        </prism-table>
+      </div>
+    </div>
+    <paper-dialog id="propDelete" class="vertical">
+      <span class="font-display1">Eliminando propiedad</span>
+      <span>Estas seguro que deseas eliminar esta propiedad</span>
+      <div class="horizontl self-end">
+        <paper-button on-tap="deleteProp">Eliminar</paper-button>
+        <paper-button on-tap="closeDeleteDialog">Cancelar</paper-button>
+      </div>
+    </paper-dialog>
+    <paper-dialog id="propUnpublish" class="vertical">
+      <span class="font-display1">Dejar de publicar propiedad</span>
+      <span>Estas seguro que deseas dejar de publicar esta propiedad</span>
+      <div class="horizontl self-end">
+        <paper-button on-tap="unPublishProp">Dejar de publicar</paper-button>
+        <paper-button on-tap="closeUnpublishDialog">Cancelar</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+    class PropsSection extends SearchMixin(GlobalStoreMixin(Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior],Polymer.Element))) {
+      static get is(){
+        return 'props-section';
+      }
+      static get properties(){
+        return {
+          props:{
+            type:Array,
+            statePath: 'search.props.entities'
+          },
+          query:{
+            type:Object,
+            value:()=>{
+              return {
+                id:null,
+                state:'a',
+                title:null,
+                page: '1',
+                limit: 20,
+              }
+            }
+          },
+          propStats:{
+            type: Object,
+            statePath:'search.props.stats'
+          },
+          total: {
+            type: Number,
+            statePath: 'search.props.total'
+          },
+          language: {
+            type: String,
+            value: 'es',
+          },
+          propToDelete: {
+            type: String,
+            value: null
+          },
+          propToUnpublish: {
+            type: String,
+            value: null
+          },
+          loading: {
+            type: Boolean,
+            value: false,
+          },
+          resources: {
+            value: () => ({
+              'es': {
+                'date' : '{value,date,medium}',
+                'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                'state' : '{value,select, p {pendiente} r {renovada} v {publicada} n {no puclicada} e {expirada}}',
+              },
+              'en': {
+                'date' : '{value,date,medium}',
+                'type':'{type , select, rro {Habitación} rrs {Habitación compartida} hih {Casa Independiente} ddu {Departamento Duplex}hth {Casa Adosada/Junta} dde {Departamento} dpe {Penthouse} dsu {Suite} dlo {Loft} lfa {Quinta/Hacienda} lla {Terreno} cof{Oficina} cse {Local Comercial} cst {Bodega} cga{Garage} cba {Galpon} rsr {Habitación Compartida} tsm {Habitación de Hotel Simple} tdb {Habitación de Hotel doble} ths {Suite de Hotel} tma {Habitacion de Hotel matrimonial} other{}}',
+                'state' : '{value,select, p {Pendiente} r {Renovada} v {Publicada} n {No puclicada} e {Expirada}}',
+              }
+            })
+          }
+        }
+      }
+
+      searchProps(){  
+        this.loading = true;
+        var query= {};
+        Object.keys(this.query).forEach((key)=>{
+          if(this.query[key]){
+            query[key]=this.query[key];
+          }
+        });
+        if(query.from && query.to){
+          query.from = new Date(query.from).getTime();
+          query.to = new Date(query.to).getTime();
+        }
+        this.dispatch('searchProps',query,(e)=>{
+          if(e)return showMessage('Error en la búsqueda');
+          this.loading = false;
+          this.dispatch('loadPropsStats',(e)=>{
+          if(e)return showMessage('No pudimos obtener las estadísticas');
+        })
+        });
+      }
+      shareFacebook(e){
+        var id = e.target.id;
+        window.open('https://www.ecuadorhouserentals.com/prop/'+id);
+      }
+      setDeleteProp(e){
+        this.set('propToDelete', e.target.id);
+        this.$.propDelete.open();
+      }
+      setUnpublishProp(e){
+        this.set('propToUnpublish', e.target.id);
+        this.$.propUnpublish.open();
+      }
+      unPublishProp(e){
+        this.dispatch('unPublishProp',this.propToUnpublish,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Propiedad despublicada');
+          this.searchProps();
+          this.$.propUnpublish.close();
+        });
+      }
+      deleteProp(e){
+        this.dispatch('deleteProp',this.propToDelete,(err)=>{
+          if (err) return showMessage(err);
+          showMessage('Propiedad eliminado');
+          this.searchProps();
+          this.$.propDelete.close();
+        })
+      }
+      closeDeleteDialog(e){
+        this.$.propDelete.close();
+      }   
+      closeUnpublishDialog(e){
+        this.$.propUnpublish.close();
+      }
+      loadProp(e){
+        this.dispatch('loadSingleProp',e.target.id);
+      }
+    }
+    customElements.define(PropsSection.is,PropsSection);
+  </script>
+</dom-module>
